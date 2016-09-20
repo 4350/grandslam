@@ -97,30 +97,30 @@ optimize1FnCond <- function(params, u, cluster) {
 }
 
 # TESTING OF LOG LIKELIHOOD FNs ----
-params <- c(5, 1, 0.03, 0.96)
-u <- sapply(garch.fit, function(f) f$u)
-
-kNumCores <- detectCores() - 1
-cluster <- makeCluster(kNumCores)
-clusterEvalQ(cluster, library(ghyp))
-clusterExport(cluster, "marginalLogLikelihood")
-clusterExport(cluster, "jointLogLikelihood")
-clusterExport(cluster, "dc.shocks")
-clusterExport(cluster, "dc.shocks.std")
-clusterExport(cluster, "dc.Q")
-clusterExport(cluster, "dc.Omega")
-clusterExport(cluster, "dc.Correlation")
-
-# Start the clock!
-ptm <- proc.time()
-optimize1FnCond(params, u, cluster)
-proc.time() - ptm
-
-ptm <- proc.time()
-optimize1Fn(params, u, cluster)
-proc.time() - ptm
-
-stopCluster(cluster)
+# params <- c(5, 1, 0.03, 0.96)
+# u <- sapply(garch.fit, function(f) f$u)
+# 
+# kNumCores <- detectCores() - 1
+# cluster <- makeCluster(kNumCores)
+# clusterEvalQ(cluster, library(ghyp))
+# clusterExport(cluster, "marginalLogLikelihood")
+# clusterExport(cluster, "jointLogLikelihood")
+# clusterExport(cluster, "dc.shocks")
+# clusterExport(cluster, "dc.shocks.std")
+# clusterExport(cluster, "dc.Q")
+# clusterExport(cluster, "dc.Omega")
+# clusterExport(cluster, "dc.Correlation")
+# 
+# # Start the clock!
+# ptm <- proc.time()
+# optimize1FnCond(params, u, cluster)
+# proc.time() - ptm
+# 
+# ptm <- proc.time()
+# optimize1Fn(params, u, cluster)
+# proc.time() - ptm
+# 
+# stopCluster(cluster)
 
 # Do Optimization ----
 # Input data

@@ -24,7 +24,7 @@ to.weekly <- function(df) {
 
 df <-
   left_join(
-    read.csv("data/source/ff_factors-daily.csv") %>% to.weekly,
+    read.csv("data/source/ff_5factors-daily.csv") %>% to.weekly,
     read.csv("data/source/ff_momentum-daily.csv") %>% to.weekly,
     by = "Date"
   ) %>%
