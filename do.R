@@ -72,7 +72,7 @@ source('func/dynamicCopula.R')
 #' @param u 
 #'
 #' @return negative log likelihood
-optimize1Fn <- function(params, u) {
+optimize1Fn <- function(params, u, cluster) {
   df <- params[1]
   skew <- rep(params[2], ncol(u))
   alpha <- params[3]
@@ -80,7 +80,7 @@ optimize1Fn <- function(params, u) {
   
   print(params)
   
-  -logLikelihood(u, df, skew, alpha, beta)
+  -totalLogLikelihood(u, df, skew, alpha, beta, cluster)
 }
 
 #' Optimize conditional log-likelihood with a single skewness parameter
@@ -113,10 +113,11 @@ clusterExport(cluster, "dc.Correlation")
 
 # Start the clock!
 ptm <- proc.time()
-
 optimize1FnCond(params, u, cluster)
+proc.time() - ptm
 
-# Stop the clock
+ptm <- proc.time()
+optimize1Fn(params, u, cluster)
 proc.time() - ptm
 
 stopCluster(cluster)
