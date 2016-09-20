@@ -124,14 +124,17 @@ dc.Q <- function(shocks.std, Omega, alpha, beta) {
 #'
 #' @return NxNxT array with unit diagonals
 #' @export
-dc.Correlation <- function(Q) {
-  T <- dim(Q)[3]
-  
-  simplify2array(lapply(seq(T), function(t) {
-    Q_t <- Q[,, t]
-    inv.sqrt <- solve(sqrt(diag(diag(Q_t))))
-    inv.sqrt %*% Q_t %*% inv.sqrt
-  }))
+dc.Correlation <- function(Q, cluster) {
+  parSapply(
+    cluster,
+    seq(dim(Q)[3]),
+    function(t) {
+      Q_t <- Q[,, t]
+      inv.sqrt <- solve(sqrt(diag(diag(Q_t))))
+      inv.sqrt %*% Q_t %*% inv.sqrt
+    },
+    simplify = "array"
+  )
 }
 
 # Log Likelihood Functions ----
@@ -175,7 +178,7 @@ jointLogLikelihood <- function(shocks, uv.dists, mv.df, mv.skew, alpha, beta, cl
   shocks.std <- dc.shocks.std(shocks, uv.dists, alpha, beta)
   Omega <- dc.Omega(shocks.std)
   Q <- dc.Q(shocks.std, Omega, alpha, beta)
-  Correlation <- dc.Correlation(Q)
+  Correlation <- dc.Correlation(Q, cluster = cluster)
   
   # Compute joint likelihood, which depends on the time-varying correlation
   # matrix
