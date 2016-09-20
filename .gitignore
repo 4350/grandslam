@@ -2,4 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+*.Rc
 data/ff-weekly.RData
+data/derived

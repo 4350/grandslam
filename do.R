@@ -7,6 +7,7 @@ library(sn)
 library(ghyp)
 library(dplyr)
 library(parallel)
+library(compiler)
 
 # Reset Workspace to just Returns Data ----
 rm(list = ls())
@@ -61,10 +62,14 @@ get.u <- function(ts) {
 }
 
 garch.fit <- lapply(garch.fit, get.u)
+u <- sapply(garch.fit, function(fit) fit$u)
+save(u, file = 'data/derived/garch5f-u.Rdata')
 
 # Dynamic Copula Estimation ----
 
-source('func/dynamicCopula.R')
+enableJIT(3)
+cmpfile('func/dynamicCopula.R')
+loadcmp('func/dynamicCopula.Rc')
 
 #' Optimize log-likelihood with a single skewness parameter
 #'
