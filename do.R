@@ -86,9 +86,26 @@ optimize1Fn <- function(params, u, cluster) {
   -totalLogLikelihood(u, df, skew, alpha, beta, cluster)
 }
 
+#' Optimize log-likelihood with free skewness parameters
+#'
+#' @param params
+#' @param u
+#' @param cluster
+#'
+#' @return
+#' @export
+#'
+#' @examples
+optimize2Fn <- function(params, u, cluster) {
+  df <- params[1]
+  skew <- params[2:(ncol(u) + 1)]
+  alpha <- tail(params, 2)[1]
+  beta <- tail(params, 1)[1]
+  
+  -totalLogLikelihood(u, df, skew, alpha, beta, cluster)
+}
+
 #' Optimize conditional log-likelihood with a single skewness parameter
-#' 
-#' @param 
 optimize1FnCond <- function(params, u, cluster) {
   df <- params[1]
   skew <- rep(params[2], ncol(u))
@@ -172,67 +189,72 @@ param.constrOptim <- constrOptim(
 
 stopCluster(cluster)
 
-# Get Correlation ----
-# get.series.Correlation <- function(eta, df, skew, alpha, beta) {
-#   zstar <- get.zstar(eta, df, skew)
-#   zstar_bar <- get.zstar_bar(zstar, alpha, beta)
-#   Omega <- get.Omega(zstar_bar)
-#   Gamma <- get.Gamma(zstar_bar, Omega, alpha, beta)
-#   Correlation <- normalize.Gamma(Gamma)
-#   Correlation
-# }
-# 
-# corr <- get.series.Correlation(
-#   eta,
-#   df = df,
-#   skew = rep(param.nlm$estimate[1], ncol(eta)),
-#   alpha = param.nlm$estimate[2],
-#   beta = param.nlm$estimate[3]
-# )
-# plot(corr[1,2,], type = 'l')
+# Perform optimization with free skewness per N ----
 
-# Other ----
+u <- sapply(garch.fit, function(f) f$u)
+params <- c(5, rep(0, ncol(u)), 0.03, 0.96)
 
-# Initial parameters: df, skew, alpha, beta
-# params <- c(5, 1, 0.03, 0.96)
-# 
-# params.optim <- optim(
-#   params,
-#   optimize1Fn,
-#   gr = NULL,
-#   eta,
-#   lower = c(3, -Inf, 0, 0),
-#   upper = c(Inf, Inf, 0.9999, 0.9999),
-#   control = list(
-#     trace = 10,
-#     maxit = 2
-#   ),
-#   method = 'SANN'
-# )
-# 
-# # Constrained optimization ----
-# ui <- rbind(
-#   c( 1,  0,  0,  0),
-#   c( 0,  0,  1,  0),
-#   c( 0,  0,  0,  1),
-#   c( 0,  0, -1, -1)
-# )
-# ci <- rbind(
-#   3,
-#   0,
-#   0,
-#   -0.9999
-# )
-# params.constrOptim <- constrOptim(
-#   params,
-#   optimize1Fn,
-#   grad = NULL,
-#   ui = ui,
-#   ci = ci,
-#   control = list(
-#     trace = 5,
-#     maxit = 1,
-#     fnscale = -1
-#   ),
-#   eta = eta
-# )
+# Prepare clusters
+kNumCores <- detectCores() - 1
+cluster <- makeCluster(kNumCores)
+clusterEvalQ(cluster, library(ghyp))
+clusterExport(cluster, "marginalLogLikelihood")
+clusterExport(cluster, "jointLogLikelihood")
+clusterExport(cluster, "dc.shocks")
+clusterExport(cluster, "dc.shocks.std")
+clusterExport(cluster, "dc.Q")
+clusterExport(cluster, "dc.Omega")
+clusterExport(cluster, "dc.Correlation")
+
+param.constrOptim <- constrOptim(
+  theta = params,
+  optimize2Fn,
+  grad = NULL,
+  u = u,
+  cluster = cluster,
+  ui = rbind(
+    c( 1,  0,  0,  0,  0,  0,  0,  0,  0),
+    c(-1,  0,  0,  0,  0,  0,  0,  0,  0),
+    
+    c( 0,  1,  0,  0,  0,  0,  0,  0,  0),
+    c( 0, -1,  0,  0,  0,  0,  0,  0,  0),
+    c( 0,  0,  1,  0,  0,  0,  0,  0,  0),
+    c( 0,  0, -1,  0,  0,  0,  0,  0,  0),
+    c( 0,  0,  0,  1,  0,  0,  0,  0,  0),
+    c( 0,  0,  0, -1,  0,  0,  0,  0,  0),
+    c( 0,  0,  0,  0,  1,  0,  0,  0,  0),
+    c( 0,  0,  0,  0, -1,  0,  0,  0,  0),
+    c( 0,  0,  0,  0,  0,  1,  0,  0,  0),
+    c( 0,  0,  0,  0,  0, -1,  0,  0,  0),
+    c( 0,  0,  0,  0,  0,  0,  1,  0,  0),
+    c( 0,  0,  0,  0,  0,  0, -1,  0,  0),
+    
+    c( 0,  0,  0,  0,  0,  0,  0,  1,  0),
+    c( 0,  0,  0,  0,  0,  0,  0,  0,  1),
+    c( 0,  0,  0,  0,  0,  0,  0, -1, -1)
+  ),
+  ci = rbind(
+    4,       # min df
+    -10,     # -(max df)
+    
+    -1,      # min skew
+    -1,      # -(max skew)
+    -1,      # min skew
+    -1,      # -(max skew)
+    -1,      # min skew
+    -1,      # -(max skew)
+    -1,      # min skew
+    -1,      # -(max skew)
+    -1,      # min skew
+    -1,      # -(max skew)
+    -1,      # min skew
+    -1,      # -(max skew)
+    
+    0,       # min alpha
+    0,       # min beta
+    -0.9999  # -(max alpha + beta)
+  ),
+  control = list(
+    trace = 6
+  )
+)
