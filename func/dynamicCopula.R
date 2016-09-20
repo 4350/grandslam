@@ -1,0 +1,258 @@
+library(ghyp)
+
+#' Compute copula shocks (non-standardized)
+#'
+#' Inverts uniform residuals using copula specific univariate distribution
+#' functions (works with ghyp)
+#' 
+#' @param u dataframe of TxN uniform residuals
+#' @param uv.dists list of univariate ghyp distributions
+#'
+#' @return TxN shocks distributed per each univariate distribution
+#' @export
+dc.shocks <- function(u, uv.dists) {
+  invert <- function(i, u, uv.dists) {
+    # Invert the univariate distribution function for the shocks of this series
+    qghyp(
+      u[, i],
+      uv.dists[[i]],
+      
+      # Be decently precise
+      method = 'splines',
+      spline.points = 100,
+      root.tool = .Machine$double.eps ^ 0.25
+    )
+  }
+  
+  parSapply(seq(ncol(u)), invert, u = u, uv.dists = uv.dists)
+}
+
+#' Recursively build the normalized shocks
+#' 
+#' Transform shocks to normalized shocks by dividing through with the
+#' diagonal of conditional "correlation" matrix (qdiag).
+#'
+#' @param shocks 
+#' @parma uv.dists
+#' @param alpha 
+#' @param beta 
+#'
+#' @return
+#' @export
+dc.shocks.std <- function(shocks, uv.dists, alpha, beta) {
+  # First off, shocks must be standardized to have mean 0 and variance 1
+  # This is accomplished by using the population moments of each respective
+  # distribution
+  shocks <- sapply(seq(ncol(shocks)), function(i) {
+    dist <- uv.dists[[i]]
+    (shocks[, i] - mean(dist)) / sqrt(vcov(dist))
+  })
+  
+  # Add an extra observation to the shocks
+  shocks <- rbind(rep(0, ncol(shocks)), shocks)
+  
+  # Series that we're building here
+  shocks.std <- shocks * NA
+  qdiag <- shocks * NA
+  qdiag[1, ] <- 1
+  
+  for (t in 2:nrow(shocks)) {
+    # Compute diagonal of q for this period according to Christoffersen
+    qdiag[t, ] <-
+      (1 - alpha - beta) * 1 +
+      beta * qdiag[t - 1, ] +
+      alpha * (shocks[t - 1, ] / qdiag[t - 1, ]) ^ 2
+    
+    # Compute normalized shock this period by dividing with diagonal
+    shocks.std[t, ] <- shocks[t, ] / sqrt(qdiag[t, ])
+  }
+  
+  # Although we computed qdiag already and could in principle save it, we
+  # just get it again when we do the real recursion
+  shocks.std[-1, ]
+}
+
+#' Estimate Omega (aka S) as the expectation of the standardized shocks
+#'
+#' This follows Aielli (2009) and Christoffersen (2012)
+#'
+#' @param shocks.std copula shocks divided by diagonal of Q_t
+#'
+#' @export
+dc.Omega <- function(shocks.std) {
+  Omega <- matrix(0, ncol(shocks.std), ncol(shocks.std))
+  for (t in 1:nrow(shocks.std)) {
+    Omega = Omega + (shocks.std[t, ] %*% t(shocks.std[t, ]))
+  }
+  
+  Omega / nrow(shocks.std)
+}
+
+#' Compute Q series according to cDCC model
+#'
+#' @param shocks.std standardized/normalized shocks
+#' @param Omega long-term expectation of Q
+#' @param alpha punch of shocks
+#' @param beta autoregressive coefficient
+#'
+#' @return NxNxT series of Q
+#' @export
+dc.Q <- function(shocks.std, Omega, alpha, beta) {
+  N <- ncol(shocks.std)
+  T <- nrow(shocks.std)
+  
+  # One extra observation for the first go
+  Q <- array(dim = c(N, N, T + 1))
+  shocks.std <- rbind(rep(0, N), shocks.std)
+  
+  # t0 observation = expectation 
+  Q[,, 1] <- Omega
+  
+  for (t in 2:(T + 1)) {
+    Q[,, t] <-
+      (1 - alpha - beta) * Omega +
+      beta * Q[,, t - 1] +
+      alpha * (shocks.std[t - 1, ] %*% t(shocks.std[t - 1, ]))
+  }
+  
+  Q[,, -1]
+}
+
+#' Standardize Q to a correlation series
+#'
+#' @param Q NxNxT matrix
+#'
+#' @return NxNxT array with unit diagonals
+#' @export
+dc.Correlation <- function(Q) {
+  N <- dim(Q)[1]
+  T <- dim(Q)[3]
+  
+  Psi <- Q * NA
+  for (t in seq(T)) {
+    for (i in seq(N)) {
+      for (j in seq(N)) {
+        Psi[i, j, t] <- Q[i, j, t] / sqrt(Q[i, i, t] * Q[j, j, t])
+      }
+    }
+  }
+  
+  Psi
+}
+
+# Log Likelihood Functions ----
+
+#' Computes the joint log likelihood under the DCC model
+#' 
+#' @param shocks shocks distributed according to uv.dists
+#' @param list of distributions for shocks
+#' @param mv.df degrees of freedom for the joint distribution
+#' @param mv.skew skewness params for the joint distribution
+#' @param alpha for DCC (shock)
+#' @param beta for DCC (persistence)
+#' 
+#' @return T-vector of log likelihood of the joint distribution
+#' @export
+jointLogLikelihood <- function(shocks, uv.dists, mv.df, mv.skew, alpha, beta) {
+  shocks.std <- dc.shocks.std(shocks, uv.dists, alpha, beta)
+  Omega <- dc.Omega(shocks.std)
+  Q <- dc.Q(shocks.std, Omega, alpha, beta)
+  Correlation <- dc.Correlation(Q)
+  
+  # Compute joint likelihood, which depends on the time-varying correlation
+  # matrix
+  sapply(seq(nrow(shocks)), function(t) {
+    # Use this period's correlation
+    mv.dist <- student.t(
+      nu = mv.df,
+      mu = rep(0, ncol(shocks)),
+      sigma = Correlation[,, t],
+      gamma = mv.skew
+    )
+    
+    dghyp(shocks[t, ], mv.dist, logvalue = T)
+  })
+}
+
+#' Computes the normal log likelihood for uniform residuals and parameters
+#' 
+#' @param u uniform residuals
+#' @param df degrees of freedom in t-distributions
+#' @param skewness N-vector of skewness in t-distributions
+#' @param alpha DCC alpha (shocks)
+#' @param beta DCC beta (persistence)
+#' 
+#' @return total log likelihood
+#' @export
+totalLogLikelihood <- function(u, df, skew, alpha, beta) {
+  # Build univariate distributions as they're used for the construction
+  # of our shocks; the MV distribution is built for each T based on the
+  # Correlation matrix generated
+  uv.dists <- lapply(seq(ncol(u)), function(i) {
+    student.t(nu = df, gamma = skew[i])
+  })
+  shocks <- dc.shocks(u, uv.dists)
+  
+  # Compute marginal likelihoods of the shocks (taken to be generated by the
+  # univariate distributions directly, and then standardized)
+  marginalLL <- sapply(seq(ncol(u)), function(i) {
+    dghyp(shocks[, i], uv.dists[[i]], logvalue = T)
+  })
+  marginalLL <- rowSums(marginalLL)
+  
+  jointLL <- jointLogLikelihood(
+    shocks,
+    uv.dists,
+    mv.df = df,
+    mv.skew = skew,
+    alpha = alpha,
+    beta = beta
+  )
+  
+  sum(jointLL - marginalLL)
+}
+
+#' Compute conditional log likelihood from pairs in u
+#' 
+#' Efficient because only calls the inverse t-distribution function once for
+#' each residual series, rather than for each pair.
+#' 
+#' @param u uniform residuals
+#' @param df degrees of freedom
+#' @param skew N-vector of skewness parameters
+#' @param alpha
+#' @param beta
+#' 
+#' @return conditional log likelihood
+#' @export
+condLogLikelihood <- function(u, df, skew, alpha, beta) {
+  uv.dists <- lapply(seq(ncol(u)), function(i) {
+    student.t(nu = df, gamma = skew[i])
+  })
+  
+  # Precompute the shocks for efficiency
+  shocks <- dc.shocks(u, uv.dists)
+  
+  # Compute marginal likelihoods of the shocks (taken to be generated by the
+  # univariate distributions directly, and then standardized)
+  marginalLL <- sapply(seq(ncol(u)), function(i) {
+    dghyp(shocks[, i], uv.dists[[i]], logvalue = T)
+  })
+  marginalLL <- rowSums(marginalLL)
+  
+  # Compute log likelihood of each pair
+  pairs <- combn(ncol(u), 2)
+  sum(apply(pairs, 2, function(pair) {
+    jointLL <- jointLogLikelihood(
+      shocks[, pair],
+      uv.dists[pair],
+      mv.df = df,
+      mv.skew = skew[pair],
+      alpha = alpha,
+      beta = beta
+    )
+    
+    # Sklar's theorem
+    sum(jointLL - marginalLL)
+  }))
+}
