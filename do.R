@@ -6,6 +6,7 @@ library(rugarch)
 library(sn)
 library(ghyp)
 library(dplyr)
+library(parallel)
 
 # Reset Workspace to just Returns Data ----
 rm(list = ls())

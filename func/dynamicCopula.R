@@ -20,11 +20,11 @@ dc.shocks <- function(u, uv.dists) {
       # Be decently precise
       method = 'splines',
       spline.points = 100,
-      root.tool = .Machine$double.eps ^ 0.25
+      root.tol = .Machine$double.eps ^ 0.25
     )
   }
   
-  parSapply(seq(ncol(u)), invert, u = u, uv.dists = uv.dists)
+  sapply(seq(ncol(u)), invert, u = u, uv.dists = uv.dists)
 }
 
 #' Recursively build the normalized shocks
