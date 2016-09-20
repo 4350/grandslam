@@ -78,8 +78,6 @@ optimize1Fn <- function(params, u, cluster) {
   alpha <- params[3]
   beta <- params[4]
   
-  print(params)
-  
   -totalLogLikelihood(u, df, skew, alpha, beta, cluster)
 }
 
@@ -92,7 +90,6 @@ optimize1FnCond <- function(params, u, cluster) {
   alpha <- params[3]
   beta <- params[4]
   
-  print(params)
   -condLogLikelihood(u, df, skew, alpha, beta, cluster)
 }
 
@@ -124,12 +121,13 @@ optimize1FnCond <- function(params, u, cluster) {
 
 # Do Optimization ----
 # Input data
-params <- c(5, 1, 0.03, 0.96)
+params <- c(5, 0.05, 0.03, 0.96)
 u <- sapply(garch.fit, function(f) f$u)
 
 kNumCores <- detectCores() - 1
 cluster <- makeCluster(kNumCores)
 clusterEvalQ(cluster, library(ghyp))
+clusterExport(cluster, "marginalLogLikelihood")
 clusterExport(cluster, "jointLogLikelihood")
 clusterExport(cluster, "dc.shocks")
 clusterExport(cluster, "dc.shocks.std")
@@ -139,27 +137,31 @@ clusterExport(cluster, "dc.Correlation")
 
 param.constrOptim <- constrOptim(
   theta = params,
-  optimize1FnCond,
+  optimize1Fn,
   grad = NULL,
   u = u,
   cluster = cluster,
   ui = rbind(
     c( 1,  0,  0,  0),
     c(-1,  0,  0,  0),
+    c( 0,  1,  0,  0),
+    c( 0, -1,  0,  0),
     c( 0,  0,  1,  0),
     c( 0,  0,  0,  1),
     c( 0,  0, -1, -1)
   ),
   ci = rbind(
-    4,
-    -20,
-    0,
-    0,
-    -0.9999
+      4,     # min df
+    -10,     # -(max df)
+     -1,     # min skew
+     -1,     # -(max skew)
+      0,     # min alpha
+      0,     # min beta
+     -0.9999 # -(max alpha + beta)
   ),
   control = list(
     trace = 5,
-    maxit = 10
+    maxit = 100
   )
 )
 
