@@ -86,26 +86,55 @@ optimize1Fn <- function(params, u) {
 #' Optimize conditional log-likelihood with a single skewness parameter
 #' 
 #' @param 
-optimize1FnCond <- function(params, u) {
+optimize1FnCond <- function(params, u, cluster) {
   df <- params[1]
   skew <- rep(params[2], ncol(u))
   alpha <- params[3]
   beta <- params[4]
   
   print(params)
-  -condLogLikelihood(u, df, skew, alpha, beta)
+  -condLogLikelihood(u, df, skew, alpha, beta, cluster)
 }
+
+# TESTING OF LOG LIKELIHOOD FNs
+params <- c(5, 1, 0.03, 0.96)
+u <- sapply(garch.fit, function(f) f$u)
+
+kNumCores <- detectCores() - 1
+cluster <- makeCluster(kNumCores)
+clusterEvalQ(cluster, library(ghyp))
+clusterExport(cluster, "jointLogLikelihood")
+clusterExport(cluster, "dc.shocks")
+clusterExport(cluster, "dc.shocks.std")
+clusterExport(cluster, "dc.Q")
+clusterExport(cluster, "dc.Omega")
+clusterExport(cluster, "dc.Correlation")
+
+optimize1FnCond(params, u, cluster)
+
+stopCluster(cluster)
 
 # Do Optimization ----
 # Input data
 params <- c(5, 1, 0.03, 0.96)
 u <- sapply(garch.fit, function(f) f$u)
 
+kNumCores <- detectCores() - 1
+cluster <- makeCluster(kNumCores)
+clusterEvalQ(cluster, library(ghyp))
+clusterExport(cluster, "jointLogLikelihood")
+clusterExport(cluster, "dc.shocks")
+clusterExport(cluster, "dc.shocks.std")
+clusterExport(cluster, "dc.Q")
+clusterExport(cluster, "dc.Omega")
+clusterExport(cluster, "dc.Correlation")
+
 param.constrOptim <- constrOptim(
   theta = params,
   optimize1FnCond,
   grad = NULL,
   u = u,
+  cluster = cluster,
   ui = rbind(
     c( 1,  0,  0,  0),
     c(-1,  0,  0,  0),
@@ -125,6 +154,8 @@ param.constrOptim <- constrOptim(
     maxit = 10
   )
 )
+
+stopCluster(cluster)
 
 # Get Correlation ----
 # get.series.Correlation <- function(eta, df, skew, alpha, beta) {
