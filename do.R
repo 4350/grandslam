@@ -96,13 +96,14 @@ optimize1FnCond <- function(params, u, cluster) {
   -condLogLikelihood(u, df, skew, alpha, beta, cluster)
 }
 
-# TESTING OF LOG LIKELIHOOD FNs
+# TESTING OF LOG LIKELIHOOD FNs ----
 params <- c(5, 1, 0.03, 0.96)
 u <- sapply(garch.fit, function(f) f$u)
 
 kNumCores <- detectCores() - 1
 cluster <- makeCluster(kNumCores)
 clusterEvalQ(cluster, library(ghyp))
+clusterExport(cluster, "marginalLogLikelihood")
 clusterExport(cluster, "jointLogLikelihood")
 clusterExport(cluster, "dc.shocks")
 clusterExport(cluster, "dc.shocks.std")
@@ -110,7 +111,13 @@ clusterExport(cluster, "dc.Q")
 clusterExport(cluster, "dc.Omega")
 clusterExport(cluster, "dc.Correlation")
 
+# Start the clock!
+ptm <- proc.time()
+
 optimize1FnCond(params, u, cluster)
+
+# Stop the clock
+proc.time() - ptm
 
 stopCluster(cluster)
 
