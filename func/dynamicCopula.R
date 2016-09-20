@@ -125,19 +125,13 @@ dc.Q <- function(shocks.std, Omega, alpha, beta) {
 #' @return NxNxT array with unit diagonals
 #' @export
 dc.Correlation <- function(Q) {
-  N <- dim(Q)[1]
   T <- dim(Q)[3]
   
-  Psi <- Q * NA
-  for (t in seq(T)) {
-    for (i in seq(N)) {
-      for (j in seq(N)) {
-        Psi[i, j, t] <- Q[i, j, t] / sqrt(Q[i, i, t] * Q[j, j, t])
-      }
-    }
-  }
-  
-  Psi
+  simplify2array(lapply(seq(T), function(t) {
+    Q_t <- Q[,, t]
+    inv.sqrt <- solve(sqrt(diag(diag(Q_t))))
+    inv.sqrt %*% Q_t %*% inv.sqrt
+  }))
 }
 
 # Log Likelihood Functions ----
