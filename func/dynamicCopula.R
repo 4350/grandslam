@@ -18,9 +18,9 @@ dc.shocks <- function(u, uv.dists, cluster) {
       uv.dists[[i]],
       
       # Be decently precise
-      method = 'splines',
-      spline.points = 100,
-      root.tol = .Machine$double.eps ^ 0.25
+      method = 'splines'
+      # spline.points = 100,
+      # root.tol = .Machine$double.eps ^ 0.25
     )
   }
   
