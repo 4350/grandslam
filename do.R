@@ -144,7 +144,7 @@ optimize1FnCond <- function(params, u, cluster) {
 # Do Optimization ----
 # Input data
 params <- c(5, 0.05, 0.03, 0.96)
-u <- sapply(garch.fit, function(f) f$u)
+load('data/derived/garch5f-u.RData')
 
 kNumCores <- detectCores() - 1
 cluster <- makeCluster(kNumCores)
@@ -191,7 +191,7 @@ stopCluster(cluster)
 
 # Perform optimization with free skewness per N ----
 
-u <- sapply(garch.fit, function(f) f$u)
+load('data/derived/garch5f-u.RData')
 params <- c(5, rep(0, ncol(u)), 0.03, 0.96)
 
 # Prepare clusters
@@ -258,3 +258,5 @@ param.constrOptim <- constrOptim(
     trace = 6
   )
 )
+
+stopCluster(cluster)
