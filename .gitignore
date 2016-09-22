@@ -5,3 +5,4 @@
 *.Rc
 data/ff-weekly.RData
 data/derived
+output
