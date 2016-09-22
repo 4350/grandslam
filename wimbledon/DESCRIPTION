@@ -1,0 +1,14 @@
+Package: wimbledon
+Title: Master's thesis functions
+Version: 0.0.0.9000
+Authors@R: c(
+  person("Victor", "Andrée", email = "22584@student.hhs.se", role = c("aut", "cre")),
+  person("Gustaf", "Patrikson", email = "22107@student.hhs.se", role = c("aut", "cre"))
+  )
+Description: Functions for the Master's thesis, used by scripts in the thesis
+Depends: R (>= 3.3.1)
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports:
+  ghyp
