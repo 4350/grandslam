@@ -1,5 +1,7 @@
-#' Load daily factors return data and save weekly log returns to
-#'  `data/ff-weekly.RData`
+#' Load daily factors return data and save weekly log returns
+#' in two different data sets,
+#' 1) full data set (1963-) weekly-full.RData
+#' 2) estimation data set (1963-2010)`weekly-estim.RData
 
 # Load Libraries ----
 library(dplyr)
@@ -28,11 +30,13 @@ df <-
     read.csv("data/source/ff_momentum-daily.csv") %>% to.weekly,
     by = "Date"
   ) %>%
-  
-  # Filter to Christoffersen & Langlois sample
+  select(-RF)
+
+# Create two data sets, one for full period and one for estimation window (1963-2010)
+df.estim <- df %>%
   filter(Date >= '1963-07-05' & Date <= '2010-12-31')
 
-# Save this for later loading
-save(df, file = "data/ff-weekly.RData")
+# Save for later loading
+save(df, file = "data/derived/weekly-full.RData")
+save(df.estim, file = "data/derived/weekly-estim.RData")
 rm(to.weekly)
-
