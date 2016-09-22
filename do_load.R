@@ -32,11 +32,34 @@ df <-
   ) %>%
   select(-RF)
 
-# Create two data sets, one for full period and one for estimation window (1963-2010)
+# Create two weekly data sets, one for full period and one for estimation window (1963-2010)
 df.estim <- df %>%
-  filter(Date >= '1963-07-05' & Date <= '2010-12-31')
+  dplyr::filter(Date >= '1963-07-05' & Date <= '2010-12-31')
 
 # Save for later loading
 save(df, file = "data/derived/weekly-full.RData")
 save(df.estim, file = "data/derived/weekly-estim.RData")
 rm(to.weekly)
+
+# Create two daily data sets, one for full period and one for estimation window (1963-2010)
+
+df <-
+  left_join(
+    read.csv("data/source/ff_5factors-daily.csv"),
+    read.csv("data/source/ff_momentum-daily.csv"),
+    by = "Date"
+  ) %>%
+  select(-RF)
+
+df <- df %>%
+  mutate(
+    # Convert Date into proper Date
+    Date = as.Date(as.character(Date), format = "%Y%m%d")
+  )
+
+df.estim <- df %>%
+  dplyr::filter(Date >= '1963-07-05' & Date <= '2010-12-31')
+
+# Save for later loading
+save(df, file = "data/derived/daily-full.RData")
+save(df.estim, file = "data/derived/daily-estim.RData")
