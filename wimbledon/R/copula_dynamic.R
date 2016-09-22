@@ -187,12 +187,19 @@ dc.ll.joint <- function(shocks, dist.params, Correlation, cluster) {
   }
   
   symmetricTfn <- function(t, shocks, params, Correlation) {
-    dist <- ghyp::student.t(nu = params$df, sigma = Correlation[,, t])
+    dist <- ghyp::student.t(
+      nu = params$df,
+      mu = rep(0, ncol(shocks)),
+      sigma = Correlation[,, t]
+    )
     ghyp::dghyp(shocks[t, ], dist, logvalue = T)
   }
   
   gaussianFn <- function(t, shocks, params, Correlation) {
-    dist <- ghyp::gauss(sigma = Correlation[,, t])
+    dist <- ghyp::gauss(
+      mu = rep(0, ncol(shocks)),
+      sigma = Correlation[,, t]
+    )
     ghyp::dghyp(shocks[t, ], dist, logvalue = T)
   }
   
