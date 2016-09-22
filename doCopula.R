@@ -21,7 +21,10 @@ rm(dfWeekly.u)
 
 enableJIT(3)
 cmpfile('func/dynamicCopula.R')
+cmpfile('func/dghsstx.R')
+loadcmp('func/dghsstx.Rc')
 loadcmp('func/dynamicCopula.Rc')
+
 
 prepareCluster <- function() {
   cluster <- makeCluster(detectCores() - 1)
@@ -33,6 +36,8 @@ prepareCluster <- function() {
   clusterExport(cluster, "dc.Q")
   clusterExport(cluster, "dc.Omega")
   clusterExport(cluster, "dc.Correlation")
+  clusterExport(cluster, "besselM3")
+  clusterExport(cluster, "dghsstx")
   cluster
 }
 
@@ -105,7 +110,23 @@ stopCluster(cluster)
 
 # These parameters break qghyp if one uses a low tolerance because there are
 # no roots in the intervals it looks at...
-params <- c(9, rep(0, 6), 0.03, 0.96)
+#
+# Note: The specialized multivariate density function does not work for
+# symmetric t; so don't try gamma = 0
+params <- c(15, rep(0.10, 6), 0.03, 0.96)
+
+# Best params as of 2016-09-21 for df (8-12), gamma (-0.20-0.20)
+params <- c(
+  10.796258944,
+  0.035832769,
+  -0.184606557,
+  0.009726851,
+  0.084787508,
+  -0.036544851,
+  -0.152462968,
+  0.067887334,
+  0.912931257
+)
 # params <- c(5.53417002054087, 0.0218613978265847, -0.0141872411754378, 
 #             -0.133528167821921, -0.0160852945932761, 0.0621979871082812, 
 #             0.00687898447016727, 0.0378971855489661, 0.956425966391781)
@@ -141,23 +162,23 @@ param.constrOptim <- constrOptim(
     c( 0,  0,  0,  0,  0,  0,  0, -1, -1)
   ),
   ci = rbind(
-    8,       # min df
-    -12,     # -(max df)
+    6,       # min df
+    -20,     # -(max df)
     
     # SMB daily cannot handle skew = 0.50 -- which seems like a large value
     # from looking at Christoffersen; constrain hard
-    -0.15,      # min skew
-    -0.15,      # -(max skew)
-    -0.15,      # min skew
-    -0.15,      # -(max skew)
-    -0.15,      # min skew
-    -0.15,      # -(max skew)
-    -0.15,      # min skew
-    -0.15,      # -(max skew)
-    -0.15,      # min skew
-    -0.15,      # -(max skew)
-    -0.15,      # min skew
-    -0.15,      # -(max skew)
+    -0.25,      # min skew
+    -0.25,      # -(max skew)
+    -0.25,      # min skew
+    -0.25,      # -(max skew)
+    -0.25,      # min skew
+    -0.25,      # -(max skew)
+    -0.25,      # min skew
+    -0.25,      # -(max skew)
+    -0.25,      # min skew
+    -0.25,      # -(max skew)
+    -0.25,      # min skew
+    -0.25,      # -(max skew)
     
     0,       # min alpha
     0,       # min beta
@@ -165,7 +186,7 @@ param.constrOptim <- constrOptim(
   ),
   control = list(
     trace = 6,
-    maxit = 500
+    maxit = 1000
   )
 )
 proc.time() - ptc

@@ -11,7 +11,7 @@ library(ghyp)
 #' @return TxN shocks distributed per each univariate distribution
 #' @export
 dc.shocks <- function(u, uv.dists, cluster) {
-  invert <- function(i) {
+  invert <- function(i, uv.dists) {
     # Invert the univariate distribution function for the shocks of this series
     qghyp(
       u[, i],
@@ -24,7 +24,7 @@ dc.shocks <- function(u, uv.dists, cluster) {
     )
   }
   
-  parSapply(cluster, seq(ncol(u)), invert)
+  parSapply(cluster, seq(ncol(u)), invert, uv.dists = uv.dists)
 }
 
 #' Recursively build the normalized shocks
@@ -184,17 +184,25 @@ jointLogLikelihood <- function(shocks, uv.dists, mv.df, mv.skew, alpha, beta, cl
     # This period's correlation
     # Call internal multivariate distribution function directly saves
     # *a lot* of time (50%)
-    val = unname(as.vector(
-      ghyp:::.dghypmv(
+
+    unname(as.vector(
+      dghsstx(
         rbind(shocks[t, ]),
         lambda = -mv.df / 2,
         chi = mv.df - 2,
-        psi = 0,
-        mu = rep(0, ncol(shocks)),
-        sigma  = Correlation[,, t],
-        gamma = mv.skew,
-        logvalue = T
+        sigma = Correlation[,, t],
+        gamma = mv.skew
       )
+      # ghyp:::.dghypmv(
+      #   rbind(shocks[t, ]),
+      #   lambda = -mv.df / 2,
+      #   chi = mv.df - 2,
+      #   psi = 0,
+      #   mu = rep(0, ncol(shocks)),
+      #   sigma  = Correlation[,, t],
+      #   gamma = mv.skew,
+      #   logvalue = T
+      # )
     ))
   }
 
