@@ -60,6 +60,7 @@ df <- df %>%
 df.estim <- df %>%
   dplyr::filter(Date >= '1963-07-05' & Date <= '2010-12-31')
 
+
 # Save for later loading
 save(df, file = "data/derived/daily-full.RData")
 save(df.estim, file = "data/derived/daily-estim.RData")
