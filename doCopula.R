@@ -4,16 +4,18 @@
 library(ghyp)
 library(dplyr)
 library(parallel)
-library(rugarch)
 library(compiler)
 
 
 # Reset Workspace ----
 rm(list = ls())
+load('data/derived/GARCHunifres.RData')
+u <- dfWeekly.u[, -1]
+rm(dfWeekly.u)
 # load('data/derived/GARCHunifres.RData')
 # u <- as.matrix(dfDaily.u[, -1])
 # rm(dfDaily.u)
-load('data/derived/garch5f-u.Rdata')
+# load('data/derived/garch5f-u.Rdata')
 
 # Optimization Boilerplate ----
 
@@ -40,7 +42,6 @@ optimize2Fn <- function(params, u, cluster) {
   skew <- params[2:(ncol(u) + 1)]
   alpha <- tail(params, 2)[1]
   beta <- tail(params, 1)[1]
-  print(params)
   
   -totalLogLikelihood(u, df, skew, alpha, beta, cluster)
 }
@@ -116,7 +117,7 @@ param.constrOptim <- constrOptim(
   theta = params,
   optimize2Fn,
   grad = NULL,
-  u = head(u, 500),
+  u = u,
   cluster = cluster,
   ui = rbind(
     c( 1,  0,  0,  0,  0,  0,  0,  0,  0),
