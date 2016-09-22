@@ -1,4 +1,4 @@
-"besselM3" <- function(lambda = 9/2, x = 2, logvalue = FALSE) {
+".besselM3" <- function(lambda = 9/2, x = 2, logvalue = FALSE) {
   if(all(abs(lambda) == 0.5)){
     ## Simplified expression in case lambda == 0.5
     if (!logvalue){
@@ -16,17 +16,18 @@
   return(res)
 }
 
-#' Specialized multivariate distribution function
+#' Special multivariate density function for asymmetric t-distribution
 #' 
-#' Appropriate only if mu = 0 and x is already a row vector-matrix. Takes about
-#' 50% the speed of regular dghypmv
-#'
-#' @param x 
-#' @param lambda -nu/2
-#' @param chi nu - 2
-#' @param sigma regular sigma
-#' @param gamma regular gamma
-dghsstx <- function(x, lambda, chi, sigma, gamma) {
+#' Calling this function directly instead of going through dghyp shaves about
+#' 500 milliseconds per run (for big T). It skips most error checking, assumes
+#' mu = 0
+#' 
+#' Code copied from internal dghypmv and stripped of essentially all error
+#' checking.
+dghsst <- function(x, nu, gamma, sigma) {
+  lambda = -nu / 2
+  chi = nu - 2
+  
   d <- dim(x)[2]
   n <- dim(x)[1]
   
@@ -46,7 +47,7 @@ dghsstx <- function(x, lambda, chi, sigma, gamma) {
   log.const.bottom <- d / 2 * log(2 * pi) + 0.5 * log(det.sigma) +
     lgamma(-lambda) - (lambda + 1) * log(2)
   log.top <-
-    besselM3(lambda.min.d.2, interm, logvalue = TRUE) +
+    .besselM3(lambda.min.d.2, interm, logvalue = TRUE) +
     skewness.scaled
   log.bottom <- -lambda.min.d.2 * log(interm)
   
