@@ -33,9 +33,9 @@ thCorrelationList = list()
 for (value in factors.value) {
   
   # Get three statistics sets
-  correlations <- factor.apply(factors.all, value, 'coef', df.estim, 1)
-  lb <- factor.apply(factors.all, value, 'lb', df.estim, 1)
-  ub <- factor.apply(factors.all, value, 'ub', df.estim, 1)
+correlations <- correlations.factor.apply(factors.all, value, 'coef', df.estim, 1)
+  lb <- correlations.factor.apply(factors.all, value, 'lb', df.estim, 1)
+  ub <- correlations.factor.apply(factors.all, value, 'ub', df.estim, 1)
   
   # Consolidate and order data frame
   out.df <- data.frame(qs = seq(0.10, 0.90, by = 0.01), correlations, lb = lb[, 'value'], ub = ub[, 'value'])
@@ -46,7 +46,7 @@ for (value in factors.value) {
 }
 
 # Do plots for every factor's data frame of threshold correlations vs all other factors
-plots <- lapply(thCorrelationList, plotTHC)
+plots <- lapply(thCorrelationList, correlations.plot.threshold)
 
 # Arrange and save plots
 g <- grid.arrange(
@@ -74,9 +74,9 @@ rollingCorrelationList = list()
 for (value in factors.value) {
   
   # Get three statistics sets
-  correlations <- factor.apply(factors.all, value, 'coef', df.estim, 0)
-  lb <- factor.apply(factors.all, value, 'lb', df.estim, 0)
-  ub <- factor.apply(factors.all, value, 'ub', df.estim, 0)
+  correlations <- correlations.factor.apply(factors.all, value, 'coef', df.estim, 0)
+  lb <- correlations.factor.apply(factors.all, value, 'lb', df.estim, 0)
+  ub <- correlations.factor.apply(factors.all, value, 'ub', df.estim, 0)
   
   # Consolidate and order data frame
   out.df <- data.frame(Date = tail(df.estim$Date, (dim(df.estim)[1]-250+1)), 
@@ -92,7 +92,7 @@ for (value in factors.value) {
 }
 
 # Do plots for every factor's data frame of threshold correlations vs all other factors
-plots <- lapply(rollingCorrelationList, plotRC)
+plots <- lapply(rollingCorrelationList, correlations.plot.rolling)
 
 # Arrange and save plots
 g <- grid.arrange(

@@ -19,18 +19,18 @@ load('data/derived/weekly-full.Rdata')
 load_all('wimbledon')
 
 # Descriptive statistics tables ---
-summaryTable(df, 'Full')
-summaryTable(df.estim, 'Estim')
+summary.table(df, 'Full')
+summary.table(df.estim, 'Estim')
 
 # Marginal plots ----
 varlist = list('Mkt.RF','HML','SMB','Mom','RMW','CMA')
 
 lapply(varlist,
-       function(varlist) statPlots(df, 'Full', varlist))
+       function(varlist) summary.plots(df, 'Full', varlist))
 
 lapply(varlist,
-       function(varlist) statPlots(df.estim, 'Estim', varlist))
+       function(varlist) summary.plots(df.estim, 'Estim', varlist))
 
 # Cumulative plots
-cumretPlots(df, 'Full')
-cumretPlots(df.estim, 'Estim')
+summary.cumretplots(df, 'Full')
+summary.cumretplots(df.estim, 'Estim')
