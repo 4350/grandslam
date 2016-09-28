@@ -17,7 +17,7 @@ as.correlation.matrix <- function(correlations) {
   c
 }
 
-cc.ll.total <- function(u, mvdist) {
+cc.ll.total <- function(u, mvdist, cluster) {
   # Extract the univariate distributions from the multivariate object
   uvdists <- lapply(seq(ncol(u)), function(i) {
     # sigma is always unit diagonal, but let's do it the right way
@@ -36,9 +36,16 @@ cc.ll.total <- function(u, mvdist) {
   })
   
   # Inverse the uniforms into their copula shocks
-  x <- sapply(seq(ncol(u)), function(i) {
+  inverse <- function(i, u, uvdists) {
     ghyp::qghyp(u[, i], uvdists[[i]], method = 'splines')
-  })
+  }
+  x <- parSapply(
+    cluster,
+    seq(ncol(u)),
+    inverse,
+    u = u,
+    uvdists = uvdists
+  )
   
   ll.joint <- ghyp::dghyp(x, mvdist, logvalue = T)
   ll.marginal <- rowSums(sapply(seq(ncol(u)), function(i) {
