@@ -21,7 +21,7 @@ kRandomSeed <- 403
 kBSRepetitions <- 1000
 
 # Bootstrap iteration to start at (<=kBootstrapRepetitions)
-kBSIteration <- 1
+kBSIteration <- 3
 
 # Average block length for stationary bootstrap
 # See optim_block_length for choosing this number
@@ -163,3 +163,4 @@ build.bootstrap.output.copula <- function(b.copula) {
 
 # Bootstrap --------------------------------------------------------------
 source('source/dynamic_bootstrap.R')
+

@@ -105,7 +105,8 @@ dir.create(run.directory, showWarnings = FALSE)
 
 for (b in seq(kBSIteration, kBSRepetitions)) {
   cat(noquote(strrep('-', 79)))
-  cat(noquote(sprintf("%s - ITERATION %04d - (%s)", kBSName, b, Sys.time())))
+  cat('\n')
+  cat(noquote(sprintf("%s - ITERATION %04d - (%s)\n", kBSName, b, Sys.time())))
   
   # Bootstrapped sample
   b.sample <- df.estim[bs.index[, b], ]
@@ -114,19 +115,19 @@ for (b in seq(kBSIteration, kBSRepetitions)) {
   # Takes roughly 15 seconds on Victor's MacBook -- 4 seconds if parallelized,
   # which isn't worth the complexity since the copula estimation takes
   # ~30 minutes
-  cat(noquote("GARCH ESTIMATION"))
+  cat(noquote("GARCH ESTIMATION\n"))
   tic()
     b.garch <- estimate.garch(b.sample)
   toc()
   
   # Extract uniform residuals
   # Takes roughly 20 seconds on Victor's MacBook
-  cat(noquote("EXTRACT UNIFORM RESIDUALS"))
+  cat(noquote("EXTRACT UNIFORM RESIDUALS\n"))
   tic()
     b.u <- extract.uniforms(b.garch)
   toc()
   
-  cat(noquote("COPULA ESTIMATION"))
+  cat(noquote("COPULA ESTIMATION\n"))
   tic()
     b.copula.param <- estimate.copula(b.u)
   toc()
