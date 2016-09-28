@@ -162,7 +162,7 @@ dc.ll.marginal <- function(shocks, uv.dists, cluster) {
   
   parSapply(
     cluster,
-    seq(ncol(u)),
+    seq(ncol(shocks)),
     fn,
     
     # Closures on clusters seems to work intermittently; pass all relevant
