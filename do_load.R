@@ -32,6 +32,18 @@ df <-
   ) %>%
   select(-RF)
 
+# Explicitly order df as the order we use later
+df <- select(
+  df,
+  Date,
+  Mkt.RF,
+  HML,
+  SMB,
+  Mom,
+  RMW,
+  CMA
+)
+
 # Create two weekly data sets, one for full period and one for estimation window (1963-2010)
 df.estim <- df %>%
   dplyr::filter(Date >= '1963-07-05' & Date <= '2010-12-31')
@@ -50,6 +62,17 @@ df <-
     by = "Date"
   ) %>%
   select(-RF)
+
+df <- select(
+  df,
+  Date,
+  Mkt.RF,
+  HML,
+  SMB,
+  Mom,
+  RMW,
+  CMA
+)
 
 df <- df %>%
   mutate(
