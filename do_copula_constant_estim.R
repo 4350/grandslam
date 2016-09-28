@@ -14,20 +14,20 @@ load_all('wimbledon')
 # Estimate Gaussian ----
 load_all('wimbledon')
 
-optimize.gauss <- function(params, u) {
+optimize.gauss <- function(params, u, cluster) {
   dist <- ghyp::gauss(
     mu = rep(0, ncol(u)),
     sigma = as.correlation.matrix(params)
   )
   
-  wimbledon::cc.ll.total(u, dist)
+  wimbledon::cc.ll.total(u, dist, cluster)
 }
 
 #' Log likelihood of params with a Student t distribution
 #'
 #' @param params correlations, df, skewness
 #' @param u uniform residuals
-optimize.ghskt <- function(params, u) {
+optimize.ghskt <- function(params, u, cluster) {
   num.corr <- ncol(u) * (ncol(u) - 1) / 2
   num.skew <- ncol(u)
   
@@ -46,9 +46,47 @@ optimize.ghskt <- function(params, u) {
     gamma = skew
   )
   
-  wimbledon::cc.ll.total(u, dist)
+  wimbledon::cc.ll.total(u, dist, cluster)
 }
 
-optimize.gauss(rep(0.75, 15), u)
-optimize.ghskt(c(rep(0.75, 15), 7), u)
-optimize.ghskt(c(rep(0.75, 15), 7, rep(0.90, ncol(u))), u)
+prepare.cluster <- function() {
+  cluster <- makeCluster(detectCores() - 1)
+  clusterEvalQ(cluster, library(ghyp))
+  clusterEvalQ(cluster, library(devtools))
+  clusterEvalQ(cluster, load_all('wimbledon'))
+  cluster
+}
+
+# optimize.gauss(rep(0.75, 15), u)
+# optimize.ghskt(c(rep(0.75, 15), 7), u)
+
+cluster <- prepare.cluster()
+optimize.ghskt(
+  c(rep(0.75, 15), 7, rep(0.90, ncol(u))),
+  u = u,
+  cluster = cluster
+)
+
+stopCluster(cluster)
+rm(ptc)
+
+# Estimate Gaussian ----
+cluster <- prepare.cluster()
+c <- cor(apply(u, 2, qnorm))
+params <- c[lower.tri(c)]
+
+param.gauss <- optim(
+  params,
+  optimize.gauss,
+  u = u,
+  cluster = cluster,
+  control = list(
+    trace = 6,
+    fnscale = -1,
+    maxit = 20000
+  ),
+  hessian = T
+)
+
+stopCluster(cluster)
+rm(cluster)
