@@ -125,49 +125,117 @@ correlations.rolling <- function(df, factor1, factor2) {
     data.frame(result),
     'factor',
     'value',
-    1:length(factors.all)
+    1:length(other.factors)
   )
+  # Add facetvalue, one of the value factors, to do even better ggplot
+  result$facetvalue <- value
+  result$order2 <- factor(result$facetvalue, factors.value)
+  return(result)
 }
 
-#' Plot rolling correlation. To be used in list apply
+#' Plot rolling correlation
 #' 
-#' @param value Data frame for one factor of rolling correlation data
+#' @param df Data frame for one factor of rolling correlation data
 #'
 #' @return gridded plot of rolling correlation graphs
 #' @export
-correlations.plot.rolling <- function(value) {
+correlations.plot.rolling <- function(df) {
   ggplot(
-    value,
-    aes(x = Date, y = value, group = factor)
+    df,
+    aes(x = Date, y = value)
   ) + 
-    geom_ribbon(aes(ymin = lb, ymax = ub),
-                fill = "grey70") +
-    geom_line(aes(color = factor)) +
-    
+    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = "grey40",
+                alpha = 0.3
+    ) +
+    geom_line(aes(color = 'Correlation coefficient')) +
     theme(legend.position="none") +
     ylab('') +
     coord_cartesian(ylim = c(-1, 1)) +
     #scale_x_date(date_breaks = "5 years", date_labels = "%y")+
-    facet_grid(. ~ order)  
+    facet_grid(order2 ~ order)  
 }
 
-#' Plot threshold correlation. To be used in list apply
+#' Plot threshold correlation
 #' 
-#' @param value Data frame for one factor of threshold correlation data
+#' @param df Data frame for one factor of threshold correlation data
 #'
 #' @return gridded plot of threshold correlation graphs
 #' @export
-correlations.plot.threshold <- function(value) {
+correlations.plot.threshold <- function(df) {
   ggplot(
-    value,
-    aes(x = qs, y = value, group = factor)
+    df,
+    aes(x = qs, y = value)
   ) + 
-    geom_ribbon(aes(ymin = lb, ymax = ub),
-                fill = "grey80") +
-    geom_line(aes(color = factor)) +
-    theme(legend.position="none") +
+    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = "grey40",
+                alpha = 0.3
+    ) +
+    #scale_colour_manual("",values=c("darkslategrey", "blue", "darkgreen"))+
+    geom_line(aes(color = "Correlation coefficient")) +
+    theme(legend.key = element_blank(), legend.title = element_blank())+
     ylab('') +
+    xlab('Quantiles')+
     coord_cartesian(xlim = c(0, 1), ylim = c(-0.5, 1)) +
     scale_x_continuous(labels = scales::percent) +
-    facet_grid(. ~ order)  
+    facet_grid(order2 ~ order)
+}
+
+#' Plot threshold correlation incl simulated
+#' 
+#' @param df Data frame for one factor of threshold correlation data
+#'
+#' @return gridded plot of threshold correlation graphs
+#' @export
+correlations.plot.threshold.sim <- function(df) {
+  ggplot(
+    df,
+    aes(x = qs, y = value)
+  ) + 
+    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = "grey40",
+                alpha = 0.3
+    ) +
+    #scale_colour_manual("",values=c("darkslategrey", "blue", "darkgreen"))+
+    geom_line(aes(color = "Empirical distribution")) +
+    geom_line(aes(x = qs, y = norm, color = "Normal distribution"), linetype = 2)+
+    theme(legend.key = element_blank(), legend.title = element_blank())+
+    #geom_line(aes(x = qs, y = t, group = factor))+
+    #geom_line(aes(x = qs, y = skewt, group = factor))+
+    ylab('') +
+    xlab('Quantiles')+
+    coord_cartesian(xlim = c(0, 1), ylim = c(-0.5, 1)) +
+    scale_x_continuous(labels = scales::percent) +
+    facet_grid(order2 ~ order)
+  
+}
+
+#' Calculate list of simulated threshold correlations from 
+#' a given data frame
+#' 
+#' @param df Data frame (TxBootruns)xN of simulated data
+#'
+#' @return simThCorrelationList a list of three (one for each value factor)
+#'  data frames with threshold correlations for each factor
+#' @export
+sim_th_corr <- function(df) {
+  # Get some size of data
+  N <- ncol(df)
+  T <- nrow(df)
+  
+  # Set up factor groups ----
+  factors.value <- c("HML", "RMW", "CMA")
+  factors.all <- c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
+  
+  # Create list to hold simulated corrs
+  simThCorrelationList = list()
+  
+  # Populate output matrix with point estimates for all value factors vs all factors
+  for (value in factors.value) {
+    # Get point estimates for each pair value <-> other factor
+    simThCorrelationList[[value]] <- data.frame(
+      simvalues = correlations.factor.apply(factors.all, value, 'coef', df, 1)[,'value']
+    )
+  }
+  return(simThCorrelationList)
 }
