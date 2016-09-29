@@ -50,10 +50,12 @@ dc.shocks.std <- function(shocks, uv.dists, alpha, beta) {
   # If innovations are t-distributed, they do not have unit variance; and if
   # skewed, they also don't have expectation zero. We therefore standardize
   # all shocks using the distribution moments. This follows Christoffersen.
-  shocks <- sapply(seq(ncol(shocks)), function(i) {
+  
+  # rbind ensures that this is a matrix even if T = 1
+  shocks <- rbind(sapply(seq(ncol(shocks)), function(i) {
     dist <- uv.dists[[i]]
     (shocks[, i] - ghyp::mean(dist)) / sqrt(ghyp::vcov(dist))
-  })
+  }))
   
   # Add an initial observation (assumed zero)
   shocks <- rbind(rep(0, ncol(shocks)), shocks)
@@ -140,17 +142,21 @@ dc.Q <- function(shocks.std, Omega, alpha, beta) {
 #'
 #' @return NxNxT array with unit diagonals
 #' @export
-dc.Correlation <- function(Q, cluster) {
-  parSapply(
-    cluster,
-    seq(dim(Q)[3]),
-    function(t) {
-      Q_t <- Q[,, t]
-      inv.sqrt <- solve(sqrt(diag(diag(Q_t))))
-      inv.sqrt %*% Q_t %*% inv.sqrt
-    },
-    simplify = "array"
-  )
+dc.Correlation <- function(Q, cluster = NULL) {
+  fn <- function(t, Q) {
+    Q_t <- Q[,, t]
+    inv.sqrt <- solve(sqrt(diag(diag(Q_t))))
+    inv.sqrt %*% Q_t %*% inv.sqrt
+  }
+  
+  seqT <- seq(dim(Q)[3])
+  
+  # Run in parallel if a cluster was passed
+  if (!is.null(cluster)) {
+    return(parSapply(cluster, seqT, fn, Q = Q, simplify = "array"))
+  }
+  
+  sapply(seqT, fn, Q = Q, simplify = "array")
 }
 
 # Log Likelihood Functions ----
