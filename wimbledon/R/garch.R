@@ -32,6 +32,46 @@ garch.specgen <- function(p, q = 0, r = 1, s = 1, model = 'fGARCH', submodel = '
   spec
 }
 
+#' rugarch quantile function implemented in ghyp
+#' 
+#' This function translates the rugarch parametrization of the generalized
+#' hyperbolic skewed Student's t distribution into the parametrization of
+#' the generalized hyperbolic skewed Student's t distribution used by package
+#' ghyp, which allows us to estimate using splines which is typically a lot
+#' faster for many quantiles
+#'
+#' @param p univariate quantiles
+#' @param shape as specified by rugarch
+#' @param skew as specified by rugarch
+#'
+#' @return vector of quantiles
+#' @export
+garch.qghyp.rugarch <- function(p, shape, skew) {
+  # The rugarch parametrization is *kinda* the location and scale invariant
+  # parametrization mentioned in the ghyp package documentation. The below
+  # code is copy-pasted from rugarch source code (rugarch-distributions.R)
+  # which uses the SkewHyperbolic library, and then fed to the ghyp
+  # quantile function.
+  #
+  # chi is delta ^ 2
+  nu <- shape
+  chi <- 1 / ( ((2 * skew^2)/((nu-2)*(nu-2)*(nu-4))) + (1/(nu-2)) )
+  beta <- skew / sqrt(chi)
+  mu <- -(beta * chi / (nu - 2))
+  
+  ghyp::qghyp(
+    p,
+    student.t(
+      mu = mu,
+      chi = chi,
+      nu = nu,
+      sigma = 1,
+      gamma = beta
+    ),
+    method = 'splines'
+  )
+}
+
 #' Function to get values for Standardized Residuals Empirical Density graph
 #'
 #' @param x fitted model object
