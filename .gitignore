@@ -6,3 +6,15 @@
 data/ff-weekly.RData
 data/derived
 output
+*.aux
+drafts/gameball/out/Thesis Draft (22107 and 22584).bbl
+*.bcf
+drafts/gameball/out/Thesis Draft (22107 and 22584).fdb_latexmk
+*.fls
+drafts/gameball/out/Thesis Draft (22107 and 22584).out
+*.pdf
+drafts/gameball/out/Thesis Draft (22107 and 22584).run.xml
+*.ini
+drafts/gameball/out/Thesis Draft (22107 and 22584).thm
+*.blg
+drafts/gameball/out/Thesis Draft (22107 and 22584).log
