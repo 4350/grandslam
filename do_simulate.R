@@ -53,50 +53,16 @@ library(tictoc)
 load_all('wimbledon')
 rm(list = ls())
 
-# Setup: Demo ----
+# SETUP ------------------------------------------------------------------
+load('data/derived/model_GARCH.RData')
+load('data/derived/model_copula_dynamic_ghskt.RData')
 
-params.copula <- list(
-  dist.params = list(
-    df = 8,
-    skew = c(-0.25, 0.25)
-  ),
-  alpha = 0.06,
-  beta = 0.91,
-  Omega = matrix(c(
-    1.00, 0.50,
-    0.50, 1.00
-  ), ncol = 2, byrow = T)
-)
-
-kGARCHModels <- list(
-  ugarchspec(
-    mean.model = list(armaOrder = c(0, 0)),
-    distribution.model = 'ghst',
-    fixed.pars = list(
-      mu = 0,
-      omega = 0.0001,
-      alpha1 = 0.05,
-      beta1 = 0.90,
-      skew = 0.10,
-      shape = 8
-    )
-  ),
-  ugarchspec(
-    mean.model = list(armaOrder = c(0, 0)),
-    distribution.model = 'ghst',
-    fixed.pars = list(
-      mu = 0.01,
-      omega = 0.0001,
-      alpha1 = 0.05,
-      beta1 = 0.90,
-      skew = 0.10,
-      shape = 8
-    )
-  )
-)
+kCopulaModel <- model.copula.dynamic.ghskt
+kGARCHModels <- model.GARCH
+rm(model.GARCH, model.copula.dynamic.ghskt)
 
 T <- 5000
-N <- ncol(params.copula$Omega)
+N <- ncol(kCopulaModel$Omega)
 
 # Build copula univariate distributions
 sim.c.uv.dists <- function(p.c) {
@@ -153,12 +119,12 @@ sim.c.Q_tp1 <- function(p.c, Q_t, shocks.std_t) {
 # SIMULATION SETUP -------------------------------------------------------
 
 # Create univariate distribution objects depending on copula parameters
-c.uv.dists <- sim.c.uv.dists(params.copula)
+c.uv.dists <- sim.c.uv.dists(kCopulaModel)
 
 # We intialize the correlation to (the correlationalized version of) Omega
 Q <- array(dim = c(N, N, T))
 Correlation <- NA * Q
-Q[,, 1] <- params.copula$Omega
+Q[,, 1] <- kCopulaModel$Omega
 Correlation[,, 1] <- dc.Correlation(array(Q[,, 1], dim = c(N, N, 1)))
 
 shocks <- matrix(ncol = N, nrow = T)
@@ -169,18 +135,18 @@ shocks.std <- shocks * NA
 tic()
 for (t in seq(T)) {
   # Get shocks from MV distribution for this period
-  shocks[t, ] <- sim.c.rghyp(params.copula, Correlation[,, t])
+  shocks[t, ] <- sim.c.rghyp(kCopulaModel, Correlation[,, t])
   shocks.std[t, ] <- dc.shocks.std(
     rbind(shocks[t, ]),
     c.uv.dists,
-    alpha = params.copula$alpha,
-    beta = params.copula$beta
+    alpha = kCopulaModel$alpha,
+    beta = kCopulaModel$beta
   )
   
   # Prepare Q and Correlation for next period
   if (t < T) {
     Q[,, t + 1] <- sim.c.Q_tp1(
-      params.copula,
+      kCopulaModel,
       Q_t = Q[,, t],
       shocks.std_t = shocks.std[t, ]
     )
@@ -191,11 +157,12 @@ for (t in seq(T)) {
   }
 }
 toc()
+rm(t)
 
 # ARMA-GARCH -------------------------------------------------------------
 
 tic()
-garchpath <- sapply(seq(N), function(i) {
+garchsim <- sapply(seq(N), function(i) {
   # Compute uniform residuals using the marginal distribution of the copula
   u <- ghyp::pghyp(shocks[, i], c.uv.dists[[i]])
   
@@ -206,18 +173,153 @@ garchpath <- sapply(seq(N), function(i) {
   
   # XXX This should use the fit if using a fit!!!
   model <- kGARCHModels[[i]]
-  pars <- model@model$fixed.pars
-  garch.qghyp.rugarch(
+  pars <- model@model$pars[, 'Level']
+  stdres <- garch.qghyp.rugarch(
     u,
-    skew = pars$skew,
-    shape = pars$shape
+    skew = pars['skew'],
+    shape = pars['shape']
   )
   
-  ugarchpath(
+  # ugarchpath if you have specs
+  ugarchsim(
     model,
-    n.sim = 1,
-    m.sim = T,
-    custom.dist = list(name = 'sample', distfit = rbind(u))
+    n.sim = T,
+    m.sim = 1,
+    custom.dist = list(name = 'sample', distfit = cbind(stdres))
   )
 })
 toc()
+
+# SAVE OUTPUT ------------------------------------------------------------
+
+output <- list(
+  series = sapply(garchsim, function(p) t(p@simulation$seriesSim)),
+  sigma = sapply(garchsim, function(p) t(p@simulation$sigmaSim)),
+  resid = sapply(garchsim, function(p) t(p@simulation$residSim))
+)
+
+# Hard-Coded Demo Models -------------------------------------------------
+
+# params.copula <- list(
+#   dist.params = list(
+#     df = 8,
+#     skew = c(-0.25, 0.25, 0.10, 0.05, 0.10, -0.05)
+#   ),
+#   alpha = 0.06,
+#   beta = 0.91,
+#   Omega = matrix(c(
+#     1.00, 0.50, 0.50, 0.50, 0.50, 0.50,
+#     0.50, 1.00, 0.50, 0.50, 0.50, 0.50,
+#     0.50, 0.50, 1.00, 0.50, 0.50, 0.50,
+#     0.50, 0.50, 0.50, 1.00, 0.50, 0.50,
+#     0.50, 0.50, 0.50, 0.50, 1.00, 0.50,
+#     0.50, 0.50, 0.50, 0.50, 0.50, 1.00
+#   ), ncol = 6, byrow = T)
+# )
+# kGARCHModels <- list(
+#   ugarchspec(
+#     mean.model = list(armaOrder = c(2, 0)),
+#     variance.model = list(
+#       model = 'fGARCH',
+#       submodel = 'GJRGARCH'
+#     ),
+#     distribution.model = 'ghst',
+#     fixed.pars = list(
+#       mu = 0.0011691388,
+#       ar1 = 0.75,
+#       ar2 = 0.20,
+#       omega = 0.0000127421,
+#       alpha1 = 0.0851367486,
+#       beta1 = 0.8680192797,
+#       eta11 = 0.3914889074,
+#       skew = -2.5203249430,
+#       shape = 12.9541169366
+#     )
+#   ),
+#   ugarchspec(
+#     mean.model = list(armaOrder = c(0, 0)),
+#     distribution.model = 'ghst',
+#     variance.model = list(
+#       model = 'fGARCH',
+#       submodel = 'GJRGARCH'
+#     ),
+#     fixed.pars = list(
+#       mu = 0.0011691388,
+#       omega = 0.0000127421,
+#       alpha1 = 0.0851367486,
+#       beta1 = 0.8680192797,
+#       eta11 = 0.3914889074,
+#       skew = -2.5203249430,
+#       shape = 12.9541169366
+#     )
+#   ),
+#   ugarchspec(
+#     mean.model = list(armaOrder = c(0, 0)),
+#     distribution.model = 'ghst',
+#     variance.model = list(
+#       model = 'fGARCH',
+#       submodel = 'GJRGARCH'
+#     ),
+#     fixed.pars = list(
+#       mu = 0.0011691388,
+#       omega = 0.0000127421,
+#       alpha1 = 0.0851367486,
+#       beta1 = 0.8680192797,
+#       eta11 = 0.3914889074,
+#       skew = -2.5203249430,
+#       shape = 12.9541169366
+#     )
+#   ),
+#   ugarchspec(
+#     mean.model = list(armaOrder = c(0, 0)),
+#     variance.model = list(
+#       model = 'fGARCH',
+#       submodel = 'GJRGARCH'
+#     ),
+#     distribution.model = 'ghst',
+#     fixed.pars = list(
+#       mu = 0.0011691388,
+#       omega = 0.0000127421,
+#       alpha1 = 0.0851367486,
+#       beta1 = 0.8680192797,
+#       eta11 = 0.3914889074,
+#       skew = -2.5203249430,
+#       shape = 12.9541169366
+#     )
+#   ),
+#   ugarchspec(
+#     mean.model = list(armaOrder = c(0, 0)),
+#     variance.model = list(
+#       model = 'fGARCH',
+#       submodel = 'GJRGARCH'
+#     ),
+#     distribution.model = 'ghst',
+#     fixed.pars = list(
+#       mu = 0.0011691388,
+#       omega = 0.0000127421,
+#       alpha1 = 0.0851367486,
+#       beta1 = 0.8680192797,
+#       eta11 = 0.3914889074,
+#       skew = -2.5203249430,
+#       shape = 12.9541169366
+#     )
+#   ),
+#   ugarchspec(
+#     mean.model = list(armaOrder = c(0, 0)),
+#     variance.model = list(
+#       model = 'fGARCH',
+#       submodel = 'GJRGARCH'
+#     ),
+#     distribution.model = 'ghst',
+#     fixed.pars = list(
+#       mu = 0.0011691388,
+#       omega = 0.0000127421,
+#       alpha1 = 0.0851367486,
+#       beta1 = 0.8680192797,
+#       eta11 = 0.3914889074,
+#       skew = -2.5203249430,
+#       shape = 12.9541169366
+#     )
+#   )
+# )
+
