@@ -35,6 +35,9 @@ bestfits <- list(
   RMW = fits$RMW$ARMA10,  
   CMA = fits$CMA$ARMA10
 )
+model.GARCH <- bestfits
+save(model.GARCH, file = 'data/derived/model_GARCH.RData')
+
 
 # Get and save standardized residuals ----
 df.stdres <- data.frame(

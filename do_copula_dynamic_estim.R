@@ -112,9 +112,11 @@ stopCluster(cluster)
 rm(cluster)
 rm(optimize.ghskt)
 rm(params)
+
+model.copula.dynamic.ghskt <- param.ghskt
 save(
-  param.ghskt,
-  file = ('data/derived/dcopula_param_ghskt.RData')
+  model.copula.dynamic.ghskt,
+  file = ('data/derived/model_copula_dynamic_ghskt.RData')
 )
 
 # Estimate Symmetric T-distribution ----
@@ -172,9 +174,11 @@ stopCluster(cluster)
 rm(optimize.ght)
 rm(cluster)
 rm(params)
+
+model.copula.dynamic.ght <- param.ght
 save(
-  param.ght,
-  file = ('data/derived/dcopula_param_ght.RData')
+  model.copula.dynamic.ght,
+  file = ('data/derived/model_copula_dynamic_ght.RData')
 )
 
 # Estimate Gaussian Copula ----
@@ -221,15 +225,16 @@ rm(optimize.gauss)
 rm(cluster)
 rm(params)
 
+model.copula.dynamic.gauss <- param.gauss
 save(
-  param.gauss,
-  file = ('data/derived/dcopula_param_gauss.RData')
+  model.copula.dynamic.gauss,
+  file = ('data/derived/model_copula_dynamic_gauss.RData')
 )
 
 # Information criteria for parameters ----
-load('data/derived/dcopula_param_ghskt.RData')
-load('data/derived/dcopula_param_ght.RData')
-load('data/derived/dcopula_param_gauss.RData')
+load('data/derived/model_copula_dynamic_ghskt.RData')
+load('data/derived/model_copula_dynamic_ght.RData')
+load('data/derived/model_copula_dynamic_gauss.RData')
 load('data/derived/garch_unires_model.RData')
 u <- df.u[, -1]
 rm(df.u)
@@ -243,9 +248,9 @@ aic <- function(param) {
 
 # Increasing order of model complexity
 param <- list(
-  "Gaussian" = param.gauss,
-  "Symmetric" = param.ght,
-  "Skewed" = param.ghskt
+  "Gaussian" = model.copula.dynamic.gauss,
+  "Symmetric" = model.copula.dynamic.ght,
+  "Skewed" = model.copula.dynamic.ghskt
 )
 
 models <- rbind(
