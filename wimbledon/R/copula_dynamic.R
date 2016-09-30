@@ -7,6 +7,25 @@
 # Functions used to produce the Q series for maximum likelihood estimation
 # and simulation.
 
+dc.uv.dists <- function(N, dist.params) {
+  lapply(seq(N), function(i) {
+    # Gaussian Case
+    if (is.null(dist.params$df)) {
+      dist <- ghyp::gauss()
+    }
+    # Symmetric T case
+    else if (is.null(dist.params$skew)) {
+      dist <- student.t(nu = dist.params$df)
+    }
+    # Skewed T case
+    else {
+      dist <- student.t(nu = dist.params$df, gamma = dist.params$skew[i])
+    }
+    
+    dist
+  })
+}
+
 #' Invert uniform realizations to the appropriate distributions
 #'
 #' @param u TxN uniforms
@@ -14,9 +33,9 @@
 #' @param cluster parallel cluster to compute on
 #' 
 #' @export
-dc.shocks <- function(u, uv.dists, cluster) {
+dc.shocks <- function(u, uv.dists, cluster = NULL) {
   invert <- function(i, u, uv.dists) {
-    qghyp(
+    ghyp::qghyp(
       u[, i],
       uv.dists[[i]],
       
@@ -26,13 +45,11 @@ dc.shocks <- function(u, uv.dists, cluster) {
     )
   }
   
-  parSapply(
-    cluster,
-    seq(ncol(u)),
-    invert,
-    u = u,
-    uv.dists = uv.dists
-  )
+  if (!is.null(cluster)) {
+    return(parSapply(cluster, seq(ncol(u)), invert, u = u, uv.dists = uv.dists))
+  }
+  
+  sapply(seq(ncol(u)), invert, u = u, uv.dists = uv.dists)
 }
 
 #' Recursively build the normalized shocks
@@ -159,6 +176,33 @@ dc.Correlation <- function(Q, cluster = NULL) {
   sapply(seqT, fn, Q = Q, simplify = "array")
 }
 
+dc.run.model <- function(u, dist.params, alpha, beta, cluster = NULL) {
+  # Build univariate distributions as they're used for the construction
+  # of our shocks; the MV distribution is built for each t based on the
+  # Correlation matrix generated
+  uv.dists <- dc.uv.dists(ncol(u), dist.params)
+  shocks <- dc.shocks(u, uv.dists, cluster)
+  
+  # Get standardized shocks
+  shocks.std <- dc.shocks.std(shocks, uv.dists, alpha, beta)
+  
+  # Compute Omega using method of moments
+  Omega <- dc.Omega(shocks.std)
+  
+  # Get correlation time series
+  Q <- dc.Q(shocks.std, Omega, alpha, beta)
+  Correlation <- dc.Correlation(Q, cluster = cluster)
+  
+  list(
+    uv.dists = uv.dists,
+    shocks = shocks,
+    shocks.std = shocks.std,
+    Omega = Omega,
+    Q = Q,
+    Correlation = Correlation
+  )
+}
+
 # Log Likelihood Functions ----
 
 dc.ll.marginal <- function(shocks, uv.dists, cluster) {
@@ -232,42 +276,25 @@ dc.ll.joint <- function(shocks, dist.params, Correlation, cluster) {
 }
 
 dc.ll.total <- function(u, dist.params, alpha, beta, cluster) {
-  # Build univariate distributions as they're used for the construction
-  # of our shocks; the MV distribution is built for each t based on the
-  # Correlation matrix generated
-  uv.dists <- lapply(seq(ncol(u)), function(i) {
-    # Gaussian Case
-    if (is.null(dist.params$df)) {
-      dist <- ghyp::gauss()
-    }
-    # Symmetric T case
-    else if (is.null(dist.params$skew)) {
-      dist <- student.t(nu = dist.params$df)
-    }
-    # Skewed T case
-    else {
-      dist <- student.t(nu = dist.params$df, gamma = dist.params$skew[i])
-    }
-  })
-  shocks <- dc.shocks(u, uv.dists, cluster)
-  
-  # Compute the DCC model parameters
-  shocks.std <- dc.shocks.std(shocks, uv.dists, alpha, beta)
-  Omega <- dc.Omega(shocks.std)
-  Q <- dc.Q(shocks.std, Omega, alpha, beta)
-  Correlation <- dc.Correlation(Q, cluster = cluster)
+  model <- dc.run.model(
+    u = u,
+    dist.params = dist.params,
+    alpha = alpha,
+    beta = beta,
+    cluster = cluster
+  )
   
   # Compute joint and marginal likelihood
   ll.joint <- sum(dc.ll.joint(
-    shocks = shocks,
+    shocks = model$shocks,
     dist.params = dist.params,
-    Correlation = Correlation,
+    Correlation = model$Correlation,
     cluster = cluster
   ))
   
   ll.marginal <- sum(dc.ll.marginal(
-    shocks = shocks,
-    uv.dists = uv.dists,
+    shocks = model$shocks,
+    uv.dists = model$uv.dists,
     cluster = cluster
   ))
   

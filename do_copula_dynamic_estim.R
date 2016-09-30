@@ -113,13 +113,52 @@ rm(cluster)
 rm(optimize.ghskt)
 rm(params)
 
-model.copula.dynamic.ghskt <- param.ghskt
+# Run and save all estimates ----
+
+# XXX This should be alot prettier
+# Both going to and from the parameter vector should be better so that
+# estimation of nested models can be done in a coherent fashion.
+model.copula.dynamic.ghskt <- list(
+  dist.params = list(
+    df = param.ghskt$par[1],
+    skew = param.ghskt$par[2:(ncol(u) + 1)]
+  ),
+  alpha = param.ghskt$par[length(param.ghskt$par) - 1],
+  beta = param.ghskt$par[length(param.ghskt$par)]
+)
+
+# Great, we now have estimated parameters -- we also need to get the
+# corresponding Omega that was estimated using method of moments on this
+# dataset
+model <- dc.run.model(
+  u,
+  model.copula.dynamic.ghskt$dist.params,
+  model.copula.dynamic.ghskt$alpha,
+  model.copula.dynamic.ghskt$beta,
+  cluster = NULL
+)
+
+# XXX UGGH WE CODE HARD
+model.copula.dynamic.ghskt$Omega <- model$Omega
+model.copula.dynamic.ghskt$Correlation <- model$Correlation
+model.copula.dynamic.ghskt$shocks <- model$shocks
+model.copula.dynamic.ghskt$shocks.std <- model$shocks.std
+
 save(
   model.copula.dynamic.ghskt,
   file = ('data/derived/model_copula_dynamic_ghskt.RData')
 )
 
+rm(model)
+
 # Estimate Symmetric T-distribution ----
+
+# DO NOT RUN
+#
+# CODE BELOW DOES NOT SAVE ESTIMATES CORRECTLY
+# SEE CODE ABOVE FOR CORRECT POST-FIDDLING TO SAVE EVERYTHING
+#
+
 optimize.ght <- function(params, u, cluster) {
   df <- params[1]
   alpha <- params[2]
