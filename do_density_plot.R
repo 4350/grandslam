@@ -7,23 +7,24 @@ library(GGally)
 library(dplyr)
 library(ellipse)
 library(mvtnorm)
-
+library(ggthemes)
+library(devtools)
+library(extrafont)
+load_all('wimbledon')
 
 # Reset workspace and load residuals from GARCH ----
 rm(list = ls())
 load('data/derived/garch_stdres.RData')
 
-# Set colors and seed
-cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-set.seed(17)
-
 # Do and save density plots ----
-jpeg(filename = "output/densityGARCHresiduals.jpeg", height = 8.3, width = 11.7, units = 'in', res = 300)
+#jpeg(filename = "output/densityGARCHresiduals.jpeg", height = 8.3, width = 11.7, units = 'in', res = 300)
 g <- df.stdres %>% select(-Date) %>%
   ggpairs(lower = list(
     continuous = function(data, mapping, ...) {
       ggplot(data = data, mapping = mapping)+
-        geom_density2d(...)
+        geom_density2d(...)+
+        theme_Publication()+
+        scale_colour_Publication()
       }
     ),
     diag = 'blank',
@@ -31,9 +32,13 @@ g <- df.stdres %>% select(-Date) %>%
       continuous = function(data, mapping, ...) {
         ggplot(data = data, mapping = mapping)+
           geom_bin2d(..., bins = 45)+
-          stat_ellipse(..., type = 'norm', level = 0.9995, color = cbbPalette[2])
+          stat_ellipse(..., type = 'norm', level = 0.9995)+
+          theme_Publication()+
+          scale_colour_Publication()
       }
-    )
-)
+    ),
+    columnLabels = rep("", 6),
+    showStrips = NULL
+  )
 print(g)
 dev.off()

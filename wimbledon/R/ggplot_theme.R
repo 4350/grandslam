@@ -1,7 +1,5 @@
 #' Theme base from
 #' https://rpubs.com/Koundy/71792
-#' Colors changed to colorblind with black
-#' http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/
 #' Minion Pro theme imported using
 #' extrafont package
 #' library(extrafont)
@@ -14,7 +12,7 @@ theme_Publication <- function(base_size=14, base_family="Minion Pro") {
   (theme_foundation(base_size=base_size, base_family=base_family)
   + theme(plot.title = element_text(face = "bold",
                                     size = rel(1.2), hjust = 0.5),
-          text = element_text(),
+          text = element_text(family = "Minion Pro"),
           panel.background = element_rect(colour = NA),
           plot.background = element_rect(colour = NA),
           panel.border = element_rect(colour = NA),
@@ -41,13 +39,12 @@ theme_Publication <- function(base_size=14, base_family="Minion Pro") {
 
 scale_fill_Publication <- function(...){
   library(scales)
-  discrete_scale("fill","Publication",manual_pal(values = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")), ...)
+  discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
   
 }
 
 scale_colour_Publication <- function(...){
   library(scales)
-  discrete_scale("colour","Publication",manual_pal(values = c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")), ...)
+  discrete_scale("colour","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
   
 }
-
