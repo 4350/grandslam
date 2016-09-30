@@ -1,0 +1,43 @@
+%!TEX program = xelatex
+%!TEX output_directory = out
+%!TEX jobname = Thesis Draft (22107 and 22584)
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[a4paper,margin=3.5cm,top=3cm,bottom=3cm,footskip=1.5cm]{geometry}
+
+% Import most packages and options
+\usepackage{article-style}
+
+% Language and bib options
+\DeclareLanguageMapping{american}{american-apa}
+\addbibresource{bibliography.bib}
+\defbibheading{bibliography}[\refname]{\section*{#1}}
+
+\setmainfont{Minion Pro}
+
+% Title and author and date
+\title{Risk analysis of classic and modern value: \\A copula approach}
+\author{
+  \begin{tabular}[t]{@{}c@{}}
+    Gustaf Soldan\\
+    {\href{mailto:22107@student.hhs.se}{22107@student.hhs.se}}
+  \end{tabular}
+  \hskip 1em
+  \begin{tabular}[t]{@{}c@{}}
+    Victor Andrée\\
+    {\href{mailto:22584@student.hhs.se}{22584@student.hhs.se}}
+  \end{tabular}
+}
+\date{October XX, 2016}
+
+% Main document pasted from other files
+\begin{document}
+\maketitle
+\begin{abstract}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\end{abstract}
+\pagebreak
+\input{tex/method}
+\pagebreak
+\input{tex/appendix}
+\end{document}

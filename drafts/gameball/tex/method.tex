@@ -1,0 +1,54 @@
+%!TEX root = ../main.tex
+\section{Method}
+\subsection{Rolling correlations}
+We compute rolling correlation estimates in order to investigate whether the factor equity strategies exhibit constant correlation over time. 
+\begin{align}
+    RCorr(r_i, r_j)_t^{250} = \frac{\sum^{t}_{t-249}(r_i - \bar{r}_i)(r_j - \bar{r}_j)}{\sqrt{\sum^{t}_{t-249} (r_i - \bar{r}_i)^2} \sqrt{\sum^{t}_{t-249} (r_j - \bar{r}_j)^2}}
+\end{align}
+where $r_i$, $r_j$ represent the $N \cdot (N-1) / 2$ different pairs of the factor strategies' log returns and the window of interest is set to approximate one trading year (250 days).
+\subsection{Threshold correlations}
+Threshold (or exceedance) correlations have previously been used to highlight the asymmetric dependence structure of i.a. country equity indices~\autocite{LonginSolnik2001}, portfolios by industry, size, value and momentum~\autocite{AngChen2002} and factor strategies~\autocite{ChristoffersenLanglois2013}. Still, however, the following analysis is incremental, as it adds the new factors profitability (RMW) and investment (CMA). We follow~\textcite{ChristoffersenLanglois2013} definition of threshold correlation
+\begin{align}
+    TCorr(r_i, r_j) = 
+    \begin{cases} 
+        Corr\Big(r_i, r_j \,|\, r_i < F_i^{-1}(p), r_j < F_j^{-1}(p)\Big)  & \text{for } p < 0.5 \\
+        Corr\Big(r_i, r_j \,|\, r_i \geq F_i^{-1}(p), r_j \geq F_j^{-1}(p)\Big)  & \text{for } p \geq 0.5
+    \end{cases}
+\end{align}
+where $F_i^{-1}(p)$ the empirical quantile of $r_i$ at percentile $p$. Graphically, threshold correlation are easily understood as the standard correlation estimate in more and more distant parts of the first and third quadrant as $p$ approaches either zero or unity. Ceteris paribus, assets pairs with weaker or negative threshold correlation as $p < 0.50$ are better diversified, as they do not coincide and contribute to negative skewness of the portfolio as a whole. Threshold correlations capture a dimension of dependence that is overlooked by the linear correlation statistic.\footnote{Only in the case of elliptical distributions is zero correlation equivalent to independence.} 
+\subsection{Copula}
+Copulae provide a numerically feasible way to estimate a multivariate distribution function, which can then be used to draw inferences and simulate return series.~\textcite{Patton2006} uses the theorem of~\textcite{Sklar1959} to show that the conditional multivariate distribution function of log returns can be decomposed into a copula function and the product of univariate distributions
+\begin{align} \label{eq:sklar}
+    f_t(r_{1,t+1}, ..., r_{N, t+1}) &= c_t(u_{1, t+1}, ... u_{N, t+1}) \prod^N_{i=1} f_{i,t}(r_{i, t+1})
+\end{align}
+where $c_t(u_{1, t+1}, ... u_{N, t+1})$ is the copula density function, in this application taking uniform transformations of residuals from the AR-GARCH model, $\{u_i\}$, as arguments. This relies on a two-step maximum likelihood procedure (also known as the inference-by-margins (IFM) procedure) introduced by~\textcite{Joe1997}, which starts by estimating with the marginal distributions and subsequently estimates the copula function, using the margin residuals as given. For details on the marginal estimation procedure, see \autoref{App:AppendixB} The IFM method drastically improves the speed of the optimization process in large data sets; however, it is not efficient as shown by~\textcite{ChenFanTsyrennikov2006}, who instead propose a sieve ML estimation. This paper still employs IFM, as the efficiency loss is small in most cases~\autocite{Patton2006}.  
+
+We focus on a skewed Student-\textit{t} copula, parameterized by $\Theta = \{\gamma, \nu, R\}$ using the constant correlation specification, and by $\Theta^{cDCC} = \{\alpha, \beta, \gamma, \nu, R\}$ using the dynamic correlation process. The analysis closely follows in the footsteps of~\textcite{Aielli2013} and~\textcite{ChristoffersenErrunzaJacobLanglois2012}. The skewed Student-\textit{t} distribution is described in detail in \autoref{App:AppendixA}.
+
+The normal and Student-\textit{t} copulae are both nested in the skewed Student-\textit{t} model, as the degree of freedom and skewness parameters go to infinity and zero respectively. Results are presented for all three copulae, with and without correlation dynamics.
+
+\subsection{Constant correlation specification}
+As a benchmark model, we consider the case of a constant correlation matrix between the factor strategies' ARMA-GJR-GARCH residuals.  
+
+With a constant correlation matrix $R$, the copula parameters $\Theta = \{\gamma, \nu, R\}$ are estimated using ML of the copula function, where $\gamma$ is the vector of skewness parameters and $\nu$ is the degree of freedom of the skewed Student-\textit{t} distribution. Rearranging Sklar's Theorem in \autoref{eq:sklar} and taking logs, the copula log-likelihood function is
+\begin{align} \label{eq:constantllf}
+    LLF(\gamma, \nu, R; u_1, ..., u_T) = \sum^T_{t=1} \Big \{ ln f_t(\varepsilon_{t}; \gamma, \nu, R) - \sum^N_{i = 1} ln f_{i,t}(\varepsilon_{i, t}; \gamma, \nu) \Big \}
+\end{align}
+where the density function $f$ is the skewed Student-\textit{t} given by \autoref{eq:dskewt}.
+
+\subsection{\textit{c}DCC conditional correlation process}
+To capture time-varying dependency, as motivated by rolling correlation and threshold correlation analyses, the copula correlation matrix $R_t$ is allowed to vary over time according to the \textit{c}DCC model~\autocite{Aielli2013}\footnote{\textit{c} stands for corrected, as Aielli (2009) has shown that the standard DCC estimator of Engle (2002) and Tse \& Tsui (2002) can be inconsistent.}
+\begin{align} \label{eq:qtrtlink}
+    R_t &= Q_t^{-1/2} Q_t Q_t^{-1/2}
+    \intertext{where the core process is}
+    Q_t &= (1 - \alpha - \beta) S + \alpha z_{t-1} z_{t-1}^\top + \beta Q_{t-1}
+\end{align}
+The $Q_t$ process is comprised of three components that are weighted according to $\alpha, \beta$: (1) $S$, a time-invariant component, to be interpreted similarly to a long-term mean in a regular GARCH process as $E[Q_t] = S$, (2) $z_{t-1} z_{t-1}^\top$, an innovation component from the copula shocks, and (3) $Q_{t-1}$, an autoregressive component of order one. In order for the the correlation matrix $R_t$ to be positive definite, $Q_t$ has to be positive definite, which is ascertained by requiring that $\alpha \geq 0$, $\beta \geq 0$ and $(\alpha + \beta) < 1$.
+
+The parameters are simultaneously estimated with the skewed Student-\textit{t} parameters $\nu$ and $\gamma$ using ML for the copula function, whose log-likelihood function is again found by rearranging Sklar's theorem (\autoref{eq:sklar}) and taking logs on both sides
+\begin{align} \label{eq:cdccllf}
+    LLF(\alpha, \beta, \gamma, \nu; u_1, ..., u_T) = \sum^T_{t=1} \Big \{ ln f_t(\varepsilon_{t}; \alpha, \beta, \gamma, \nu, R) - \sum^N_{i = 1} ln f_{i,t}(\varepsilon_{i, t}; \gamma, \nu) \Big \}
+\end{align}
+where the density function $f$ is the skewed Student-\textit{t} given by \autoref{eq:dskewt}.
+
+The process of the copula estimation with \textit{c}DCC dynamics is quite involved, as it relies on moment matching and recursive estimation of parameters to estimate the copula correlation matrices $\{\hat{R}\}$. Again, we follow \textcite{Aielli2013}, as is described in further detail in \autoref{App:AppendixD}.

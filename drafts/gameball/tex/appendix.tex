@@ -1,0 +1,92 @@
+%!TEX root = ../main.tex
+\appendix
+\appendixpageoff
+\section{Appendix A. Skewed Student-\textit{t} distribution} \label{App:AppendixA}
+In line with stylized facts on financial return series, the factor strategies exhibit fat tails and skewness - features that are poorly represented by the normal Gaussian. Our univariate estimations as well as our copula builds on the~\textcite{Hansen1994} skewed Student-\textit{t} distribution. The skewed Student-\textit{t} distribution is, more generally, nested in the generalized hyperbolic distribution~\autocite{McNeilFreyEmbrecht2005}.
+
+The random vector X is distributed multivariate generalized hyperbolic if
+\begin{align}
+    X \sim \mu + \sqrt{W} A Z + \gamma W
+\end{align}
+where $\gamma$ is the skewness vector, $\mu$ is the location vector, $R = A A^\top$ is the dispersion matrix, $W$ follows a generalized inverse-gamma distribution $W \sim GIG(\lambda, \chi, \psi)$ and Z is multivariate normal $Z \sim N(\mu^N, R)$, with $W, Z$ independent. The skewed Student-\textit{t} is nested with parameters
+\begin{align}
+    \lambda = \frac{\nu}{-2} && \chi = \nu - 2 && \psi = 0
+\end{align}
+where $\nu$ is the degree of freedom. Furthermore
+\begin{align}
+    E[X] &= \mu + E[W] \gamma \\
+    Var[X] &= E[Cov(X|W)] + Cov(E[X|W]) \\
+    &= Var(W) \gamma \gamma^\top + E[W] R \nonumber
+\end{align}
+These moments describe the link between the copula correlation matrix $R$ and the skewed Student-\textit{t} distribution's dispersion matrix $R$. Covariances are finite when $\nu > 4$. The multivariate density function is given by
+\begin{align} \label{eq:dskewt}
+    f_X(x) &= \frac{(\nu - 2)^\frac{\nu}{2} (\gamma^\top R^{-1} \gamma)^{\frac{\nu+d}{2}}}{(2 \pi)^{\frac{d}{2}} |R|^\frac{1}{2} \Gamma (\frac{\nu}{2}) 2^{\frac{\nu}{2} - 1}} \cdot \frac{K_{\frac{\nu + d}{2}} ( \sqrt{(\nu - 2 + Q(x)) \gamma^\top R^{-1} \gamma}) e^{(x-\mu)^\top R^{-1} \gamma} )}{( \sqrt{(\nu - 2 + Q(x)) \gamma^\top R^{-1} \gamma})^{\frac{\nu + d}{2}}}
+\end{align}
+where $K(\cdot)$ is the modified Bessel function of the second kind, $Q(x) = (x-\mu)^\top R^{-1} (x-\mu)$, $d$ is the length of $x$, and $\Gamma$ is the gamma distribution density.
+
+\newpage
+\section{Appendix B. ARMA-GARCH modeling of marginal distributions} \label{App:AppendixB}
+
+By examining marginal factor strategy returns, we find evidence of non-normality, autocorrelation, volatility clustering and leverage effects, in line with stylized factors on financial return series (Engle (1982), Bollerslev (1986), Black (1976), Glosten, Jagannathan \& Runkle (1993)). [Add text and reference to the marginal summary stats and the marginal plots to provide evidence]. An ARMA-GARCH model allows us to filter away such marginal asymmetries, while leaving any multivariate asymmetry to the copula specification. 
+
+The most important goal of this application GARCH model is not to have high predictive power of asset return series, but to sanitize the data to be used in multivariate analysis. We focus on parsimonious models with few lags, but enough flexibility to capture salient features of the summary plots of the marginal series, such as volatility clustering and leverage effect.
+
+The selection process is as follows: for each factor strategy, ARMA-GJR-GARCH models are estimated with different ARMA lag orders (up to 3,3) and a fixed GJR-GARCH order of (1,1). We then compute the Bayesian Information Criteria (BIC) for each specification, and for each factor select the model with the lowest BIC as the primary candidate. The primary candidate specification is then checked for remaining serial correlation and ARCH effects in residuals. All of the primary candidate models pass the diagnostic tests.
+
+We use the GJR-GARCH model with ARMA mean equation
+\begin{align}
+    r_t &= \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}  \\
+    \sigma_{t}^2 &= \omega + (a + \xi I_{t-1}) \epsilon_{t-1}^2 + b \sigma_{t-1}
+\end{align}
+which can be ML estimated for each of the factor return series. The innovations $\epsilon_{i,t}$ are assumed to be distributed skewed Student-\textit{t} with skewness $\zeta$ and degree of freedom $\varrho$.
+
+Using conditional one-step-ahead forecasts of log return and standard deviation from the ARMA-GARCH model, we can compute standardized GARCH residuals
+\begin{align}
+    \epsilon^*_{i,t} = \frac{\epsilon_{i,t} - E_{t-1}[\epsilon{i,t}]}{E_{t-1}[\sigma(\epsilon{i,t})]}
+\end{align}
+which are subsequently transformed into uniform residuals using the inverse of the skewed Student-\textit{t} distribution (\autoref{eq:dskewt}). The uniform series $\{u_i\}$ are then employed in the copula estimation.
+\begin{align}
+    u_{i,t} = t^{-1}_{\zeta, \varrho}(\epsilon^*_{i,t})
+\end{align}
+
+\newpage
+\section{Appendix C. Stationary bootstrap of copula parameter standard errors} \label{App:AppendixC}
+We rely on the multi-step maximum likelihood estimation of the copula model, which takes the standardized residuals of marginal distributions as given in the second step. The first estimation step introduces parameter uncertainty that is not taken into account by the conventional standard errors of the second estimation.\footnote{Here, our model deviates from Christoffersen \& Langlois (2013), who use a semi-parametric model that uses the empirical density function, and find standard errors using the analytical approach in Chen \& Fan (2006). However, those errors are not valid in a time-varying copula context, as the estimation of means and variances impact the asymptotic distributions of copula parameters (Rémillard 2010).} We use the stationary block bootstrap method of Politis \& Romano (1994) to find reliable standard errors for copula parameters. The procedure is theoretically supported by Goncalves \& White (2004) and implemented as follows:
+\begin{enumerate}[(i)]
+    \item Generate a block bootstrap version of the original weekly return data
+    \item Estimate the ARMA-GJR-GARCH models and calculate standardized residuals
+    \item Transform standardized residuals to uniform and estimate the copula model
+    \item Collect the copula parameters $\Theta_i$
+    \item Repeat (i)-(iv) N times to get $\{\Theta_i\}^{N}_{i=1}$
+    \item Use the confidence interval given by the $\alpha/2$ and $1- \alpha/2$ quantiles of $\{\Theta_i\}^{N}_{i=1}$
+\end{enumerate}
+
+\newpage
+\section{Appendix D. Copula correlation matrix estimation with \textit{c}DCC dynamics} \label{App:AppendixD}
+This is a step-by-step description of the procedure used to find the copula correlation matrix $\{\hat{R_t}\}$ in the \textit{c}DCC case, and has been adapted from \textcite{Aielli2013}.
+\begin{enumerate}[(i)]
+    \item Re-standardize uniform residuals from univariate ARMA-GJR-GARCH models $\{u_{i}\}$ using the inverse skewed Student-\textit{t} distribution with copula parameters $\gamma, \nu$,  and scale to zero mean and unit variance using the conditional mean and standard deviation\footnote{Unless the copula is normal, the re-standardized residuals $\{\varepsilon^c_i\}$ will not have zero mean and unit variance, which is required for the estimation of the sample correlation matrix $\hat{S}$.}
+    \begin{align}
+        \varepsilon^c_{i,t} = t^{-1}_{\gamma, \nu}(u_{i,t})
+    \end{align}
+    \begin{align}
+        \varepsilon_{i,t} = \frac{\varepsilon^c_{i, t} - E_{t-1}[\varepsilon^c_{i,t}]}{E_{t-1}[\sigma(\varepsilon^c_{i,t})]}
+    \end{align}
+    \item Compute the diagonal elements in $Q_t$ over time recursively, initializing with unit diagonal, and using Q-residuals $\{z_i\}$
+    \begin{align}
+        \intertext{Utilizing that $\S_{ii} = 1$ (for any correlation matrix), the process for diagonal elements of Q simplifies to}
+        q_{ii, t} &= (1 - \alpha - \beta) + \alpha z_{t-1} z_{t-1}^\top + \beta q_{ii, t-1}
+        \intertext{where residuals $\{z_{i}\}$ are initialized at zero and then calculated as}
+        z_{i, t} &= \varepsilon_{i, t} \sqrt{q_{ii, t}}
+    \end{align}
+    \item Use Q-standardized residuals $\{z_{i}\}$ to calculate a copula sample correlation matrix
+    \begin{align}
+        \hat{S} = \frac{1}{T} \sum_{t=1}^{T} z_{t-1} z_{t-1}^\top
+    \end{align}
+    \item Calculate off-diagonal elements of the Q matrix using the copula sample correlation matrix $\hat{S}$ as the long-term correlation matrix in the \textit{c}DCC specification
+    \begin{align}
+        \hat{Q_t} = (1 - \alpha - \beta) \hat{S} + \alpha z_{t-1} z_{t-1}^\top + \beta Q_{t-1}
+    \end{align}
+    \item Standardize $\hat{Q_t}$ to the copula correlation matrix $\hat{R_t}$ (\autoref{eq:qtrtlink}) and calculate the sum of log-likelihoods for a given parameter set $\Theta = \{\alpha, \beta, \gamma, \nu\}$ (\autoref{eq:cdccllf})
+\end{enumerate}
+

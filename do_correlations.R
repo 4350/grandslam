@@ -1,5 +1,7 @@
-#' Estimates threshold and rolling corrs
-#' Saves graph grids
+#' Estimates threshold and rolling corrs.
+#' Currently implementing daily return series. Has previously run weekly
+#' series for threshold correlation. The thCorrelationList is saved in derived
+#' data for further use in simulated threshold graphs.
 #' 
 
 # Libraries ----
@@ -33,38 +35,33 @@ thCorrelationList = list()
 for (value in factors.value) {
   
   # Get three statistics sets
-correlations <- correlations.factor.apply(factors.all, value, 'coef', df.estim, 1)
+  correlations <- correlations.factor.apply(factors.all, value, 'coef', df.estim, 1)
   lb <- correlations.factor.apply(factors.all, value, 'lb', df.estim, 1)
   ub <- correlations.factor.apply(factors.all, value, 'ub', df.estim, 1)
   
   # Consolidate and order data frame
   out.df <- data.frame(qs = seq(0.10, 0.90, by = 0.01), correlations, lb = lb[, 'value'], ub = ub[, 'value'])
   out.df$order <- factor(out.df$factor, levels = factors.all)
+  out.df$order2 <- factor(out.df$facetvalue, levels = factors.value)
   
   # Save to common object that holds all factors
   thCorrelationList[[value]] <- out.df
 }
 
+# Bind to one df for plot
+plotdf <- bind_rows(thCorrelationList$HML, thCorrelationList$RMW, thCorrelationList$CMA)
+
 # Do plots for every factor's data frame of threshold correlations vs all other factors
-plots <- lapply(thCorrelationList, correlations.plot.threshold)
+plots <- correlations.plot.threshold(plotdf)
 
 # Arrange and save plots
 g <- grid.arrange(
-  plots$HML +
-    ylab('HML')+
-    theme(axis.line=element_blank(),axis.text.x=element_blank(),
-          axis.title.x=element_blank(), axis.ticks.x = element_blank()),
-  plots$RMW +
-    ylab('RMW')+
-    theme(axis.line=element_blank(),axis.text.x=element_blank(),
-          axis.title.x=element_blank(), axis.ticks.x = element_blank()),
-  plots$CMA +
-    ylab('CMA') +
-    xlab('Quantiles'),
-  top = textGrob("Threshold correlations on daily data (95% confidence bounds)", gp = gpar(fontsize = 15))
+  plots,
+  top = textGrob("Threshold correlations on daily data (with 95% confidence bounds)", gp = gpar(fontsize = 15))
 )
 
-ggsave(file = 'output/ThresholdCorrelationsDaily.jpeg', g, width = 8.3, height = 11.7, units = 'in')
+ggsave(file = 'output/ThresholdCorrelationsDaily.jpeg', g, width = 16.6, height = 11.7, units = 'in')
+
 
 # Rolling correlations ----
 
@@ -91,22 +88,14 @@ for (value in factors.value) {
   
 }
 
-# Do plots for every factor's data frame of threshold correlations vs all other factors
-plots <- lapply(rollingCorrelationList, correlations.plot.rolling)
+# Bind to one df for plot
+plotdf <- bind_rows(rollingCorrelationList$HML, rollingCorrelationList$RMW, rollingCorrelationList$CMA)
+
+plots <- correlations.plot.rolling(plotdf)
 
 # Arrange and save plots
 g <- grid.arrange(
-  plots$HML +
-    ylab('HML')+
-    theme(axis.line=element_blank(),axis.text.x=element_blank(),
-          axis.title.x=element_blank(), axis.ticks.x = element_blank()),
-  plots$RMW +
-    ylab('RMW')+
-    theme(axis.line=element_blank(),axis.text.x=element_blank(),
-          axis.title.x=element_blank(), axis.ticks.x = element_blank()),
-  plots$CMA +
-    ylab('CMA') +
-    xlab(''),
+  plots,
   top = textGrob("Rolling 250-day correlations (95% confidence bounds)", gp = gpar(fontsize = 15))
 )
 
