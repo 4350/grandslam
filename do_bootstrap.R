@@ -21,7 +21,7 @@ kRandomSeed <- 403
 kBSRepetitions <- 1000
 
 # Bootstrap iteration to start at (<=kBootstrapRepetitions)
-kBSIteration <- 1
+kBSIteration <- 4
 
 # Average block length for stationary bootstrap
 # See optim_block_length for choosing this number
@@ -41,8 +41,14 @@ kGARCHModels <- list(
 kBSOutputPath <- 'data/derived/bootstrap/ghskt'
 
 # From previous runs, values around here are found to optimize the LL
-load('data/derived/dcopula_param_ghskt.RData')
-kCopulaParams <- param.ghskt$par
+load('data/derived/model_copula_dynamic_ghskt.RData')
+kCopulaParams <- c(
+  model.copula.dynamic.ghskt$dist.params$df,
+  model.copula.dynamic.ghskt$dist.params$skew,
+  model.copula.dynamic.ghskt$alpha,
+  model.copula.dynamic.ghskt$beta
+)
+
 # c(
 #   11.804937402,
 #   -0.019263030,
