@@ -38,6 +38,15 @@ bestfits <- list(
 model.GARCH <- bestfits
 save(model.GARCH, file = 'data/derived/model_GARCH.RData')
 
+# Get and save residuals ----
+df.res <- data.frame(
+  Date = df.estim$Date,
+  as.data.frame(
+    lapply(bestfits,
+           function(factor) factor@fit$residuals)
+  )
+)
+save(df.res, file = 'data/derived/garch_res.RData')
 
 # Get and save standardized residuals ----
 df.stdres <- data.frame(
