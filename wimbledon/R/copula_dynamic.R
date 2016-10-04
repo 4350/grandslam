@@ -205,25 +205,29 @@ dc.run.model <- function(u, dist.params, alpha, beta, cluster = NULL) {
 
 # Log Likelihood Functions ----
 
-dc.ll.marginal <- function(shocks, uv.dists, cluster) {
+dc.ll.marginal <- function(shocks, uv.dists, cluster = NULL) {
   fn <- function(i, shocks, uv.dists) {
     sum(ghyp::dghyp(shocks[, i], uv.dists[[i]], logvalue = T))
   }
-  
-  parSapply(
-    cluster,
-    seq(ncol(shocks)),
-    fn,
-    
-    # Closures on clusters seems to work intermittently; pass all relevant
-    # parameters directly for safety (seems to have a slight performance
-    # impact).
-    shocks = shocks,
-    uv.dists = uv.dists
-  )
+
+  if (!is.null(cluster)) {
+    return(parSapply(
+      cluster,
+      seq(ncol(shocks)),
+      fn,
+
+      # Closures on clusters seems to work intermittently; pass all relevant
+      # parameters directly for safety (seems to have a slight performance
+      # impact).
+      shocks = shocks,
+      uv.dists = uv.dists
+    ))
+  }
+
+  sapply(seq(ncol(shocks)), fn, shocks = shocks, uv.dists = uv.dists)
 }
 
-dc.ll.joint <- function(shocks, dist.params, Correlation, cluster) {
+dc.ll.joint <- function(shocks, dist.params, Correlation, cluster = NULL) {
   # For performance reasons, the skewed t-distribution calls a special density
   # function which skips a lot of checks. This shaves about 500 milliseconds
   # per call relative to calling dghyp.
@@ -262,9 +266,22 @@ dc.ll.joint <- function(shocks, dist.params, Correlation, cluster) {
       fn <- skewedTFn
     }
   }
-  
-  parSapply(
-    cluster,
+
+  # Run in parallel if a cluster was passed
+  if (!is.null(cluster)) {
+    return(parSapply(
+      cluster,
+      seq(nrow(shocks)),
+      fn,
+
+      # Again: Pass all parameters explicitly seems safer than not doing it
+      shocks = shocks,
+      params = dist.params,
+      Correlation = Correlation
+    ))
+  }
+
+  sapply(
     seq(nrow(shocks)),
     fn,
 
