@@ -300,21 +300,108 @@ dc.ll.total <- function(u, dist.params, alpha, beta, cluster) {
     beta = beta,
     cluster = cluster
   )
-  
-  # Compute joint and marginal likelihood
+
+  dc.ll(dist.params, model, cluster)
+}
+
+dc.ll <- function(dist.params, model, cluster = NULL) {
   ll.joint <- sum(dc.ll.joint(
     shocks = model$shocks,
     dist.params = dist.params,
     Correlation = model$Correlation,
     cluster = cluster
   ))
-  
+
   ll.marginal <- sum(dc.ll.marginal(
     shocks = model$shocks,
     uv.dists = model$uv.dists,
     cluster = cluster
   ))
-  
+
   # Sklar's theorem
   ll.joint - ll.marginal
+}
+
+
+# Utilities --------------------------------------------------------------
+
+#' Get dist.params from vector of params
+#'
+#' @param dist gauss, ghskt or ght
+#' @param N number of series
+#' @param params c(df, skew..., alpha, beta)
+#'
+#' @return list(df = df, skew = c(skew))
+#' @export
+dc.get.dist.params <- function(theta, N, dist) {
+  if (dist == "gauss") {
+    return(list())
+  }
+
+  df <- theta[1]
+  skew <- NULL
+  if (dist == "ghskt") {
+    skew <- theta[2:(N + 1)]
+  }
+
+  list(
+    df = df,
+    skew = skew
+  )
+}
+
+dc.get.params <- function(theta, N, dist) {
+  dist.params <- dc.get.dist.params(theta, N, dist)
+
+  # Get the number of distribution parameters, which is zero for Gaussian
+  # when dist.params is empty.
+  N.dist <- length(dist.params)
+  if (N.dist > 0) {
+    # Sum total number of distribution parameters
+    N.dist <- sum(sapply(dist.params, length))
+  }
+
+  # Theta has alpha and beta if it is longer than the number of distribution
+  # parameters
+  alpha <- 0
+  beta <- 0
+  if (length(theta) > N.dist) {
+    # Sanity check
+    print(N.dist)
+    stopifnot(length(theta) - N.dist == 2)
+
+    alpha <- theta[length(theta)]
+    beta <- theta[length(theta) - 1]
+  }
+
+  list(
+    dist.params = dist.params,
+    alpha = alpha,
+    beta = beta
+  )
+}
+
+#' Build output for an optimized model
+#'
+#' @param u Data optimized against
+#' @param dist.params
+#' @param alpha
+#' @param beta
+#'
+#' @return list of model output and parameters
+#' @export
+build.output <- function(u, params) {
+  # Generate model output
+  model <- dc.run.model(u, params$dist.params, params$alpha, params$beta)
+  ll <- dc.ll(params$dist.params, model)
+
+  list(
+    params = params,
+
+    Omega = model$Omega,
+    Correlation = model$Correlation,
+    shocks = model$shocks,
+    shocks.std = model$shocks.std,
+    ll = ll
+  )
 }
