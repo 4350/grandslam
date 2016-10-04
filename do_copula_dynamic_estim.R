@@ -1,46 +1,25 @@
-# Reset ----
+#' Estimate copulas with dynamic correlations
+
+# Workspace Setup --------------------------------------------------------
+library(parallel)
+library(magic)
+library(devtools)
+load_all('wimbledon')
 
 rm(list = ls())
+
 load('data/derived/garch_unires_model.RData')
 u <- df.u[, -1]
 rm(df.u)
 
-library(ghyp)
-library(parallel)
-library(devtools)
-load_all('wimbledon')
-
-prepare.cluster <- function() {
-  cluster <- makeCluster(detectCores() - 1)
-  clusterEvalQ(cluster, library(ghyp))
-  clusterEvalQ(cluster, library(devtools))
-  clusterEvalQ(cluster, load_all('wimbledon'))
-  cluster
-}
+# Constraints for the optimizers
+constr <- dc.constraints(ncol(u))
 
 # Estimate Asymmetric T-distribution ----
-optimize.ghskt <- function(params, u, cluster) {
-  df <- params[1]
-  skew <- params[2:(ncol(u) + 1)]
-  alpha <- tail(params, 2)[1]
-  beta <- tail(params, 1)[1]
-  
-  -wimbledon::dc.ll.total(
-    u,
-    list(
-      df = df,
-      skew = skew
-    ),
-    alpha = alpha,
-    beta = beta,
-    cluster
-  )
-}
-
 cluster <- prepare.cluster()
 
 # From previous run
-params <- c(
+theta.ghskt <- c(
   11.804937402,
   -0.019263030,
    0.064795233,
@@ -52,56 +31,26 @@ params <- c(
    0.912195831
 )
 
-param.ghskt <- constrOptim(
-  theta = params,
-  optimize.ghskt,
+optim.ghskt <- constrOptim(
+  theta.ghskt,
+  dc.optimize.fn,
   grad = NULL,
-  u = u,
+
+  dist = 'ghskt',
+  data = u,
   cluster = cluster,
-  ui = rbind(
-    c( 1,  0,  0,  0,  0,  0,  0,  0,  0),
-    c(-1,  0,  0,  0,  0,  0,  0,  0,  0),
-    
-    c( 0,  1,  0,  0,  0,  0,  0,  0,  0),
-    c( 0, -1,  0,  0,  0,  0,  0,  0,  0),
-    c( 0,  0,  1,  0,  0,  0,  0,  0,  0),
-    c( 0,  0, -1,  0,  0,  0,  0,  0,  0),
-    c( 0,  0,  0,  1,  0,  0,  0,  0,  0),
-    c( 0,  0,  0, -1,  0,  0,  0,  0,  0),
-    c( 0,  0,  0,  0,  1,  0,  0,  0,  0),
-    c( 0,  0,  0,  0, -1,  0,  0,  0,  0),
-    c( 0,  0,  0,  0,  0,  1,  0,  0,  0),
-    c( 0,  0,  0,  0,  0, -1,  0,  0,  0),
-    c( 0,  0,  0,  0,  0,  0,  1,  0,  0),
-    c( 0,  0,  0,  0,  0,  0, -1,  0,  0),
-    
-    c( 0,  0,  0,  0,  0,  0,  0,  1,  0),
-    c( 0,  0,  0,  0,  0,  0,  0,  0,  1),
-    c( 0,  0,  0,  0,  0,  0,  0, -1, -1)
+
+  ui = adiag(
+    constr$ui$df,
+    constr$ui$skew,
+    constr$ui$alphabeta
   ),
-  ci = rbind(
-    6,       # min df
-    -20,     # -(max df)
-    
-    # SMB daily cannot handle skew = 0.50 -- which seems like a large value
-    # from looking at Christoffersen; constrain hard
-    -0.25,      # min skew
-    -0.25,      # -(max skew)
-    -0.25,      # min skew
-    -0.25,      # -(max skew)
-    -0.25,      # min skew
-    -0.25,      # -(max skew)
-    -0.25,      # min skew
-    -0.25,      # -(max skew)
-    -0.25,      # min skew
-    -0.25,      # -(max skew)
-    -0.25,      # min skew
-    -0.25,      # -(max skew)
-    
-    0,       # min alpha
-    0,       # min beta
-    -0.9999  # -(max alpha + beta)
+  ci = c(
+    constr$ci$df,
+    constr$ci$skew,
+    constr$ci$alphabeta
   ),
+
   control = list(
     trace = 6,
     maxit = 1000
@@ -109,47 +58,15 @@ param.ghskt <- constrOptim(
 )
 
 stopCluster(cluster)
-rm(cluster)
-rm(optimize.ghskt)
-rm(params)
 
-# Run and save all estimates ----
-
-# XXX This should be alot prettier
-# Both going to and from the parameter vector should be better so that
-# estimation of nested models can be done in a coherent fashion.
-model.copula.dynamic.ghskt <- list(
-  dist.params = list(
-    df = param.ghskt$par[1],
-    skew = param.ghskt$par[2:(ncol(u) + 1)]
-  ),
-  alpha = param.ghskt$par[length(param.ghskt$par) - 1],
-  beta = param.ghskt$par[length(param.ghskt$par)]
-)
-
-# Great, we now have estimated parameters -- we also need to get the
-# corresponding Omega that was estimated using method of moments on this
-# dataset
-model <- dc.run.model(
+model.copula.dynamic.ghskt <- build.output(
   u,
-  model.copula.dynamic.ghskt$dist.params,
-  model.copula.dynamic.ghskt$alpha,
-  model.copula.dynamic.ghskt$beta,
-  cluster = NULL
+  dc.get.params(optim.ghskt$par, ncol(u), 'ghskt')
 )
-
-# XXX UGGH WE CODE HARD
-model.copula.dynamic.ghskt$Omega <- model$Omega
-model.copula.dynamic.ghskt$Correlation <- model$Correlation
-model.copula.dynamic.ghskt$shocks <- model$shocks
-model.copula.dynamic.ghskt$shocks.std <- model$shocks.std
-
 save(
   model.copula.dynamic.ghskt,
   file = ('data/derived/model_copula_dynamic_ghskt.RData')
 )
-
-rm(model)
 
 # Estimate Symmetric T-distribution ----
 
@@ -163,7 +80,7 @@ optimize.ght <- function(params, u, cluster) {
   df <- params[1]
   alpha <- params[2]
   beta <- params[3]
-  
+
   -wimbledon::dc.ll.total(
     u,
     list(
@@ -224,7 +141,7 @@ save(
 optimize.gauss <- function(params, u, cluster) {
   alpha <- params[1]
   beta <- params[2]
-  
+
   -wimbledon::dc.ll.total(
     u,
     list(),
@@ -296,7 +213,7 @@ models <- rbind(
   sapply(param, function(p) -p$value),
   sapply(param, bic),
   sapply(param, aic),
-  
+
   # Christoffersen appears to count correlations estimated for Q
   sapply(param, function(p) length(p$par))
 )

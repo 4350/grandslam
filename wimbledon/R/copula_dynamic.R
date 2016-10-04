@@ -15,11 +15,11 @@ dc.uv.dists <- function(N, dist.params) {
     }
     # Symmetric T case
     else if (is.null(dist.params$skew)) {
-      dist <- student.t(nu = dist.params$df)
+      dist <- ghyp::student.t(nu = dist.params$df)
     }
     # Skewed T case
     else {
-      dist <- student.t(nu = dist.params$df, gamma = dist.params$skew[i])
+      dist <- ghyp::student.t(nu = dist.params$df, gamma = dist.params$skew[i])
     }
 
     dist
@@ -324,6 +324,72 @@ dc.ll <- function(dist.params, model, cluster = NULL) {
 
 
 # Utilities --------------------------------------------------------------
+
+dc.constraints <- function(N) {
+  ui <- list()
+  ci <- list()
+
+  # Df constraints
+  ui$df <- rbind(1, -1)
+  ci$df <- rbind(6, -20)
+
+  # Skew constraints
+  ui$skew <- rbind(
+    diag(1, N),
+    diag(-1, N)
+  )
+  ci$skew <- cbind(c(
+    rep(-0.25, N),
+    rep(-0.25, N)
+  ))
+
+  ui$alphabeta <- rbind(
+    c( 1,  0),
+    c( 0,  1),
+    c(-1, -1)
+  )
+
+  ci$alphabeta <- rbind(
+    0.0000,
+    0.0000,
+    -0.9999
+  )
+
+  list(ui = ui, ci = ci)
+}
+
+#' Cluster that can be used for optimization
+#'
+#' @return
+#' @export
+prepare.cluster <- function() {
+  cluster <- makeCluster(detectCores() - 1)
+  clusterEvalQ(cluster, library(ghyp))
+  clusterEvalQ(cluster, library(devtools))
+  clusterEvalQ(cluster, load_all('wimbledon'))
+  cluster
+}
+
+#' Function that can be minimized by optim to maximize likelihood
+#'
+#' @param theta Smart parameter list; see `dc.get.params`.
+#' @param dist ghskt, ght or gauss
+#' @param data uniforms residuals
+#' @param cluster cluster for parallel optim
+#'
+#' @return negative log-likelihood
+#' @export
+dc.optimize.fn <- function(theta, dist, data, cluster = NULL) {
+  params <- dc.get.params(theta, ncol(data), dist)
+
+  -wimbledon::dc.ll.total(
+    dist.params = params$dist.params,
+    alpha = params$alpha,
+    beta = params$beta,
+    u = data,
+    cluster = cluster
+  )
+}
 
 #' Get dist.params from vector of params
 #'
