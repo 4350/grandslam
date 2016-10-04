@@ -17,7 +17,7 @@ rm(list = ls())
 load('data/derived/garch_stdres.RData')
 
 # Do and save density plots ----
-#jpeg(filename = "output/densityGARCHresiduals.jpeg", height = 8.3, width = 11.7, units = 'in', res = 300)
+jpeg(filename = "output/densityGARCHresiduals.jpeg", height = 8.3, width = 11.7, units = 'in', res = 300)
 g <- df.stdres %>% select(-Date) %>%
   ggpairs(lower = list(
     continuous = function(data, mapping, ...) {

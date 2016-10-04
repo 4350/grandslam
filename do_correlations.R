@@ -27,40 +27,26 @@ factors.all   = c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
 # Threshold correlations ----
 
 # Create list to hold correlation sets
-thCorrelationList = list()
+thCorrList = list()
 
 # Loop for each value factors to get threshold correlation for all factors
 # and save to the list created above
 
-for (value in factors.value) {
-  
-  # Get three statistics sets
-  correlations <- correlations.factor.apply(factors.all, value, 'coef', df.estim, 1)
-  lb <- correlations.factor.apply(factors.all, value, 'lb', df.estim, 1)
-  ub <- correlations.factor.apply(factors.all, value, 'ub', df.estim, 1)
-  
-  # Consolidate and order data frame
-  out.df <- data.frame(qs = seq(0.10, 0.90, by = 0.01), correlations, lb = lb[, 'value'], ub = ub[, 'value'])
-  out.df$order <- factor(out.df$factor, levels = factors.all)
-  out.df$order2 <- factor(out.df$facetvalue, levels = factors.value)
-  
-  # Save to common object that holds all factors
-  thCorrelationList[[value]] <- out.df
-}
+thCorrList <- th_corr(df.estim %>% select(-Date), 0)
 
 # Bind to one df for plot
-plotdf <- bind_rows(thCorrelationList$HML, thCorrelationList$RMW, thCorrelationList$CMA)
+plotdf <- bind_rows(thCorrList$HML, thCorrList$RMW, thCorrList$CMA)
 
 # Do plots for every factor's data frame of threshold correlations vs all other factors
-plots <- correlations.plot.threshold(plotdf)
+plots <- correlations.plot.threshold(plotdf)+
+  ggtitle("Threshold correlations of daily log returns (95% confidence bounds)")
 
 # Arrange and save plots
 g <- grid.arrange(
-  plots,
-  top = textGrob("Threshold correlations on daily data (with 95% confidence bounds)", gp = gpar(fontsize = 15))
+  plots
 )
 
-ggsave(file = 'output/ThresholdCorrelationsDaily.jpeg', g, width = 16.6, height = 11.7, units = 'in')
+ggsave(file = 'output/ThresholdCorrelationsDaily2.jpeg', g, width = 16.6, height = 11.7, units = 'in')
 
 
 # Rolling correlations ----
@@ -91,16 +77,16 @@ for (value in factors.value) {
 # Bind to one df for plot
 plotdf <- bind_rows(rollingCorrelationList$HML, rollingCorrelationList$RMW, rollingCorrelationList$CMA)
 
-plots <- correlations.plot.rolling(plotdf)
+plots <- correlations.plot.rolling(plotdf)+
+  ggtitle("Rolling 250-day correlations (95% confidence bounds)")
 
 # Arrange and save plots
 g <- grid.arrange(
-  plots,
-  top = textGrob("Rolling 250-day correlations (95% confidence bounds)", gp = gpar(fontsize = 15))
+  plots
 )
 
 ggsave(
-  file = 'output/rollingCorrelations/250daily.jpeg',
+  file = 'output/rollingCorrelations/250daily2.jpeg',
   g,
   width = 16.6,
   height = 11.7,

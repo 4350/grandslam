@@ -150,6 +150,7 @@ correlations.plot.rolling <- function(df) {
     ) +
     geom_line(aes(color = 'Correlation coefficient')) +
     theme(legend.position="none") +
+    theme_Publication()+
     ylab('') +
     coord_cartesian(ylim = c(-1, 1)) +
     #scale_x_date(date_breaks = "5 years", date_labels = "%y")+
@@ -178,6 +179,7 @@ correlations.plot.threshold <- function(df) {
     xlab('Quantiles')+
     coord_cartesian(xlim = c(0, 1), ylim = c(-0.5, 1)) +
     scale_x_continuous(labels = scales::percent) +
+    theme_Publication()+
     facet_grid(order2 ~ order)
 }
 
@@ -198,27 +200,29 @@ correlations.plot.threshold.sim <- function(df) {
     ) +
     #scale_colour_manual("",values=c("darkslategrey", "blue", "darkgreen"))+
     geom_line(aes(color = "Empirical distribution")) +
-    geom_line(aes(x = qs, y = norm, color = "Normal distribution"), linetype = 2)+
+    #geom_line(aes(x = qs, y = norm, color = "Normal distribution"), linetype = 2)+
+    #geom_line(aes(x = qs, y = t, color = "Student-t distribution"), linetype = 2)+
+    geom_line(aes(x = qs, y = skewt, color = "Skewed Student-t distribution"), linetype = 2)+
     theme(legend.key = element_blank(), legend.title = element_blank())+
-    #geom_line(aes(x = qs, y = t, group = factor))+
-    #geom_line(aes(x = qs, y = skewt, group = factor))+
     ylab('') +
     xlab('Quantiles')+
     coord_cartesian(xlim = c(0, 1), ylim = c(-0.5, 1)) +
     scale_x_continuous(labels = scales::percent) +
+    theme_Publication()+
     facet_grid(order2 ~ order)
-  
 }
 
-#' Calculate list of simulated threshold correlations from 
-#' a given data frame
+
+#' Calculate list of threshold correlations
 #' 
-#' @param df Data frame (TxBootruns)xN of simulated data
+#' @param df Data frame (TxBootruns)xN of simulated data or empirical data (shorter)
+#' @param simulatetoggle Dummy 1 if simulated series, else considered empirical
 #'
-#' @return simThCorrelationList a list of three (one for each value factor)
-#'  data frames with threshold correlations for each factor
+#' @return out.list a list of three (one for each value factor)
+#'  data frames with threshold correlations for each factor,
+#'  also holds factor ordering for ggplot
 #' @export
-sim_th_corr <- function(df) {
+th_corr <- function(df, simulatetoggle) {
   # Get some size of data
   N <- ncol(df)
   T <- nrow(df)
@@ -228,14 +232,29 @@ sim_th_corr <- function(df) {
   factors.all <- c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
   
   # Create list to hold simulated corrs
-  simThCorrelationList = list()
+  out.list = list()
   
   # Populate output matrix with point estimates for all value factors vs all factors
   for (value in factors.value) {
     # Get point estimates for each pair value <-> other factor
-    simThCorrelationList[[value]] <- data.frame(
-      simvalues = correlations.factor.apply(factors.all, value, 'coef', df, 1)[,'value']
-    )
+    # If simulated data set
+    if (simulatetoggle == 1) {
+      out.df <- data.frame(
+        simcoef = correlations.factor.apply(factors.all, value, 'coef', df, 1)[,'value']
+      )
+    } else {
+    # Else empirical data set  
+      out.df <- data.frame(
+        qs = seq(0.10,0.90,0.01),
+        correlations.factor.apply(factors.all, value, 'coef', df, 1),
+        lb = correlations.factor.apply(factors.all, value, 'lb', df, 1)[,'value'],
+        ub = correlations.factor.apply(factors.all, value, 'ub', df, 1)[,'value']
+      )
+      # Ordering for ggplot
+      out.df$order <- factor(out.df$factor, levels = factors.all)
+    }
+    # Put in list
+    out.list[[value]] <- out.df
   }
-  return(simThCorrelationList)
+  return(out.list)
 }
