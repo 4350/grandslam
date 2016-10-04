@@ -50,7 +50,7 @@ estimate.garch <- function(df, nOOS) {
 garch.fits <- estimate.garch(df, H)
 
 # Make the rolling 1-step ahead forecasts of sigma and the series
-n.roll = 30
+n.roll = H
 
 fcList = list()
 
@@ -92,27 +92,38 @@ sigma.fc <- rbind(
 )
 
 
-#' Function to update the standardized returns with latest forecast of vol
-#' See Hull & White (1998)
+#' Function to calculate VaR, using volatility updated 
+#' standardized returns, see Hull & White (1998)
+#' 
 #' @param h Index in the forecast period, h<H
+#' @param q Lower tail probability of interest
 #' @param std.ret Consolidated matrix of standardized returns (T+H)xN, both in and out of sample
 #' @param sigma.fc Consolidated matrix of conditional volatilities (T+H)*N, both in and out of sample
 #' @param T End of estimation period
 #' 
-#' @return r.star Volatility updated returns (T+h-1)xN
-volatilityupdate <- function(h, std.ret, sigma.fc, T) {
+#' @return var.star Vector length N. 1-step ahead VaR for forecast index h
+volatilityupdate <- function(h, q, std.ret, sigma.fc, T) {
+  
   # Standard returns up to last period
   std.ret <- std.ret[1:(T+h-1),]
   r.star <- apply(std.ret, 1, function(r, h) {
     # Multiply each time t standardized rets by next forecast of vol
-    r * sigma.fc[T+h,]
+    r * sigma.fc[(T+h),]
   },
   h = h)
+  
+  # Turn it right
   r.star <- t(r.star)
+  
+  # Calculate VaRs
+  var.star <- apply(r.star, 2, function(r, q) {
+    quantile(r, probs = q)
+  },
+  q = q
+  )
+  
+  var.star
 }
-
-# Set probaiblities for VaR
-kQs <- c(0.01, 0.05)
 
 #' Historical simulation using volatility updated returns
 #' 
@@ -123,14 +134,43 @@ kQs <- c(0.01, 0.05)
 #' 
 #' @return HS.VaR Historically simulated VaR
 hist.sim <- function(q, std.ret, sigma.fc, T) {
-  H = T - nrow(std.ret)
-  
-  # Get the vol updated return matrix
-  r.star = volatilityupdate(1, std.ret, sigma.fc, T)
-  # Calculate the VaR from empirical CDF of vol updated data
-  var.star <- apply(r.star, 2, function(r, q) {
-    quantile(r, probs = q)
+  H = nrow(std.ret) - T - 1
+  HS.VaR = sapply(seq(1:H), function(h, q, std.ret, sigma.fc, T) {
+    volatilityupdate(h, q, std.ret, sigma.fc, T)
   },
-  q = q
+  q = q,
+  std.ret = std.ret,
+  sigma.fc = sigma.fc, 
+  T = T
   )
+  HS.VaR = t(HS.VaR)
 }
+
+library(tidyr)
+library(ggplot2)
+
+# ugly stuff to try it quickly :)
+a <- hist.sim(0.01, std.ret, sigma.fc, T)
+a <- as.data.frame(a)
+
+a <- gather(a, 'factor','value',1:6)
+a$h <- rep(seq(1,H), 6)
+a$order <- factor(a$factor, names(kGARCHModels))
+
+b <- hist.sim(0.05, std.ret, sigma.fc, T)
+b <- as.data.frame(b)
+
+b <- gather(b, 'factor','value',1:6)
+b$h <- rep(seq(1,H), 6)
+b$order <- factor(b$factor, names(kGARCHModels))
+
+emp <- gather(df[(T+1):nrow(df), ], 'factor','value', 1:6)
+emp$h <- rep(seq(1,H), 6)
+emp$order <- factor(emp$factor, names(kGARCHModels))
+
+ggplot(a, aes(x = h, y = value, group = factor))+
+  geom_line()+
+  geom_line(aes(color = 'blue'), data = b)+
+  geom_line(aes(color = factor), data = emp)+
+  facet_grid(order ~ .)
+
