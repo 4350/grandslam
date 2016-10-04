@@ -50,7 +50,7 @@ estimate.garch <- function(df, nOOS) {
 garch.fits <- estimate.garch(df, H)
 
 # Make the rolling 1-step ahead forecasts of sigma and the series
-n.roll = H
+n.roll = H - 1
 
 fcList = list()
 
@@ -64,30 +64,17 @@ fcList <- lapply(garch.fits,
                  },
                  n.roll = n.roll)
 
-# Consolidate series of standardized returns and sigma in and out of sample ----
-std.ret <- rbind(
-  # Get conditional standardized returns in-sample
-  sapply(garch.fits,
-         function(fFit) {
-           std.ret = (fFit@fit$z/100) / fFit@fit$sigma 
-         }),
-  # Get conditional standardized returns "out-of-sample"
-  sapply(fcList,
-         function(ffc) {
-           std.ret = ffc@forecast$seriesFor / ffc@forecast$sigmaFor
-         })
-)
-
-sigma.fc <- rbind(
+# # Consolidate series of sigma in and out of sample ----
+sigma <- rbind(
   # Get conditional sigma in-sample
   sapply(garch.fits,
          function(fFit) {
-           sigma.fc = fFit@fit$sigma 
+           sigma = fFit@fit$sigma
          }),
   # Get conditional sigma "out-of-sample"
   sapply(fcList,
          function(ffc) {
-           sigma.fc = ffc@forecast$sigmaFor
+           sigma = ffc@forecast$sigmaFor
          })
 )
 
@@ -95,33 +82,33 @@ sigma.fc <- rbind(
 #' Function to calculate VaR, using volatility updated 
 #' standardized returns, see Hull & White (1998)
 #' 
-#' @param h Index in the forecast period, h<H
+#' @param h Index in the forecast period, h<=H
 #' @param q Lower tail probability of interest
-#' @param std.ret Consolidated matrix of standardized returns (T+H)xN, both in and out of sample
-#' @param sigma.fc Consolidated matrix of conditional volatilities (T+H)*N, both in and out of sample
+#' @param df 
+#' @param sigma Consolidated matrix of conditional volatilities (T+H)*N, both in and out of sample
 #' @param T End of estimation period
 #' 
 #' @return var.star Vector length N. 1-step ahead VaR for forecast index h
-volatilityupdate <- function(h, q, std.ret, sigma.fc, T) {
+volatilityupdate <- function(h, q, df, sigma, T) {
   
   # Standard returns up to last period
-  std.ret <- std.ret[1:(T+h-1),]
+  std.ret <- df[1:(T+h-1), ] / sigma[1:(T+h-1), ]
   r.star <- apply(std.ret, 1, function(r, h) {
     # Multiply each time t standardized rets by next forecast of vol
-    r * sigma.fc[(T+h),]
+    r * sigma[(T+h),]
   },
   h = h)
   
   # Turn it right
   r.star <- t(r.star)
   
-  # Calculate VaRs
+  #Calculate VaRs
   var.star <- apply(r.star, 2, function(r, q) {
     quantile(r, probs = q)
   },
   q = q
   )
-  
+
   var.star
 }
 
@@ -132,45 +119,59 @@ volatilityupdate <- function(h, q, std.ret, sigma.fc, T) {
 #' @param sigma.fc Consolidated matrix of conditional volatilities (T+H)*N, both in and out of sample
 #' @param T End of estimation period
 #' 
-#' @return HS.VaR Historically simulated VaR
-hist.sim <- function(q, std.ret, sigma.fc, T) {
-  H = nrow(std.ret) - T - 1
-  HS.VaR = sapply(seq(1:H), function(h, q, std.ret, sigma.fc, T) {
-    volatilityupdate(h, q, std.ret, sigma.fc, T)
+#' @return HS.VaR df of historically simulated VaR
+hist.sim <- function(q, df, sigma.fc, T) {
+  H = nrow(df) - T
+  HS.VaR = sapply(seq(1:H), function(h, q, df, sigma, T) {
+    volatilityupdate(h, q, df, sigma, T)
   },
   q = q,
-  std.ret = std.ret,
-  sigma.fc = sigma.fc, 
+  df = df,
+  sigma = sigma, 
   T = T
   )
-  HS.VaR = t(HS.VaR)
+  HS.VaR = data.frame(t(HS.VaR))
 }
 
+# Libraries for plot ----
 library(tidyr)
 library(ggplot2)
+library(extrafont)
 
-# ugly stuff to try it quickly :)
-a <- hist.sim(0.01, std.ret, sigma.fc, T)
-a <- as.data.frame(a)
+# Tidy data frame return for plot
 
-a <- gather(a, 'factor','value',1:6)
-a$h <- rep(seq(1,H), 6)
-a$order <- factor(a$factor, names(kGARCHModels))
+hist.sim.tidy <- function(q, df, sigma, T, kGARCHModels) {
+  H = nrow(df) - T
+  N = ncol(df)
+  # Run simulation
+  out.df <- hist.sim(q, df, sigma, T)
+  # Long format data
+  out.df <- gather(out.df, 'factor', 'value', 1:N)
+  # Add horizon "x values"
+  out.df$h <- rep(seq(1,H), N)
+  # Order data set for plot
+  out.df$order <- factor(out.df$factor, names(kGARCHModels))
+  out.df
+}
 
-b <- hist.sim(0.05, std.ret, sigma.fc, T)
-b <- as.data.frame(b)
+# Get the stuff we want for plot, including empirical
 
-b <- gather(b, 'factor','value',1:6)
-b$h <- rep(seq(1,H), 6)
-b$order <- factor(b$factor, names(kGARCHModels))
+var05 <- hist.sim.tidy(.05, df, sigma, T, kGARCHModels)
+var01 <- hist.sim.tidy(.01, df, sigma, T, kGARCHModels)
 
 emp <- gather(df[(T+1):nrow(df), ], 'factor','value', 1:6)
-emp$h <- rep(seq(1,H), 6)
+emp$h <- rep(seq(1,H), ncol(df))
 emp$order <- factor(emp$factor, names(kGARCHModels))
 
-ggplot(a, aes(x = h, y = value, group = factor))+
-  geom_line()+
-  geom_line(aes(color = 'blue'), data = b)+
-  geom_line(aes(color = factor), data = emp)+
-  facet_grid(order ~ .)
+# Plot that
+ggplot(emp, aes(x = h, y = value, group = factor))+
+  geom_line(aes(color = 'Realized return'))+
+  geom_line(aes(color = '5% HS-HW VaR'), data = var05)+
+  geom_line(aes(color = '1% HS-HW VaR'), data = var01)+
+  theme_Publication()+
+  facet_grid(. ~ order)
 
+# Evalute with tests
+
+var01$violate <- emp$value < var01$value
+var05$violate <- emp$value < var05$value
