@@ -4,6 +4,8 @@
 #' alpha = beta = 0.
 #'
 
+# THIS CODE NEEDS TO BE UPDATED TO WORK WITH NEW COPULA CODE!!!
+
 # Workspace Setup --------------------------------------------------------
 library(parallel)
 library(devtools)
@@ -14,14 +16,6 @@ rm(list = ls())
 load('data/derived/garch_unires_model.RData')
 u <- df.u[, -1]
 rm(df.u)
-
-prepare.cluster <- function() {
-  cluster <- makeCluster(detectCores() - 1)
-  clusterEvalQ(cluster, library(ghyp))
-  clusterEvalQ(cluster, library(devtools))
-  clusterEvalQ(cluster, load_all('wimbledon'))
-  cluster
-}
 
 optimizeFn <- function(theta, dist, data, cluster = NULL) {
   params <- dc.get.params(theta, ncol(data), dist)
@@ -82,10 +76,7 @@ optim.ghskt <- constrOptim(
 )
 
 stopCluster(cluster)
-model.copula.constant.ghskt <- build.output(
-  u,
-  dc.get.params(optim.ghskt$par, ncol(u), 'ghskt')
-)
+model.copula.constant.ghskt <- build.output(u, optim.ghskt$par, 'ghskt')
 
 save(
   model.copula.constant.ghskt,
@@ -111,10 +102,7 @@ optim.ght <- optim(
 )
 
 stopCluster(cluster)
-model.copula.constant.ght <- build.output(
-  u,
-  dc.get.params(optim.ght$par, ncol(u), 'ght')
-)
+model.copula.constant.ght <- build.output(u, optim.ght$par, 'ght')
 
 save(
   model.copula.constant.ght,
@@ -123,10 +111,7 @@ save(
 
 # Gaussian Copula ----
 # No optimization to do here as correlation matrix is MoM estimated
-model.copula.constant.gauss <- build.output(
-  u,
-  dc.get.params(NULL, ncol(u), 'gauss')
-)
+model.copula.constant.gauss <- build.output(u, NULL, 'gauss')
 
 save(
   model.copula.constant.gauss,

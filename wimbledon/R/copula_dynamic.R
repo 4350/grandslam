@@ -449,13 +449,16 @@ dc.get.params <- function(theta, N, dist) {
 #' Build output for an optimized model
 #'
 #' @param u Data optimized against
-#' @param dist.params
-#' @param alpha
+#' @param theta
+#' @param dist
 #' @param beta
 #'
 #' @return list of model output and parameters
 #' @export
-build.output <- function(u, params) {
+build.output <- function(u, theta, dist) {
+  # Translate theta into params list
+  params <- dc.get.params(theta, ncol(u), dist)
+
   # Generate model output
   model <- dc.run.model(u, params$dist.params, params$alpha, params$beta)
   ll <- dc.ll(params$dist.params, model)
