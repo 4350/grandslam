@@ -2,7 +2,7 @@
 #'
 #' This is done sequentially for each bootstrap, however, it is suitable
 #' to run this process on multiple computers and later join the results.
-#' 
+#'
 #' The script is written to output its results progressively, so you can cancel
 #' it and the bootstrapped parameters so far will be available in an output
 #' file.
@@ -34,7 +34,7 @@ kGARCHModels <- list(
   SMB = garch.specgen(1, 1),
   Mom = garch.specgen(1, 0),
   RMW = garch.specgen(1, 0),
-  CMA = garch.specgen(1, 0) 
+  CMA = garch.specgen(1, 0)
 )
 
 # Output path
@@ -66,11 +66,11 @@ kCopulaUi <- rbind(
   # Degrees of freedom bounds
   c( 1, cz, 0, 0),
   c(-1, cz, 0, 0),
-  
+
   # Skewness Bounds
   cbind(cz, diag( 1, 6), cz, cz),
   cbind(cz, diag(-1, 6), cz, cz),
-  
+
   # Alpha/Beta Bounds
   c(0, cz,  1,  0),
   c(0, cz,  0,  1),
@@ -93,14 +93,14 @@ kCopulaCi <- cbind(
 # Functions Unique to Each Copula Model ----
 
 #' Function to optimize for GHSKT copula
-#' 
+#'
 #' Unique because parameters are special for this copula
 optimize <- function(params, u, cluster) {
   df <- params[1]
   skew <- params[2:(ncol(u) + 1)]
   alpha <- tail(params, 2)[1]
   beta <- tail(params, 1)[1]
-  
+
   -wimbledon::dc.ll.total(
     u,
     list(
@@ -114,7 +114,7 @@ optimize <- function(params, u, cluster) {
 }
 
 #' Estimate GHSKT copula
-#' 
+#'
 #' Unique because constraints need to be set specifically, and correct
 #' optimized function must be called
 estimate.copula <- function(u) {
@@ -122,30 +122,30 @@ estimate.copula <- function(u) {
   clusterEvalQ(cluster, library(ghyp))
   clusterEvalQ(cluster, library(devtools))
   clusterEvalQ(cluster, load_all('wimbledon'))
-  
+
   param <- constrOptim(
     theta = kCopulaParams,
     f = optimize,
     grad = NULL,
     u = u,
     cluster = cluster,
-    
+
     # Optimization constraints and control
     ui = kCopulaUi,
     ci = kCopulaCi,
-    
+
     control = list(
       trace = 0,
       maxit = 1000
     )
   )
-  
+
   stopCluster(cluster)
   param
 }
 
 #' Build bootstrap output for GHSKT copula
-#' 
+#'
 #' Unique because names of parameters are hardcoded
 build.bootstrap.output.copula <- function(b.copula) {
   b.out.copula <- c(
@@ -159,12 +159,12 @@ build.bootstrap.output.copula <- function(b.copula) {
     paste0('par.skew', seq(1, 6)),
     'par.alpha',
     'par.beta',
-    
+
     # Diagnostics
     'll',
     'convergence'
   ))
-  
+
   b.out.copula
 }
 
