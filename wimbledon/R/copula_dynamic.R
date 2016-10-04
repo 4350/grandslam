@@ -367,11 +367,10 @@ dc.get.params <- function(theta, N, dist) {
   beta <- 0
   if (length(theta) > N.dist) {
     # Sanity check
-    print(N.dist)
     stopifnot(length(theta) - N.dist == 2)
 
-    alpha <- theta[length(theta)]
-    beta <- theta[length(theta) - 1]
+    alpha <- theta[length(theta) - 1]
+    beta <- theta[length(theta)]
   }
 
   list(
