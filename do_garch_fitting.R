@@ -13,6 +13,10 @@ load_all('wimbledon')
 # Reset Workspace ----
 rm(list = ls())
 load('data/derived/weekly-estim.RData')
+load('data/derived/weekly-full.RData')
+
+# Calculate number of weeks out of sample ---- 
+nOOS <- nrow(df) - nrow(df.estim)
 
 # Estimate GARCH specifications ----
 speclist <- list(
@@ -41,16 +45,18 @@ clusterEvalQ(cluster, library(rugarch))
 
 fits <- lapply(
   df.estim[, -1],
-  function(factor) {
+  function(factor, nOOS) {
     parLapply(
       cluster,
       speclist,
-      function(spec, factor) {
-        ugarchfit(spec, factor, model = "hybrid")
+      function(spec, factor, nOOS) {
+        ugarchfit(spec, factor, out.sample = nOOS, model = "hybrid")
       },
-      factor = factor
+      factor = factor,
+      nOOS = nOOS
     )
-  }
+  },
+  nOOS = nOOS
 )
 stopCluster(cluster)
 rm(cluster)
