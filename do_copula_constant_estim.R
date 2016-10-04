@@ -1,53 +1,19 @@
-#' Estimate copula with constant correlation matrices
+#' Estimate copulas with constant correlation matrices
+#'
+#' These estimations use the dynamic code, but with parameter restrictions
+#' alpha = beta = 0.
+#'
 
-# Reset ----
-rm(list = ls())
-load('data/derived/garch_unires_model.RData')
-u <- df.u[, -1]
-rm(df.u)
-
-library(ghyp)
+# Workspace Setup --------------------------------------------------------
 library(parallel)
 library(devtools)
 load_all('wimbledon')
 
-# Estimate Gaussian ----
-load_all('wimbledon')
+rm(list = ls())
 
-optimize.gauss <- function(params, u, cluster) {
-  dist <- ghyp::gauss(
-    mu = rep(0, ncol(u)),
-    sigma = as.correlation.matrix(params)
-  )
-  
-  wimbledon::cc.ll.total(u, dist, cluster)
-}
-
-#' Log likelihood of params with a Student t distribution
-#'
-#' @param params correlations, df, skewness
-#' @param u uniform residuals
-optimize.ghskt <- function(params, u, cluster) {
-  num.corr <- ncol(u) * (ncol(u) - 1) / 2
-  num.skew <- ncol(u)
-  
-  sigma <- as.correlation.matrix(params[1:num.corr])
-  df <- params[num.corr + 1]
-  
-  skew <- rep(0, num.skew)
-  if (length(params) > (num.corr + 1)) {
-    skew <- params[(num.corr + 2):(num.corr + 1 + num.skew)]
-  }
-  
-  dist <- ghyp::student.t(
-    nu = df,
-    mu = rep(0, ncol(u)),
-    sigma = sigma,
-    gamma = skew
-  )
-  
-  wimbledon::cc.ll.total(u, dist, cluster)
-}
+load('data/derived/garch_unires_model.RData')
+u <- df.u[, -1]
+rm(df.u)
 
 prepare.cluster <- function() {
   cluster <- makeCluster(detectCores() - 1)
@@ -57,36 +23,112 @@ prepare.cluster <- function() {
   cluster
 }
 
-# optimize.gauss(rep(0.75, 15), u)
-# optimize.ghskt(c(rep(0.75, 15), 7), u)
+optimizeFn <- function(theta, dist, data, cluster = NULL) {
+  params <- dc.get.params(theta, ncol(data), dist)
 
-cluster <- prepare.cluster()
-optimize.ghskt(
-  c(rep(0.75, 15), 7, rep(0.90, ncol(u))),
-  u = u,
-  cluster = cluster
+  -wimbledon::dc.ll.total(
+    dist.params = params$dist.params,
+    alpha = params$alpha,
+    beta = params$beta,
+    u = data,
+    cluster = cluster
+  )
+}
+
+# Asymmetric Student's t Optimization ----
+theta.ghskt <- c(
+   6.56539043,
+  -0.01912332,
+   0.08972005,
+  -0.08280076,
+  -0.17185179,
+   0.01118687,
+   0.07844633
 )
 
-stopCluster(cluster)
-rm(ptc)
+ui <- rbind(
+  c( 1, rep(0, ncol(u))), # min df
+  c(-1, rep(0, ncol(u))), # max df
 
-# Estimate Gaussian ----
+  cbind(0, diag( 1, ncol(u))), # min skew
+  cbind(0, diag(-1, ncol(u)))  # max skew
+)
+
+ci <- cbind(c(
+       6.0000,   # min df
+     -20.0000,   # max df
+  rep(-0.25, ncol(u)),  # min skew
+  rep(-0.25, ncol(u))   # max skew
+))
+
 cluster <- prepare.cluster()
-c <- cor(apply(u, 2, qnorm))
-params <- c[lower.tri(c)]
 
-param.gauss <- optim(
-  params,
-  optimize.gauss,
-  u = u,
+optim.ghskt <- constrOptim(
+  theta.ghskt,
+  optimizeFn,
+  grad = NULL,
+
+  dist = 'ghskt',
+  data = u,
   cluster = cluster,
+
+  ui = ui,
+  ci = ci,
+
   control = list(
     trace = 6,
-    fnscale = -1,
-    maxit = 20000
-  ),
-  hessian = T
+    maxit = 1000
+  )
 )
 
 stopCluster(cluster)
-rm(cluster)
+model.copula.constant.ghskt <- build.output(
+  u,
+  dc.get.params(optim.ghskt$par, ncol(u), 'ghskt')
+)
+
+save(
+  model.copula.constant.ghskt,
+  file = 'data/derived/model_copula_constant_ghskt.RData'
+)
+
+# Symmetric Student's t optimization ----
+theta.ght <- c(6.508058)
+cluster <- prepare.cluster()
+
+optim.ght <- optim(
+  theta.ght,
+  optimizeFn,
+  gr = NULL,
+
+  dist = 'ght',
+  data = u,
+  cluster = cluster,
+
+  method = "Brent",
+  lower = 6,
+  upper = 50
+)
+
+stopCluster(cluster)
+model.copula.constant.ght <- build.output(
+  u,
+  dc.get.params(optim.ght$par, ncol(u), 'ght')
+)
+
+save(
+  model.copula.constant.ght,
+  file = 'data/derived/model_copula_constant_ght.RData'
+)
+
+# Gaussian Copula ----
+# No optimization to do here as correlation matrix is MoM estimated
+model.copula.constant.gauss <- build.output(
+  u,
+  dc.get.params(NULL, ncol(u), 'gauss')
+)
+
+save(
+  model.copula.constant.gauss,
+  file = 'data/derived/model_copula_constant_gauss.RData'
+)
