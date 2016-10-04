@@ -87,7 +87,7 @@ model.copula.dynamic.ght <- estimate.dynamic.copula(
 )
 save(
   model.copula.dynamic.ght,
-  file = 'data/derived/model_copula_constant_ght.RData'
+  file = 'data/derived/model_copula_dynamic_ght.RData'
 )
 
 # Estimate Gaussian Copula -----------------------------------------------
@@ -100,7 +100,7 @@ model.copula.dynamic.gauss <- estimate.dynamic.copula(
 )
 save(
   model.copula.dynamic.gauss,
-  file = 'data/derived/model_copula_constant_gauss.RData'
+  file = 'data/derived/model_copula_dynamic_gauss.RData'
 )
 
 # Information criteria for parameters ----
