@@ -113,29 +113,29 @@ load('data/derived/garch_unires_model.RData')
 u <- df.u[, -1]
 rm(df.u)
 
-bic <- function(param) {
-  -2 * -param$value + length(param$par) * log(nrow(u))
+bic <- function(model) {
+  -2 * model$value + length(model) * log(nrow(u))
 }
 aic <- function(param) {
   -2 * -param$value + 2 * length(param$par)
 }
 
 # Increasing order of model complexity
-param <- list(
+models <- list(
   "Gaussian" = model.copula.dynamic.gauss,
   "Symmetric" = model.copula.dynamic.ght,
   "Skewed" = model.copula.dynamic.ghskt
 )
 
-models <- rbind(
-  sapply(param, function(p) -p$value),
-  sapply(param, bic),
-  sapply(param, aic),
+models.diag <- rbind(
+  sapply(models, function(m) m$ll),
+  sapply(models, bic),
+  sapply(models, aic),
 
   # Christoffersen appears to count correlations estimated for Q
   sapply(param, function(p) length(p$par))
 )
 rownames(models) <- c('Log-l', 'BIC', 'AIC', 'Params')
-colnames(models) <- names(param)
+colnames(models) <- names(models)
 models
 
