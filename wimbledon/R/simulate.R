@@ -6,10 +6,12 @@
 #'
 #' @return Q next period
 #' @export
-sim.c.Q_tp1 <- function(p.c, Q_t, shocks.std_t) {
-  (1 - p.c$alpha - p.c$beta) * p.c$Omega +
-    p.c$beta * Q_t +
-    p.c$alpha * (shocks.std_t %*% t(shocks.std_t))
+sim.c.Q_tp1 <- function(copula, Q_t, shocks.std_t) {
+  coef <- copula$params
+
+  (1 - coef$alpha - coef$beta) * copula$Omega +
+    coef$beta * Q_t +
+    coef$alpha * (shocks.std_t %*% t(shocks.std_t))
 }
 
 #' Simulate copula shocks (default 1 period)
@@ -21,28 +23,28 @@ sim.c.Q_tp1 <- function(p.c, Q_t, shocks.std_t) {
 #' @return Nxn shocks
 #' @export
 sim.c.rghyp <- function(p.c, Correlation, n = 1) {
-  p.d <- p.c$dist.params
+  p.d <- p.c$params$dist.params
   N <- ncol(p.c$Omega)
   mu <- rep(0, N)
-  
+
   mv.dist <- NULL
   if (is.null(p.d$df)) {
-    mv.dist <- gauss(
+    mv.dist <- ghyp::gauss(
       mu = mu,
       sigma = Correlation
     )
   }
   else {
     skew <- if (is.null(p.d$skew)) rep(0, N) else p.d$skew
-    
-    mv.dist <- student.t(
+
+    mv.dist <- ghyp::student.t(
       nu = p.d$df,
       mu = mu,
       gamma = skew,
       sigma = Correlation
     )
   }
-  
+
   ghyp::rghyp(n, mv.dist)
 }
 
@@ -56,32 +58,32 @@ sim.c.rghyp <- function(p.c, Correlation, n = 1) {
 sim.c.copula <- function(T, copula) {
   # Setup
   N <- ncol(copula$Omega)
-  
+
   # Univariate distributions for shocks
-  c.uv.dists <- dc.uv.dists(N, copula$dist.params)
-  
+  c.uv.dists <- dc.uv.dists(N, copula$params$dist.params)
+
   # Copula model results
   shocks <- matrix(ncol = N, nrow = T)
   Q <- array(dim = c(N, N, T))
-  
+
   shocks.std <- shocks * NA
   Correlation <- NA * Q
-  
+
   # We intialize the correlation to (the correlationalized version of) Omega
   Q[,, 1] <- copula$Omega
   Correlation[,, 1] <- dc.Correlation(array(Q[,, 1], dim = c(N, N, 1)))
-  
+
   for (t in seq(T)) {
     # Get shocks from MV distribution for this period
     shocks[t, ] <- sim.c.rghyp(copula, Correlation[,, t])
-    
+
     shocks.std[t, ] <- dc.shocks.std(
       rbind(shocks[t, ]),
       c.uv.dists,
-      alpha = copula$alpha,
-      beta = copula$beta
+      alpha = copula$params$alpha,
+      beta = copula$params$beta
     )
-    
+
     # Prepare Q and Correlation for next period
     if (t < T) {
       Q[,, t + 1] <- sim.c.Q_tp1(
@@ -89,13 +91,13 @@ sim.c.copula <- function(T, copula) {
         Q_t = Q[,, t],
         shocks.std_t = shocks.std[t, ]
       )
-      
+
       Correlation[,, t + 1] <- dc.Correlation(
         array(Q[,, t + 1], dim = c(N, N, 1))
       )
     }
   }
-  
+
   # Compute uniform residuals using the marginal distribution of the copula
   sapply(seq(N), function(i) ghyp::pghyp(shocks[, i], c.uv.dists[[i]]))
 }
@@ -109,25 +111,25 @@ sim.c.copula <- function(T, copula) {
 #' @export
 sim.c.GARCH <- function(u, garch) {
   T <- nrow(u)
-  
+
   sim <- sapply(seq(ncol(u)), function(i) {
     model <- garch[[i]]
     pars <- model@model$pars[, 'Level']
-    
+
     stdres <- garch.qghyp.rugarch(
       u[, i],
       skew = pars['skew'],
       shape = pars['shape']
     )
-    
-    ugarchsim(
+
+    rugarch::ugarchsim(
       model,
       n.sim = T,
       m.sim = 1,
       custom.dist = list(name = 'sample', distfit = cbind(stdres))
     )
   })
-  
+
   # Collect it all nicely (we don't care about the models or the seed)
   list(
     series = sapply(sim, function(p) t(p@simulation$seriesSim)),
