@@ -10,7 +10,7 @@
 #' @param factor1 String - factor number one
 #' @param factor2 String - factor number two
 #' 
-#' @return result Matrix 91x3 of coef, lb, ub at percentiles 10-90
+#' @return result Matrix 81x3 of coef, lb, ub at percentiles 10-90
 #' @export
 correlations.threshold <- function(df, factor1, factor2) {
   
@@ -53,27 +53,28 @@ correlations.threshold <- function(df, factor1, factor2) {
 
 #' Rolling correlations
 #' 
-#' Takes a data frame and returns rolling 250-d correlations of pairs with lb ub,
+#' Takes a data frame and returns rolling n-period correlations of pairs with lb ub,
 #' using the factor names given
 #' 
 #' @param df Data frame of return series
 #' @param factor1 String - factor number one
 #' @param factor2 String - factor number two
+#' @param window Length of correlation roll
 #' 
 #' @return result Matrix of coef, lb, ub for time series length less window size
 #' @export
-correlations.rolling <- function(df, factor1, factor2) {
+correlations.rolling <- function(df, factor1, factor2, window) {
   
   corrvalues <- df %>%
     .[,c(factor1, factor2)] %>%
     as.matrix() %>%
     
-    rollapply(250, function(x) {
+    rollapply(width = window, function(x) {
       result <- cor.test(x[, 1], x[, 2], method = 'pearson')
       corresult <- c(result$estimate,
                      result$conf.int[1],
                      result$conf.int[2])
-    }, 
+    },
     by.column=FALSE, align="right")
   
   corrvalues <- t(corrvalues)
@@ -92,32 +93,34 @@ correlations.rolling <- function(df, factor1, factor2) {
 #' @param statistic String, indicating the required statistic to get
 #' @param df data frame used
 #' @param threshold 1 for threshold, 0 for rolling
+#' @param window Length of correlation window in rolling
 #' 
 #' @return result Data frame (tidy) with factor and value of statistic
 #' @export
-  correlations.factor.apply <- function(other.factors, value, statistic, df, thresholdtoggle) {
+  correlations.factor.apply <- function(other.factors, value, statistic, df, thresholdtoggle, window = NULL) {
   result = sapply(
     other.factors,
-    function(other.factors, value, statistic, df, thresholdtoggle) {
+    function(other.factors, value, statistic, df, thresholdtoggle, window) {
       # Check if same column for value factor as for other factor, then return NA
       if (other.factors == value) {
         # Check if in rolling or threshold
         if (thresholdtoggle == 1) {
           return(matrix(NA, 1, 81))
         }
-        return(matrix(NA, 1, dim(df)[1]-250+1))
+        return(matrix(NA, 1, dim(df)[1]-window+1))
       }
       # Else return the result depending on which statistic is requested
       # Check if in rolling or threshold
       if (thresholdtoggle == 1) {
         return(rbind(correlations.threshold(df, value, other.factors)[statistic, ]))
       }
-      return(rbind(correlations.rolling(df, value, other.factors)[statistic, ]))  
+      return(rbind(correlations.rolling(df, value, other.factors, window)[statistic, ]))  
     },
     value = value,
     statistic = statistic,
     df = df,
-    thresholdtoggle = thresholdtoggle
+    thresholdtoggle = thresholdtoggle,
+    window = window
   )
   
   # Gather result in tidy fashion
@@ -128,59 +131,12 @@ correlations.rolling <- function(df, factor1, factor2) {
     1:length(other.factors)
   )
   # Add facetvalue, one of the value factors, to do even better ggplot
+  factors.value = c("HML", "RMW", "CMA")
+  factors.all   = c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
+  
   result$facetvalue <- value
   result$order2 <- factor(result$facetvalue, factors.value)
   return(result)
-}
-
-#' Plot rolling correlation
-#' 
-#' @param df Data frame for one factor of rolling correlation data
-#'
-#' @return gridded plot of rolling correlation graphs
-#' @export
-correlations.plot.rolling <- function(df) {
-  ggplot(
-    df,
-    aes(x = Date, y = value)
-  ) + 
-    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-                fill = "grey40",
-                alpha = 0.3
-    ) +
-    geom_line(aes(color = 'Correlation coefficient')) +
-    theme(legend.position="none") +
-    theme_Publication()+
-    ylab('') +
-    coord_cartesian(ylim = c(-1, 1)) +
-    #scale_x_date(date_breaks = "5 years", date_labels = "%y")+
-    facet_grid(order2 ~ order)  
-}
-
-#' Plot threshold correlation
-#' 
-#' @param df Data frame for one factor of threshold correlation data
-#'
-#' @return gridded plot of threshold correlation graphs
-#' @export
-correlations.plot.threshold <- function(df) {
-  ggplot(
-    df,
-    aes(x = qs, y = value)
-  ) + 
-    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-                fill = "grey40",
-                alpha = 0.3
-    ) +
-    #scale_colour_manual("",values=c("darkslategrey", "blue", "darkgreen"))+
-    geom_line(aes(color = "Correlation coefficient")) +
-    theme(legend.key = element_blank(), legend.title = element_blank())+
-    ylab('') +
-    xlab('Quantiles')+
-    coord_cartesian(xlim = c(0, 1), ylim = c(-0.5, 1)) +
-    scale_x_continuous(labels = scales::percent) +
-    theme_Publication()+
-    facet_grid(order2 ~ order)
 }
 
 #' Plot threshold correlation incl simulated
@@ -253,6 +209,53 @@ th_corr <- function(df, simulatetoggle) {
       # Ordering for ggplot
       out.df$order <- factor(out.df$factor, levels = factors.all)
     }
+    # Put in list
+    out.list[[value]] <- out.df
+  }
+  return(out.list)
+}
+
+#' Calculate list of rolling n-period correlations
+#' 
+#' @param df Data frame of empirical weekly data TxN
+#' @param df.date Optional, for date numbering
+#' @param window Length of corr window
+#'
+#' @return out.list a list of three (one for each value factor)
+#'  data frames with rolling correlations for each factor,
+#'  also holds factor ordering for ggplot
+#' @export
+roll_corr <- function(df, df.date = NULL, window) {
+  # Get some size of data
+  N <- ncol(df)
+  T <- nrow(df)
+  nCorrs <- dim(df.estim)[1]-window+1
+  
+  # Check if dates are specified or whether to use numbers
+  if(is.null(df.date)) {
+    df.date = seq(nCorrs)
+  }
+  
+  # Set up factor groups ----
+  factors.value <- c("HML", "RMW", "CMA")
+  factors.all <- c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
+  
+  # Create list to hold corrs
+  out.list = list()
+  
+  # Populate output matrix with point estimates for all value factors vs all factors
+  for (value in factors.value) {
+    # Get point estimates for each pair value <-> other factor
+    out.df <- data.frame(
+      Date = tail(df.date, nCorrs),
+      correlations.factor.apply(factors.all, value, 'coef', df, 0, window),
+      lb = correlations.factor.apply(factors.all, value, 'lb', df, 0, window)[,'value'],
+      ub = correlations.factor.apply(factors.all, value, 'ub', df, 0, window)[,'value']
+    )
+    
+    # Ordering for ggplot
+    out.df$order <- factor(out.df$factor, levels = factors.all)
+    
     # Put in list
     out.list[[value]] <- out.df
   }
