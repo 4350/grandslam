@@ -148,3 +148,34 @@ sim.c.GARCH <- function(u, garch) {
 sim.c <- function(T, garch, copula) {
   sim.c.GARCH(sim.c.copula(T, copula), garch)
 }
+
+#' Turn mxN copula shocks into mxN standardized residuals
+#'
+#' @param shocks mxN shocks from copula model
+#' @param uv list of univariate distributions
+#' @param garch list of GARCH models
+#'
+#' @return
+shocks2stdresid <- function(shocks, uv, garch, cluster = NULL) {
+  fn <- function(i, shocks, uv, garch) {
+    garch.pars <- garch[[i]]@model$fixed.pars
+    copula.dist <- uv[[i]]
+    
+    # Transform copula shocks into uniforms 
+    u <- ghyp::pghyp(shocks[, i], copula.dist)
+    
+    # Transform uniforms into GARCH stdresid
+    wimbledon::garch.qghyp.rugarch(
+      u,
+      skew = garch.pars['skew'],
+      shape = garch.pars['shape']
+    )
+  }
+  
+  NN <- seq(ncol(shocks))
+  if (is.null(cluster)) {
+    return(sapply(NN, fn, garch = garch, uv = uv, shocks = shocks))
+  }
+  
+  parSapply(cluster, NN, fn, garch = garch, uv = uv, shocks = shocks)
+}

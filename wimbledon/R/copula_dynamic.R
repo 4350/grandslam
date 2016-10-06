@@ -26,6 +26,35 @@ dc.uv.dists <- function(N, dist.params) {
   })
 }
 
+#' Get a multi-variate distribution with dist.params and Correlation
+#'
+#' @param dist.params 
+#' @param Correlation 
+#'
+#' @return
+dc.mv.dist <- function(dist.params, Correlation) {
+  N <- ncol(Correlation)
+  
+  if (is.null(dist.params$df)) {
+    return(ghyp::gauss(
+      mu = rep(0, N),
+      sigma = Correlation
+    ))
+  }
+  
+  skew <- dist.params$skew
+  if (is.null(skew)) {
+    skew <- rep(0, N)
+  }
+  
+  ghyp::student.t(
+    nu = dist.params$df,
+    mu = rep(0, N),
+    sigma = Correlation,
+    gamma = skew
+  )
+}
+
 #' Invert uniform realizations to the appropriate distributions
 #'
 #' @param u TxN uniforms
@@ -176,7 +205,7 @@ dc.Correlation <- function(Q, cluster = NULL) {
   sapply(seqT, fn, Q = Q, simplify = "array")
 }
 
-dc.run.model <- function(u, dist.params, alpha, beta, cluster = NULL) {
+dc.run.model <- function(u, dist.params, alpha, beta, cluster = NULL, Omega = NULL) {
   # Build univariate distributions as they're used for the construction
   # of our shocks; the MV distribution is built for each t based on the
   # Correlation matrix generated
@@ -187,8 +216,11 @@ dc.run.model <- function(u, dist.params, alpha, beta, cluster = NULL) {
   shocks.std <- dc.shocks.std(shocks, uv.dists, alpha, beta)
 
   # Compute Omega using method of moments
-  Omega <- dc.Omega(shocks.std)
-
+  # If Omega is already provided, don't do it!
+  if (is.null(Omega)) {
+    Omega <- dc.Omega(shocks.std)
+  }
+  
   # Get correlation time series
   Q <- dc.Q(shocks.std, Omega, alpha, beta)
   Correlation <- dc.Correlation(Q, cluster = cluster)

@@ -16,7 +16,7 @@
 #' @return uGARCHspec object
 #' @export
 garch.specgen <- function(p, q = 0, r = 1, s = 1, model = 'fGARCH', submodel = 'GJRGARCH',
-                    vtarget = T, dist = 'ghst') {
+                    vtarget = T, dist = 'ghst', fixed.pars = list()) {
   spec <- rugarch::ugarchspec(
     mean.model = list(
       armaOrder = c(p,q)
@@ -26,7 +26,8 @@ garch.specgen <- function(p, q = 0, r = 1, s = 1, model = 'fGARCH', submodel = '
       model = model,
       submodel = submodel,
       variance.targeting = vtarget
-    )
+    ),
+    fixed.pars = fixed.pars
   )
 
   spec
@@ -70,6 +71,22 @@ garch.qghyp.rugarch <- function(p, shape, skew) {
     ),
     method = 'splines'
   )
+}
+
+#' Create ugarchspec with fixed.pars from ugarchfit
+#' @param fits List of ugarchfit objects
+#'
+#' @return List of ugarchspec
+#' @export
+garch.fit2spec <- function(fits) {
+  lapply(fits, function(fit) {
+    garch.specgen(
+      fit@model$modelinc['ar'],
+      fit@model$modelinc['ma'],
+      fixed.pars = fit@fit$coef,
+      vtarget = F # necessary to activate omega
+    )
+  })
 }
 
 #' Function to get values for Standardized Residuals Empirical Density graph
