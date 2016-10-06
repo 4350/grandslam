@@ -1,11 +1,11 @@
 #' Functionality related to rolling and threshold correlations
-#' 
+#'
 
 #' Threshold correlations
-#' 
+#'
 #' Takes a data frame, and returns estimates of threshold corr, lb, ub
 #' using the factor names given
-#' 
+#'
 #' @param df Data frame of return series
 #' @param factor1 String - factor number one
 #' @param factor2 String - factor number two
@@ -13,9 +13,9 @@
 #' @return result Matrix 81x3 of coef, lb, ub at percentiles 10-90
 #' @export
 correlations.threshold <- function(df, factor1, factor2) {
-  
+
   qs <- seq(0.10, 0.90, by=0.01)
-  
+
   result <- sapply(qs, function(q, df, factor1, factor2) {
     # Extract vectors
     x = simplify2array(df[, factor1])
@@ -23,7 +23,7 @@ correlations.threshold <- function(df, factor1, factor2) {
     # Find empirical percentiles
     quantile.x <- quantile(x, q)
     quantile.y <- quantile(y, q)
-    
+
     # Check which of x and y to include in correlation estimation
     if (q < 0.50) {
       inc <- x < quantile.x & y < quantile.y
@@ -31,22 +31,22 @@ correlations.threshold <- function(df, factor1, factor2) {
     else {
       inc <- x >= quantile.x & y >= quantile.y
     }
-    
+
     # Estimate correlation
     result <- cor.test(x[inc], y[inc])
-    
+
     # Return coef, lb, ub
     corresult <- c(result$estimate,
                    result$conf.int[1],
                    result$conf.int[2])
-    
+
     return(corresult)
   },
-  df = df, 
+  df = df,
   factor1 = factor1,
   factor2 = factor2
   )
-  
+
   rownames(result) <- c('coef', 'lb', 'ub')
   return(result)
 }
@@ -55,7 +55,7 @@ correlations.threshold <- function(df, factor1, factor2) {
 #' 
 #' Takes a data frame and returns rolling n-period correlations of pairs with lb ub,
 #' using the factor names given
-#' 
+#'
 #' @param df Data frame of return series
 #' @param factor1 String - factor number one
 #' @param factor2 String - factor number two
@@ -76,18 +76,18 @@ correlations.rolling <- function(df, factor1, factor2, window) {
                      result$conf.int[2])
     },
     by.column=FALSE, align="right")
-  
+
   corrvalues <- t(corrvalues)
   rownames(corrvalues) <- c('coef', 'lb', 'ub')
   return(corrvalues)
-  
+
 }
 
 #' Factor correlations apply
-#' 
+#'
 #' Function to apply other factors on a value factor and return a statistic of the correlation
 #' Used in for loop for each value factor and each statistic (coef, lb, ub)
-#' 
+#'
 #' @param other.factors List of all factors
 #' @param value String, value factor used
 #' @param statistic String, indicating the required statistic to get
@@ -122,7 +122,7 @@ correlations.rolling <- function(df, factor1, factor2, window) {
     thresholdtoggle = thresholdtoggle,
     window = window
   )
-  
+
   # Gather result in tidy fashion
   result <- gather(
     data.frame(result),
@@ -140,7 +140,7 @@ correlations.rolling <- function(df, factor1, factor2, window) {
 }
 
 #' Plot threshold correlation incl simulated
-#' 
+#'
 #' @param df Data frame for one factor of threshold correlation data
 #'
 #' @return gridded plot of threshold correlation graphs
@@ -149,16 +149,15 @@ correlations.plot.threshold.sim <- function(df) {
   ggplot(
     df,
     aes(x = qs, y = value)
-  ) + 
+  ) +
     geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
                 fill = "grey40",
                 alpha = 0.3
     ) +
-    #scale_colour_manual("",values=c("darkslategrey", "blue", "darkgreen"))+
     geom_line(aes(color = "Empirical distribution")) +
-    #geom_line(aes(x = qs, y = norm, color = "Normal distribution"), linetype = 2)+
-    #geom_line(aes(x = qs, y = t, color = "Student-t distribution"), linetype = 2)+
-    geom_line(aes(x = qs, y = skewt, color = "Skewed Student-t distribution"), linetype = 2)+
+    geom_line(aes(x = qs, y = gauss, color = "Gaussian"), linetype = 2)+
+    geom_line(aes(x = qs, y = ght, color = "Student-t distribution"), linetype = 2)+
+    geom_line(aes(x = qs, y = ghskt, color = "Skewed Student-t distribution"), linetype = 2)+
     theme(legend.key = element_blank(), legend.title = element_blank())+
     ylab('') +
     xlab('Quantiles')+
@@ -170,7 +169,7 @@ correlations.plot.threshold.sim <- function(df) {
 
 
 #' Calculate list of threshold correlations
-#' 
+#'
 #' @param df Data frame (TxBootruns)xN of simulated data or empirical data (shorter)
 #' @param simulatetoggle Dummy 1 if simulated series, else considered empirical
 #'
@@ -182,14 +181,14 @@ th_corr <- function(df, simulatetoggle) {
   # Get some size of data
   N <- ncol(df)
   T <- nrow(df)
-  
+
   # Set up factor groups ----
   factors.value <- c("HML", "RMW", "CMA")
   factors.all <- c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
-  
+
   # Create list to hold simulated corrs
   out.list = list()
-  
+
   # Populate output matrix with point estimates for all value factors vs all factors
   for (value in factors.value) {
     # Get point estimates for each pair value <-> other factor
@@ -199,7 +198,7 @@ th_corr <- function(df, simulatetoggle) {
         simcoef = correlations.factor.apply(factors.all, value, 'coef', df, 1)[,'value']
       )
     } else {
-    # Else empirical data set  
+    # Else empirical data set
       out.df <- data.frame(
         qs = seq(0.10,0.90,0.01),
         correlations.factor.apply(factors.all, value, 'coef', df, 1),
