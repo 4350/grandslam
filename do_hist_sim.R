@@ -56,8 +56,8 @@ sigma <- rbind(
 # TESTING SECTION ----------------------------------------------------------------------------------
 
 # Kupiec and Christoffersen tests using rugarch for simplicity
-kupiec.05 <- kupiec_test(.05, df, sigma, T, kGARCHModels)
-kupiec.01 <- kupiec_test(.01, df, sigma, T, kGARCHModels)
+kupiec.05 <- kupiec_test.var(.05, df, sigma, T, kGARCHModels)
+kupiec.01 <- kupiec_test.var(.01, df, sigma, T, kGARCHModels)
 
 # PLOT SECTION -------------------------------------------------------------------------------------
 # Libraries for plot ----
@@ -73,8 +73,8 @@ df.emp$order <- factor(df.emp$factor, names(kGARCHModels))
 
 
 # Get tidy data sets for plots
-df.var05 <- hist.sim.tidy(.05, df, sigma, T, kGARCHModels)
-df.var01 <- hist.sim.tidy(.01, df, sigma, T, kGARCHModels)
+df.var05 <- hist.sim.tidy.var(.05, df, sigma, T, kGARCHModels)
+df.var01 <- hist.sim.tidy.var(.01, df, sigma, T, kGARCHModels)
 
 # Plot that
 g <- ggplot(df.emp, aes(x = h, y = value, group = factor))+

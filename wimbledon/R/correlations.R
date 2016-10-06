@@ -139,35 +139,6 @@ correlations.rolling <- function(df, factor1, factor2, window) {
   return(result)
 }
 
-#' Plot threshold correlation incl simulated
-#'
-#' @param df Data frame for one factor of threshold correlation data
-#'
-#' @return gridded plot of threshold correlation graphs
-#' @export
-correlations.plot.threshold.sim <- function(df) {
-  ggplot(
-    df,
-    aes(x = qs, y = value)
-  ) +
-    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-                fill = "grey40",
-                alpha = 0.3
-    ) +
-    geom_line(aes(color = "Empirical distribution")) +
-    geom_line(aes(x = qs, y = gauss, color = "Gaussian"), linetype = 2)+
-    geom_line(aes(x = qs, y = ght, color = "Student-t distribution"), linetype = 2)+
-    geom_line(aes(x = qs, y = ghskt, color = "Skewed Student-t distribution"), linetype = 2)+
-    theme(legend.key = element_blank(), legend.title = element_blank())+
-    ylab('') +
-    xlab('Quantiles')+
-    coord_cartesian(xlim = c(0, 1), ylim = c(-0.5, 1)) +
-    scale_x_continuous(labels = scales::percent) +
-    theme_Publication()+
-    facet_grid(order2 ~ order)
-}
-
-
 #' Calculate list of threshold correlations
 #'
 #' @param df Data frame (TxBootruns)xN of simulated data or empirical data (shorter)
@@ -259,4 +230,34 @@ roll_corr <- function(df, df.date = NULL, window) {
     out.list[[value]] <- out.df
   }
   return(out.list)
+}
+
+#' Do threshold correlation from simulated data directory
+#' Consolidates all simulation runs and standardizes the returns
+#' 
+#' @param file The directory of simulated data for this distribution
+#' 
+#' @return list of dataframes with threshold correlations
+#' @export
+do.th.sim <- function(file) {
+  # Set up factor groups
+  factors.value = c("HML", "RMW", "CMA")
+  factors.all   = c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
+  
+  df <- get.simulation.results(file)
+  stdres <- df[, 14:19] / df[, 8:13]
+  colnames(stdres) <- factors.all
+  
+  th_corr(stdres, 1)
+}
+
+#' Consolidates all simulation runs into one matrix
+#' 
+#' @param dir the directory where simulation csvs are
+#' 
+#' @return df consolidated df of all simulations runs' returns, sigma, residuals
+#' @export
+get.simulation.results <- function(dir) {
+  filenames <- file.path(dir, list.files(dir))
+  do.call('rbind', lapply(filenames, read.csv))
 }

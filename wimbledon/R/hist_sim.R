@@ -40,8 +40,8 @@ fc_List <- function(garch.fits, H) {
   )
 }
 
-#' Function to calculate VaR, using volatility updated 
-#' standardized returns, see Hull & White (1998)
+#' Function to calculate volatility updated returns
+#' see Hull & White (1998)
 #' 
 #' @param h Index in the forecast period, h<=H
 #' @param q Lower tail probability of interest
@@ -63,7 +63,19 @@ volatilityupdate <- function(h, q, df, sigma, T) {
   
   # Turn it right
   r.star <- t(r.star)
-  
+}
+
+#' Function to calculate VaR using Hull & White vol updated returns
+#' 
+#' @param h Index in the forecast period, h<=H
+#' @param q Lower tail probability of interest
+#' @param df Data frame of returns (full sample)
+#' @param sigma Consolidated matrix of conditional volatilities (T+H)*N, both in and out of sample
+#' @param T End of estimation period
+#' 
+#' @return var.star
+var.HW <- function(h, q, df, sigma, T) {
+  r.star <- volatilityupdate(h, q, df, sigma, T)
   #Calculate VaRs
   var.star <- apply(r.star, 2, function(r, q) {
     quantile(r, probs = q)
@@ -74,26 +86,26 @@ volatilityupdate <- function(h, q, df, sigma, T) {
   var.star
 }
 
-#' Historical simulation using volatility updated returns
+#' Historical simulation of VaR using volatility updated returns
 #' 
 #' @param q Lower CDF probability of interest
 #' @param std.ret Consolidated matrix of standardized returns (T+H)xN, both in and out of sample
 #' @param sigma Consolidated matrix of conditional volatilities (T+H)*N, both in and out of sample
 #' @param T End of estimation period
 #' 
-#' @return HS.VaR df of historically simulated VaR
+#' @return hs.var df of historically simulated VaR
 #' @export
-hist.sim <- function(q, df, sigma, T) {
+hist.sim.var <- function(q, df, sigma, T) {
   H = nrow(df) - T
-  HS.VaR = sapply(seq(1:H), function(h, q, df, sigma, T) {
-    volatilityupdate(h, q, df, sigma, T)
+  hs.var = sapply(seq(1:H), function(h, q, df, sigma, T) {
+    var.HW(h, q, df, sigma, T)
   },
   q = q,
   df = df,
   sigma = sigma, 
   T = T
   )
-  HS.VaR = data.frame(t(HS.VaR))
+  hs.var = data.frame(t(hs.var))
 }
 
 #' Get tidy VaR df for plotting purposes
@@ -105,7 +117,7 @@ hist.sim <- function(q, df, sigma, T) {
 #' 
 #' @return out.df tidy VaR data frame
 #' @export
-hist.sim.tidy <- function(q, df, sigma, T, kGARCHModels) {
+hist.sim.tidy.var <- function(q, df, sigma, T, kGARCHModels) {
   H = nrow(df) - T
   N = ncol(df)
   # Run simulation
@@ -129,9 +141,9 @@ hist.sim.tidy <- function(q, df, sigma, T, kGARCHModels) {
 #' 
 #' @return out.matrix 7xN matrix of test statistics (for each return series)
 #' @export
-kupiec_test <- function(q, df, sigma, T, kGARCHModels) {
+kupiec_test.var <- function(q, df, sigma, T, kGARCHModels) {
   N = ncol(df)
-  df.var <- hist.sim(q, df, sigma, T)
+  df.var <- hist.sim.var(q, df, sigma, T)
   df.emp <- as.matrix(df[(T+1):nrow(df), ])
   
   out.matrix <- matrix(NA, 7, N)
@@ -146,3 +158,6 @@ kupiec_test <- function(q, df, sigma, T, kGARCHModels) {
   write.table(out.matrix, file = paste('output/VaR/kupiec', 'T', T, 'q', q, 'csv', sep = '.'), sep = ',')
   return(out.matrix)
 }
+
+#christoffersen test in var test
+#es function for all periods

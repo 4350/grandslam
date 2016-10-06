@@ -4,91 +4,108 @@
 #' data for further use in simulated threshold graphs.
 #' 
 
-# Libraries ----
+
+# Libraries ---------------------------------------------------------------
+
 library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(grid)
 library(gridExtra)
+library(extrafont)
 library(zoo)
 library(scales)
 library(devtools)
-# Reset workspace and load return data ----
-rm(list = ls())
-load('data/derived/daily-estim.RData')
 
-# Load functions ----
+# Reset workspace and load return data
+rm(list = ls())
+#load('data/derived/daily-estim.RData')
+load('data/derived/weekly-estim.RData')
+load('data/derived/garch_stdres.RData')
+
+
+# Load functions
 load_all('wimbledon')
 
-# Set up factor groups ----
-factors.value = c("HML", "RMW", "CMA")
-factors.all   = c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
-
-# Threshold correlations ----
-
-# Create list to hold correlation sets
-thCorrList = list()
+# Threshold correlations --------------------------------------------------
 
 # Loop for each value factors to get threshold correlation for all factors
 # and save to the list created above
 
-thCorrList <- th_corr(df.estim %>% select(-Date), 0)
+thCorrList.ret <- th_corr(df = df.estim %>% select(-Date),
+                          simulatetoggle = 0
+                          )
+
+thCorrList.res <- th_corr(df = df.stdres %>% select(-Date),
+                          simulatetoggle = 0
+                          )
+
 
 # Bind to one df for plot
-plotdf <- bind_rows(thCorrList$HML, thCorrList$RMW, thCorrList$CMA)
-
-# Do plots for every factor's data frame of threshold correlations vs all other factors
-plots <- correlations.plot.threshold(plotdf)+
-  ggtitle("Threshold correlations of daily log returns (95% confidence bounds)")
-
-# Arrange and save plots
-g <- grid.arrange(
-  plots
-)
-
-ggsave(file = 'output/ThresholdCorrelationsDaily2.jpeg', g, width = 16.6, height = 11.7, units = 'in')
+plotdf.ret <- bind_rows(thCorrList.ret$HML, thCorrList.ret$RMW, thCorrList.ret$CMA)
+plotdf.res <- bind_rows(thCorrList.res$HML, thCorrList.res$RMW, thCorrList.res$CMA)
 
 
-# Rolling correlations ----
+# Do threshold plot and save ----------------------------------------------
+g <- ggplot(plotdf.ret, aes(x = qs, y = value)
+            ) +
+  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+              fill = 'grey10',
+              alpha = 0.1
+              ) +
+  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+              data = plotdf.res,
+              fill = 'grey10',
+              alpha = 0.1
+              ) +
+  geom_line(aes(color = 'Return series')) +
+  geom_line(aes(x = qs, y = value, color = 'Residual series'), data = plotdf.res) +
+  theme_Publication() +
+  ylab('') +
+  xlab('Quantiles') +
+  coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
+  scale_x_continuous(labels = scales::percent) +
+  facet_grid(order2 ~ order) +
+  ggtitle('Threshold correlations of weekly data (95% confidence bounds)')
+
+ggsave(file = 'output/thresholdCorrelations/Weekly.jpeg', g, width = 16.6, height = 11.7, units = 'in')
+
+# Rolling correlations ----------------------------------------------------
 
 # Create list to hold correlation sets
-rollingCorrelationList = list()
+rollCorrList.ret = roll_corr(df = df.estim %>% select(-Date), 
+                                   df.date = df.estim %>% select(Date), 
+                                   window = 45
+                                   )
 
-for (value in factors.value) {
-  
-  # Get three statistics sets
-  correlations <- correlations.factor.apply(factors.all, value, 'coef', df.estim, 0)
-  lb <- correlations.factor.apply(factors.all, value, 'lb', df.estim, 0)
-  ub <- correlations.factor.apply(factors.all, value, 'ub', df.estim, 0)
-  
-  # Consolidate and order data frame
-  out.df <- data.frame(Date = tail(df.estim$Date, (dim(df.estim)[1]-250+1)), 
-                       correlations,
-                       lb = lb[, 'value'],
-                       ub = ub[, 'value']
-  )
-  out.df$order <- factor(out.df$factor, levels = factors.all)
-  
-  # Save to common object that holds all factors
-  rollingCorrelationList[[value]] <- out.df
-  
-}
+rollCorrList.res = roll_corr(df = df.stdres %>% select(-Date), 
+                             df.date = df.stdres %>% select(Date), 
+                             window = 45
+)
 
 # Bind to one df for plot
-plotdf <- bind_rows(rollingCorrelationList$HML, rollingCorrelationList$RMW, rollingCorrelationList$CMA)
+plotdf.ret <- bind_rows(rollCorrList.ret$HML, rollCorrList.ret$RMW, rollCorrList.ret$CMA)
+plotdf.res <- bind_rows(rollCorrList.res$HML, rollCorrList.res$RMW, rollCorrList.res$CMA)
 
-plots <- correlations.plot.rolling(plotdf)+
-  ggtitle("Rolling 250-day correlations (95% confidence bounds)")
+# Do threshold plot and save ----------------------------------------------
+g <- ggplot(plotdf.ret, aes(x = Date, y = value)
+) +
+  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+              fill = 'grey10',
+              alpha = 0.1
+  ) +
+  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+              data = plotdf.res,
+              fill = 'grey10',
+              alpha = 0.1
+  ) +
+  geom_line(aes(color = 'Return series')) +
+  geom_line(aes(x = Date, y = value, color = 'Residual series'), data = plotdf.res) +
+  theme_Publication() +
+  ylab('') +
+  xlab('Quantiles') +
+  coord_cartesian(ylim = c(-1, 1)) + 
+  facet_grid(order2 ~ order) +
+  ggtitle('Rolling 45-week correlations (95% confidence bounds)')
 
-# Arrange and save plots
-g <- grid.arrange(
-  plots
-)
-
-ggsave(
-  file = 'output/rollingCorrelations/250daily2.jpeg',
-  g,
-  width = 16.6,
-  height = 11.7,
-  units = 'in'
-)
+ggsave(file = 'output/rollingCorrelations/45weekly.jpeg', g, width = 16.6, height = 11.7, units = 'in')
