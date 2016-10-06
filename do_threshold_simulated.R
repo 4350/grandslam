@@ -4,7 +4,8 @@
 #' All threshold correlation applied to (GARCH) residuals
 #'
 
-# Load libraries and functions ----
+# Load libraries, functions, data -----------------------------------------
+
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -16,63 +17,37 @@ library(scales)
 library(devtools)
 load_all('wimbledon')
 
-# Reset workspace and load data for each distribution ----
+# Reset workspace and load data for each distribution
 rm(list = ls())
 load('data/derived/garch_stdres.RData')
 
-# Set up factor groups ----
-factors.value = c("HML", "RMW", "CMA")
-factors.all   = c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
-
-# DATA SHOULD BE LONG FORMAT, E.G. (2479*BOOTRUNS)xN
+# Empircal data
 df.empirical <- df.stdres %>% select(-Date)
-rm(df.res)
+rm(df.stdres)
 
-# load(normdata)
-# load(tdata)
+# Calculate threshold correlation data frame lists ------------------------
 
-# load(skewtdata)
-# Load me some constant simulated data
-get.simulation.results <- function(dir) {
-  filenames <- file.path(dir, list.files(dir))
-  do.call('rbind', lapply(filenames, read.csv))
-}
-
-# df.skewt <- get.simulation.results('data/derived/simulation/constant_gauss//')
-# raw <- df.skewt
-# df.skewt <- df.skewt[, 14:19] / df.skewt[, 8:13]
-# colnames(df.skewt) <- factors.all
-
-# Threshold correlations for simulated data ----
-do.th.sim <- function(file) {
-  df <- get.simulation.results(file)
-  stdres <- df[, 14:19] / df[, 8:13]
-  colnames(stdres) <- factors.all
-
-  th_corr(stdres, 1)
-}
-
-# df.skewt <- get.simulation.results('data/derived/simulation/constant_gauss//')
-# raw <- df.skewt
-# df.skewt <- df.skewt[, 14:19] / df.skewt[, 8:13]
-# colnames(df.skewt) <- factors.all
-
+# Get simulated df lists
 th.corr.gauss <- do.th.sim('data/derived/simulation/constant_gauss/')
 th.corr.ght   <- do.th.sim('data/derived/simulation/constant_ght/')
 th.corr.ghskt <- do.th.sim('data/derived/simulation/constant_ghskt/')
 
+# Get empirical df list
 th.corr.empirical <- th_corr(df.empirical, 0)
 
-# Draw Threshold Correlations ----
-
+# Consolidate all dfs to one list
 allThCorrList <- list()
+
+# Set up factor groups ----
+factors.value <- c("HML", "RMW", "CMA")
+factors.all <- c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
 
 for (values in factors.value) {
   out.df <- data.frame(
     # The empirical imports coef, lb, ub, quantiles and ordering of factors
     th.corr.empirical[[values]],
 
-    # All other distributions only imports coefficients
+    # All other distributions only import coefficients
     gauss = th.corr.gauss[[values]]$simcoef,
     ght = th.corr.ght[[values]]$simcoef,
     ghskt = th.corr.ghskt[[values]]$simcoef
@@ -80,69 +55,27 @@ for (values in factors.value) {
   allThCorrList[[values]] <- out.df
 }
 
-plotdf <- bind_rows(allThCorrList$HML, allThCorrList$RMW, allThCorrList$CMA)
-plots <- correlations.plot.threshold.sim(plotdf)+
-  ggtitle("Threshold correlations of weekly data sets (95% confidence bounds)")
-
-# Arrange and save plots
-g <- grid.arrange(
-  plots +
-    coord_cartesian(ylim = c(-0.2, 0.5))
-)
-
-
-# OLD LIKE GUSTAF, STILL YOUNG AND FRESH ----
-
-# df.skewt <- read.table('data/derived/simulation/ghskt/1b813702-897c-11e6-bb9c-9dfbf344bd3b.csv', header = TRUE, sep = ',')
-# df.skewt <- df.skewt[,14:19]
-# colnames(df.skewt) <- factors.all
-
-# Get the correlation series for each distribution ----
-
-
-#normThCorrList <- th_corr(df.norm)
-#tThCorrList <- th_corr(df.t)
-skewtThCorrList <- th_corr(df.skewt, 1)
-
-# load('data/derived/model_copula_constant_ghskt.RData')
-# model <- model.copula.constant.ghskt
-#
-# dist <- ghyp::student.t(
-#   nu = model$params$dist.params$df,
-#   gamma = model$params$dist.params$skew,
-#   mu = rep(0, 6),
-#   sigma = cor(model$Correlation)
-# )
-# df.skewt <- ghyp::rghyp(100000, dist)
-# colnames(df.skewt) <- factors.all
-# skewtThCorrList <- th_corr(df.skewt, 1)
-# cor(df.skewt)
-
-# Set up factor list and consolidate
-allThCorrList <- list()
-
-for (values in factors.value) {
-  out.df <- data.frame(
-    # The empirical imports coef, lb, ub, quantiles and ordering of factors
-    empiricalThCorrList[[values]],
-
-    # All other distributions only imports coefficients
-    #norm = normThCorrList[[values]]$simcoef,
-    #t = tThCorrList[[values]]$simcoef,
-    skewt = skewtThCorrList[[values]]$simcoef
-  )
-  allThCorrList[[values]] <- out.df
-}
-
-# Bind to one df for plot
+# Bind all value dfs to one df for plot
 plotdf <- bind_rows(allThCorrList$HML, allThCorrList$RMW, allThCorrList$CMA)
 
-plots <- correlations.plot.threshold.sim(plotdf)+
-  ggtitle("Threshold correlations of weekly data sets (95% confidence bounds)")
 
-# Arrange and save plots
-g <- grid.arrange(
-  plots
-)
+# Do threshold plot and save ----------------------------------------------
+g <- ggplot(plotdf, aes(x = qs, y = value)
+            ) +
+  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+              fill = 'grey10',
+              alpha = 0.1
+              ) +
+  geom_line(aes(color = "Empirical distribution")) +
+  geom_line(aes(x = qs, y = gauss, color = "Simulated Gaussian"), linetype = 2) +
+  geom_line(aes(x = qs, y = ght, color = "Simulated Student-t"), linetype = 3) +
+  geom_line(aes(x = qs, y = ghskt, color = "Simulated Skewed Student-t"), linetype = 4) +
+  theme_Publication() +
+  ylab('') +
+  xlab('Quantiles') +
+  coord_cartesian(xlim = c(0, 1), ylim = c(-0.5, 1)) +
+  scale_x_continuous(labels = scales::percent) +
+  facet_grid(order2 ~ order) +
+  ggtitle('Threshold correlations of weekly data (95% confidence bounds)')
 
-ggsave(file = 'output/ThresholdCorrelationsSimulatedResiduals.jpeg', g, width = 16.6, height = 11.7, units = 'in')
+ggsave(file = 'output/thresholdCorrelations/WeeklySimulated.jpeg', g, width = 16.6, height = 11.7, units = 'in')
