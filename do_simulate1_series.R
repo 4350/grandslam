@@ -65,3 +65,11 @@ for (ti in seq(tt)) {
   distribution[,, ti] <- garch.path.t(t)
   toc()
 }
+
+save(
+  distribution,
+  file = file.path(
+    'data/derived',
+    sprintf('distribution_%s.RData', kModelName)
+  )
+)
