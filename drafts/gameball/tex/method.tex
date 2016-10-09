@@ -52,3 +52,56 @@ The parameters are simultaneously estimated with the skewed Student-\textit{t} p
 where the density function $f$ is the skewed Student-\textit{t} given by \autoref{eq:dskewt}.
 
 The process of the copula estimation with \textit{c}DCC dynamics is quite involved, as it relies on moment matching and recursive estimation of parameters to estimate the copula correlation matrices $\{\hat{R}\}$. Again, we follow \textcite{Aielli2013}, as is described in further detail in \autoref{App:AppendixD}.
+
+\subsection{VaR and ES estimation}
+Throughout this paper, we will discuss VaR and ES as the percentage VaR and percentage ES, i.e. the $1-\alpha \%$ VaR is the percentage return of asset $i$ that is expected to be exceeded only $\alpha \%$ of the time, and the $1 -\alpha \%$ ES is the expected return of asset $i$ when it realizes below the $1 - \alpha \%$ VaR. 
+
+\textbf{Analytical VaR and ES}
+
+The baseline risk model of VaR and ES is analytical and uses the sample variance-covariance matrix, and assumes normal return distributions.
+\begin{align}
+    VaR_i^{1-\alpha} &= \bar{\sigma}_i \cdot Z_{\alpha} \\
+    ES_i^{1-\alpha} &= E[r_i | r_i < VaR_i^{1-\alpha}]
+\end{align}
+where for asset $i$, $\bar{\sigma}_i$ is the sample standard deviation of the return $r_i$, and $Z$ is the $\alpha \%$ quantile of the normal distribution.
+
+While the analytical VaR and ES are simple to calculate, they are limited by the assumption of a probability distribution and the estimation of the corresponding parameters. Furthermore, we note that the estimates are constant. In reality, the probability distribution is likely to be non-stationary, as shown by volatility clustering effects in the data.
+
+\textbf{Historically simulated VaR and ES}
+
+For asset i, let the historically simulated VaR be
+\begin{align}
+    VaR_{i,T+1}^{1-\alpha} &= F_{i, T+1}^{-1}(\alpha | I_T) \\
+    ES_{i, T+1}^{1 - \alpha} &= E_t[r_{i,T+1} | r_{i,T+1} < VaR_{i,T+1}^{1-\alpha}]
+\end{align}
+where $F_{i, T+1}^{-1}(\alpha | I_T)$ is the inverse empirical CDF (based on historical return data set $I_t$) of asset $i$ at time $T+1$.
+
+The historically simulated VaR and ES are no longer bound by the correct parameterization of returns. Furthermore, the estimates can vary over time as new information is incorporated in the information set. However, the risk is that future asset returns have little to do with the past. The most naïve version of historical simulation fails to incorporate even simple trends in the data, such as time-varying average volatility. As volatility in financial return series is generally persistent, returns from a low volatility regime have lower predictive power of returns in a high volatility regime. We improve the historical simulation by following \textcite{HullWhite1998}, who propose to volatility update returns by scaling historical returns to the current conditional volatility. The volatility updated returns $\{r^*_i\}$ are calculated as
+\begin{align}
+    r^*_{i, t} = \sigma_{i,T} \cdot \frac{r_{i,t}}{\sigma_{i,t}}
+\end{align}
+where $\sigma_{i,T}$ is the conditional estimate of volatility at time $T$ made at time $T-1$ using the GARCH model and $\sigma_{i,t}$ is the conditional estimate of volatility at time $t$ made at time $t-1$ using the GARCH model, and $t<T$.
+
+\textbf{Multivariate EWMA}
+
+[PENDING]
+
+\textbf{Copula-based VaR}
+
+As our analysis of GARCH residuals and threshold correlations highlights, the dependence between factor return series can not be captured by linear correlations and elliptical dependency. The only model for VaR and ES that can generate these dynamics is the copula model.
+
+By simulating many runs of one-week-ahead copula shocks, we can find the simulated probability distributions for one-week-ahead factor strategy returns. The process is as follows
+\begin{enumerate}[(i)]
+    \item At time T, generate 100,000 one-week-ahead random copula shock vectors $z_{T+1}$ according to the conditional copula correlation matrix $\hat{R}_{T+1}$
+    \item Transform each $z_{T+1}$ vector to uniform shocks using copula parameters
+    \item Transform each uniform shocks vector to GARCH residuals using marginal distribution parameters
+    \item Forecast the ARMA-GJR-GARCH process using the residual vectors to get the simulated return vectors $r_{T+1}$
+    \item Infer the empirical distribution function of returns using the simulated return vectors
+\end{enumerate}
+The VaR and ES are then found by
+\begin{align}
+    VaR_{i,T+1}^{1-\alpha} &= F_{i, T+1}^{-1}(\alpha | I^{sim}_T) \\
+    ES_{i, T+1}^{1 - \alpha} &= E_t[r_{i,T+1} | r_{i,T+1} < VaR_{i,T+1}^{1-\alpha}]
+\end{align}
+where $F_{i, T+1}^{-1}(\alpha | I^{sim}_T)$ is the inverse empirical CDF (based on simulated data set $I^{sim}_t$) of asset $i$ at time $T+1$.
+
