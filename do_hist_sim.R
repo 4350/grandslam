@@ -59,6 +59,10 @@ sigma <- rbind(
 kupiec.05 <- kupiec_test.var(.05, df, sigma, T, kGARCHModels)
 kupiec.01 <- kupiec_test.var(.01, df, sigma, T, kGARCHModels)
 
+# Expected shortfall
+
+
+
 # PLOT SECTION -------------------------------------------------------------------------------------
 # Libraries for plot ----
 library(tidyr)
@@ -76,7 +80,10 @@ df.emp$order <- factor(df.emp$factor, names(kGARCHModels))
 df.var05 <- hist.sim.tidy.var(.05, df, sigma, T, kGARCHModels)
 df.var01 <- hist.sim.tidy.var(.01, df, sigma, T, kGARCHModels)
 
-# Plot that
+df.es05 <- hist.sim.tidy.es(.05, df, sigma, T, kGARCHModels)
+df.es01 <- hist.sim.tidy.es(.01, df, sigma, T, kGARCHModels)
+
+# Plot that VaR
 g <- ggplot(df.emp, aes(x = h, y = value, group = factor))+
   geom_line(aes(color = 'Realized return'))+
   geom_line(aes(x = h, y = VaR, color = '5% HS-HW VaR'), data = df.var05)+
@@ -89,5 +96,17 @@ g <- ggplot(df.emp, aes(x = h, y = value, group = factor))+
   ggtitle("Value-at-Risk out-of-sample using HS-HW method")
 ggsave(file = paste('output/VaR/VaRHSHW', 'T', T, 'jpeg', sep = '.'), g, width = 16.6, height = 11.7, units = 'in')
 
-
-
+# Plot that ES
+g <- ggplot(df.emp, aes(x = h, y = value, group = factor))+
+  geom_line(aes(color = 'Realized return'))+
+  geom_line(aes(x = h, y = ES, color = '5% HS-HW ES'), data = df.es05)+
+  geom_line(aes(x = h, y = ES, color = '1% HS-HW ES'), data = df.es01)+
+  geom_line(aes(x = h, y = VaR, color = '5% HS-HW VaR'), data = df.var05)+
+  geom_line(aes(x = h, y = VaR, color = '1% HS-HW VaR'), data = df.var01)+
+  theme_Publication()+
+  ylab('')+
+  xlab('Horizon')+
+  scale_y_continuous(labels = percent)+
+  facet_grid(. ~ order)+
+  ggtitle("Expected shortfall out-of-sample using HS-HW method")
+ggsave(file = paste('output/VaR/ESHSHW', 'T', T, 'jpeg', sep = '.'), g, width = 16.6, height = 11.7, units = 'in')
