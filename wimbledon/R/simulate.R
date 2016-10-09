@@ -179,3 +179,33 @@ shocks2stdresid <- function(shocks, uv, garch, cluster = NULL) {
   
   parSapply(cluster, NN, fn, garch = garch, uv = uv, shocks = shocks)
 }
+
+#' Simulate t+1 distribution for GARCH model i at time t
+#'
+#' @param i GARCH model number
+#' @param t Current time
+#' @param garch List of GARCH models
+#' @param filtered List of filtered series (with series, sigma and residuals)
+#' @param stdresid mxN matrix of standardized residuals
+#'
+#' @return
+#' @export
+garch.path.it <- function(i, t, garch, filtered, stdresid) {
+  m <- garch[[i]]@model$maxOrder
+  tt <- (t - m + 1):t
+  
+  ugarchpath(
+    garch[[i]],
+    n.sim = 1,
+    m.sim = nrow(stdresid),
+    
+    prereturns = filtered$series[tt, i],
+    presigma = filtered$sigma[tt, i],
+    preresiduals = filtered$resid[tt, i],
+    
+    custom.dist = list(
+      name = 'copula',
+      distfit = t(stdresid[, i])
+    )
+  )
+}
