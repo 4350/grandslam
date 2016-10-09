@@ -3,6 +3,7 @@
 
 # Setup ------------------------------------------------------------------
 
+library(ghyp)
 library(devtools)
 library(tictoc)
 load_all('wimbledon')
@@ -10,7 +11,7 @@ load_all('wimbledon')
 rm(list = ls())
 
 # First index for which we simulate distribution t + 1
-kTStart <- 2479
+kTStart <- 2520
 kTEnd <- 2765
 kNSim <- 1e5
 kModelName <- 'dynamic_ghskt'
@@ -40,10 +41,13 @@ for (t in kTStart:kTEnd) {
     Correlation_tp1
   )
   
-  stdresid <- shocks2stdresid(rghyp(kNSim, mv.dist), uv, garch, cluster)
+  stdresid <- shocks2stdresid(ghyp::rghyp(kNSim, mv.dist), uv, garch, cluster)
   write.csv(
     stdresid,
-    file.path(output.directory, paste0(kNSim, "_", t + 1, '.csv'))
+    file.path(
+      output.directory,
+      paste0(format(kNSim, scientific = F), "_", t + 1, '.csv')
+    )
   )
   toc()
 }
