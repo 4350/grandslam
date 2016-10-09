@@ -121,7 +121,7 @@ hist.sim.tidy.var <- function(q, df, sigma, T, kGARCHModels) {
   H = nrow(df) - T
   N = ncol(df)
   # Run simulation
-  out.df <- hist.sim(q, df, sigma, T)
+  out.df <- hist.sim.var(q, df, sigma, T)
   # Long format data
   out.df <- gather(out.df, 'factor', 'VaR', 1:N)
   # Add horizon "x values"
