@@ -3,9 +3,9 @@
 \subsection{Rolling correlations}
 We compute rolling correlation estimates in order to investigate whether the factor equity strategies exhibit constant correlation over time. 
 \begin{align}
-    RCorr(r_i, r_j)_t^{250} = \frac{\sum^{t}_{t-249}(r_i - \bar{r}_i)(r_j - \bar{r}_j)}{\sqrt{\sum^{t}_{t-249} (r_i - \bar{r}_i)^2} \sqrt{\sum^{t}_{t-249} (r_j - \bar{r}_j)^2}}
+    RCorr(r_{i, t}, r_{j, t})_t^{w} = \frac{\sum^{t}_{t-w+1}(r_{i, t} - \bar{r}_i)(r_{j,t} - \bar{r}_j)}{\sqrt{\sum^{t}_{t-w+1} (r_{i,t} - \bar{r}_i)^2} \sqrt{\sum^{t}_{t-w+1} (r_{j,t} - \bar{r}_j)^2}}
 \end{align}
-where $r_i$, $r_j$ represent the $N \cdot (N-1) / 2$ different pairs of the factor strategies' log returns and the window of interest is set to approximate one trading year (250 days).
+where $r_i$, $r_j$ are the $N \cdot (N-1) / 2$ different pairs of the factor strategies' log returns and $w$ is the rolling window of data. We use approximately one year of data with $w = 45$ on weekly data.
 \subsection{Threshold correlations}
 Threshold (or exceedance) correlations have previously been used to highlight the asymmetric dependence structure of i.a. country equity indices~\autocite{LonginSolnik2001}, portfolios by industry, size, value and momentum~\autocite{AngChen2002} and factor strategies~\autocite{ChristoffersenLanglois2013}. Still, however, the following analysis is incremental, as it adds the new factors profitability (RMW) and investment (CMA). We follow~\textcite{ChristoffersenLanglois2013} definition of threshold correlation
 \begin{align}
@@ -51,10 +51,12 @@ The parameters are simultaneously estimated with the skewed Student-\textit{t} p
 \end{align}
 where the density function $f$ is the skewed Student-\textit{t} given by \autoref{eq:dskewt}.
 
-The process of the copula estimation with \textit{c}DCC dynamics is quite involved, as it relies on moment matching and recursive estimation of parameters to estimate the copula correlation matrices $\{\hat{R}\}$. Again, we follow \textcite{Aielli2013}, as is described in further detail in \autoref{App:AppendixD}.
+The process of the copula estimation with \textit{c}DCC dynamics is quite involved, as it relies on moment matching and recursive estimation of parameters to estimate the copula correlation matrices $\{\hat{R}\}$. See \autoref{App:AppendixD} for a detailed description.
 
 \subsection{VaR and ES estimation}
-Throughout this paper, we will discuss VaR and ES as the percentage VaR and percentage ES, i.e. the $1-\alpha \%$ VaR is the percentage return of asset $i$ that is expected to be exceeded only $\alpha \%$ of the time, and the $1 -\alpha \%$ ES is the expected return of asset $i$ when it realizes below the $1 - \alpha \%$ VaR. 
+We study three conventional risk models to benchmark the VaR and ES estimates of simulations from the copula model. By comparing the risk measures, we can draw inferences about whether taking the non-elliptical and non-linear dependency between factor strategies matters for the portfolio risk level. Our hypothesis is that the risk is understated by ignoring the more complex dependencies.
+
+Throughout this paper, we will discuss VaR and ES as the percentage VaR and percentage ES, i.e. the $1-\alpha \%$ VaR is the percentage return of asset $i$ that is expected to be exceeded only $\alpha \%$ of the time, and the $1 -\alpha \%$ ES is the expected return of asset $i$ when it realizes below the $1 - \alpha \%$ VaR.
 
 \textbf{Analytical VaR and ES}
 
@@ -82,21 +84,20 @@ The historically simulated VaR and ES are no longer bound by the correct paramet
 \end{align}
 where $\sigma_{i,T}$ is the conditional estimate of volatility at time $T$ made at time $T-1$ using the GARCH model and $\sigma_{i,t}$ is the conditional estimate of volatility at time $t$ made at time $t-1$ using the GARCH model, and $t<T$.
 
-\textbf{Multivariate EWMA}
+\textbf{Multivariate EWMA VaR and ES}
 
 [PENDING]
 
-\textbf{Copula-based VaR}
-
-As our analysis of GARCH residuals and threshold correlations highlights, the dependence between factor return series can not be captured by linear correlations and elliptical dependency. The only model for VaR and ES that can generate these dynamics is the copula model.
+\textbf{Copula-based VaR and ES}
 
 By simulating many runs of one-week-ahead copula shocks, we can find the simulated probability distributions for one-week-ahead factor strategy returns. The process is as follows
 \begin{enumerate}[(i)]
-    \item At time T, generate 100,000 one-week-ahead random copula shock vectors $z_{T+1}$ according to the conditional copula correlation matrix $\hat{R}_{T+1}$
+    \item At $t = T$, generate 100,000 one-week-ahead random copula shock vectors $z_{T+1}$ according to the conditional copula correlation matrix $\hat{R}_{T+1}$
     \item Transform each $z_{T+1}$ vector to uniform shocks using copula parameters
     \item Transform each uniform shocks vector to GARCH residuals using marginal distribution parameters
     \item Forecast the ARMA-GJR-GARCH process using the residual vectors to get the simulated return vectors $r_{T+1}$
-    \item Infer the empirical distribution function of returns using the simulated return vectors
+    \item Infer the empirical distribution function of $T+1$ returns using the simulated return vectors
+    \item Repeat steps (i)-(v) at $t = T+1, T+2, ...$
 \end{enumerate}
 The VaR and ES are then found by
 \begin{align}
@@ -105,3 +106,6 @@ The VaR and ES are then found by
 \end{align}
 where $F_{i, T+1}^{-1}(\alpha | I^{sim}_T)$ is the inverse empirical CDF (based on simulated data set $I^{sim}_t$) of asset $i$ at time $T+1$.
 
+\subsection{Investing with volatility targeting}
+
+[PENDING]
