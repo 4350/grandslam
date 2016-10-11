@@ -83,6 +83,11 @@ df.var01 <- hist.sim.tidy.var(.01, df, sigma, T, kGARCHModels)
 df.es05 <- hist.sim.tidy.es(.05, df, sigma, T, kGARCHModels)
 df.es01 <- hist.sim.tidy.es(.01, df, sigma, T, kGARCHModels)
 
+save(df.var05, file = 'data/derived/var_hshw_05.RData')
+save(df.var01, file = 'data/derived/var_hshw_01.RData')
+save(df.es05, file = 'data/derived/es_hshw_05.RData')
+save(df.es01, file = 'data/derived/es_hshw_01.RData')
+
 # Plot that VaR
 g <- ggplot(df.emp, aes(x = h, y = value, group = factor))+
   geom_line(aes(color = 'Realized return'))+
