@@ -159,8 +159,7 @@ summary.cumretplots <- function(df, outlabel) {
   # Plot cumulative return series
   out.cumret <- df %>%
     ggplot(aes(x=Date, y=cumret, group=factor)) +
-    geom_line(aes(linetype=factor, color=factor))+
-    geom_point(aes(color=factor))+
+    geom_line(aes(color=factor))+
     ggtitle('Cumulative returns to factor strategies')+
     xlab('')+
     ylab('Cumulative return')+
@@ -171,8 +170,7 @@ summary.cumretplots <- function(df, outlabel) {
   # Plot cumulative standardized return series
   out.cumstdret <- df %>%
     ggplot(aes(x=Date, y=cumstdret, group=factor)) +
-    geom_line(aes(linetype=factor, color=factor))+
-    geom_point(aes(color=factor))+
+    geom_line(aes(color=factor))+
     ggtitle('Cumulative returns to factor strategies (standardized 10% annual vol)')+
     xlab('')+
     ylab('Cumulative return')+
@@ -181,7 +179,7 @@ summary.cumretplots <- function(df, outlabel) {
     theme_Publication()
   
   g <- arrangeGrob(out.cumret, out.cumstdret)
-  ggsave(filename = paste('output/cumretPlot', outlabel, 'jpeg', sep = '.'), g, 'jpeg', dpi = 300, width = 14, height = 10, units = "cm", limitsize = F)
+  ggsave(filename = paste('output/cumretPlot', outlabel, 'jpeg', sep = '.'), g, 'jpeg', dpi = 300, width = 14, height = 21, units = "cm", limitsize = F)
   g
   
 }
