@@ -9,8 +9,8 @@ library(parallel)
 library(rugarch)
 library(ghyp)
 
-load('data/derived/weekly-estim.RData')
-kT <- dim(df.estim)[1]
+load('data/derived/weekly-full.RData')
+kT <- dim(df)[1]
 
 kBSName <- sprintf(
   "RNG %05d - BLL %04d - REP %04d",
@@ -101,7 +101,7 @@ rm(path)
 # Create output folder; each run is saved to a separate file
 # It's too much work to save into one big file -- we can do that later
 run.directory <- file.path(kBSOutputPath, 'runs', kBSName)
-dir.create(run.directory, showWarnings = FALSE)
+dir.create(run.directory, showWarnings = FALSE, recursive = TRUE)
 
 for (b in seq(kBSIteration, kBSRepetitions)) {
   cat(noquote(strrep('-', 79)))
@@ -109,7 +109,7 @@ for (b in seq(kBSIteration, kBSRepetitions)) {
   cat(noquote(sprintf("%s - ITERATION %04d - (%s)\n", kBSName, b, Sys.time())))
   
   # Bootstrapped sample
-  b.sample <- df.estim[bs.index[, b], ]
+  b.sample <- df[bs.index[, b], ]
   
   # Estimate GARCH models for this sample.
   # Takes roughly 15 seconds on Victor's MacBook -- 4 seconds if parallelized,

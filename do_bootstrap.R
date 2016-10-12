@@ -33,8 +33,8 @@ kGARCHModels <- list(
   HML = garch.specgen(1, 1),
   SMB = garch.specgen(1, 1),
   Mom = garch.specgen(1, 0),
-  RMW = garch.specgen(1, 0),
-  CMA = garch.specgen(1, 0)
+  RMW = garch.specgen(1, 1),
+  CMA = garch.specgen(1, 1)
 )
 
 # Output path
@@ -43,10 +43,10 @@ kBSOutputPath <- 'data/derived/bootstrap/ghskt'
 # From previous runs, values around here are found to optimize the LL
 load('data/derived/model_copula_dynamic_ghskt.RData')
 kCopulaParams <- c(
-  model.copula.dynamic.ghskt$dist.params$df,
-  model.copula.dynamic.ghskt$dist.params$skew,
-  model.copula.dynamic.ghskt$alpha,
-  model.copula.dynamic.ghskt$beta
+  model.copula.dynamic.ghskt$params$dist.params$df,
+  model.copula.dynamic.ghskt$params$dist.params$skew,
+  model.copula.dynamic.ghskt$params$alpha,
+  model.copula.dynamic.ghskt$params$beta
 )
 
 # c(
