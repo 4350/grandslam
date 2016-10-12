@@ -6,6 +6,7 @@
 
 # Libraries ----
 library(devtools)
+library(dplyr)
 load_all('wimbledon')
 
 # Reset Worksspace ----
@@ -117,7 +118,7 @@ empdens <- lapply(bestfits, function(fit) garch.empirical.density(fit))
 library(ggplot2)
 library(ggfortify)
 library(gridExtra)
-source('func/garch_diagplots.R')
+library(extrafont)
 lapply(
   list('Mkt.RF','HML','SMB','Mom','CMA','RMW'),
   function(varlist) garch.diagplots(df.stdres, varlist, newsimp, empdens)

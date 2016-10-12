@@ -148,7 +148,8 @@ garch.diagplots <- function(df, factor, newsimp, empdens) {
     main = "ACF standardized residuals",
     ylab = "",
     xlab = ""
-  )
+  )+
+    theme_Publication()
 
   out.pacf <- ggplot2::autoplot(
     pacf(res, lag.max = 20, ylab = "", xlab = ""),
@@ -156,14 +157,16 @@ garch.diagplots <- function(df, factor, newsimp, empdens) {
     ylim = c(-.1,.1),
     ylab = "",
     xlab = ""
-  )
+  )+
+    theme_Publication()
 
   out.aacf <- ggplot2::autoplot(
     acf(absres, lag.max = 20),
     main = "ACF standardized absolute residuals",
     ylab = "",
     xlab = ""
-  )
+  )+
+    theme_Publication()
 
   out.apacf <- ggplot2::autoplot(
     pacf(absres, lag.max = 20, ylab = "", xlab = ""),
@@ -171,12 +174,14 @@ garch.diagplots <- function(df, factor, newsimp, empdens) {
     ylim = c(-.1,.1),
     ylab = "",
     xlab = ""
-  )
+  )+
+    theme_Publication()
 
   out.qq <- ggplot(df, aes_string(sample = factor))+
     stat_qq(distribution = qnorm)+
     scale_y_continuous()+
-    ggtitle("QQ plot vs normal distribution")
+    ggtitle("QQ plot vs normal distribution")+
+    theme_Publication()
 
   out.ret <- ggplot(df, aes_string(x = 'Date', y = factor))+
     geom_line()+
@@ -184,14 +189,16 @@ garch.diagplots <- function(df, factor, newsimp, empdens) {
     ylab("")+
     ggtitle("Standardized residuals")+
     coord_cartesian(ylim = c(-5,5))+
-    scale_y_continuous()
+    scale_y_continuous()+
+    theme_Publication()
 
   out.newsimpact <- ggplot(newsimpdf, aes(x = x, y = y))+
     geom_line()+
     xlab(expression(epsilon[t - 1]))+
     ylab(expression(sigma[t]^2))+
     coord_cartesian(ylim = c(0,0.025))+
-    ggtitle("News impact curve")
+    ggtitle("News impact curve")+
+    theme_Publication()
 
 
   out.empiricaldensity <- ggplot(empdensdf,
@@ -206,12 +213,13 @@ garch.diagplots <- function(df, factor, newsimp, empdens) {
     coord_cartesian(xlim = c(-6, 4), ylim = c(0, .6)) +
     xlab('')+
     ylab('')+
-    ggtitle('Empirical density vs distributions')
+    ggtitle('Empirical density vs distributions')+
+    theme_Publication()
 
   # Grid plots and print to pdf
 
   g <- arrangeGrob(out.ret, out.qq, out.acf, out.pacf,
                    out.aacf, out.apacf, out.newsimpact, out.empiricaldensity,
                    ncol = 2)
-  ggsave(file= paste('output/garch_diagnostics/garch_diagnostics', factor, '.jpeg', sep = ''), g, width = 8.3, height = 11.7, units = 'in', limitsize = F) #saves g
+  ggsave(file= paste('output/garch_diagnostics/garch_diagnostics', factor, '.jpeg', sep = ''), g, width = 14.0, height = 21.0, units = 'cm', limitsize = F) #saves g
 }

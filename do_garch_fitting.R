@@ -44,7 +44,7 @@ cluster <- makeCluster(detectCores() - 1)
 clusterEvalQ(cluster, library(rugarch))
 
 fits <- lapply(
-  df.estim[, -1],
+  df[, -1],
   function(factor, nOOS) {
     parLapply(
       cluster,
