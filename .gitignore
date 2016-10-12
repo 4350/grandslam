@@ -19,3 +19,4 @@ drafts/gameball/out/Thesis Draft (22107 and 22584).thm
 *.blg
 drafts/gameball/out/Thesis Draft (22107 and 22584).log
 *.gz
+data/derived/model_GARCH.RData

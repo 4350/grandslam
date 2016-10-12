@@ -41,42 +41,50 @@ summary.table <- function(df, outfilename) {
 #' @export
 
 summary.plots <- function(df, outlabel, factor) {
-  ret <- simplify2array(df[,factor])
+  df <- as.data.frame(df)
+  ret <- df[,factor]
   factorname <- factor
   absret <- abs(ret)
   
   out.acf <- autoplot(
     acf(ret, lag.max = 20, ylab = "", xlab = ""),
     main = "ACF log returns",
-    ylab = "", 
+    ylab = "",
     xlab = ""
-  )
+  ) +
+    theme_Publication()
   
   out.pacf <- autoplot(
     pacf(ret, lag.max = 20, ylab = "", xlab = ""),
     main = "PACF log returns",
-    ylab = "", 
+    ylab = "",
+    ylim = c(-0.10,0.15),
     xlab = ""
-  )
+  ) +
+    theme_Publication()
   
   out.aacf <- autoplot(
     acf(absret, lag.max = 20),
     main = "ACF absolute log returns",
     ylab = "", 
     xlab = ""
-  )
+  ) +
+    theme_Publication()
   
   out.apacf <- autoplot(
     pacf(absret, lag.max = 20, ylab = "", xlab = ""),
     main = "PACF absolute log returns",
     ylab = "", 
+    ylim = c(0,0.40),
     xlab = ""
-  )
+  ) +
+    theme_Publication()
   
   out.qq <- ggplot(df, aes_string(sample = factor))+ 
     stat_qq(distribution = qnorm)+
     scale_y_continuous(labels = percent)+
-    ggtitle("QQ plot vs normal distribution")
+    ggtitle("QQ plot vs normal distribution")+
+    theme_Publication()
   
   out.ret <- ggplot(df, aes_string(x = 'Date', y = factor))+
     geom_line()+
@@ -84,7 +92,8 @@ summary.plots <- function(df, outlabel, factor) {
     ylab("")+
     ggtitle("Log returns")+
     coord_cartesian(ylim = c(-.1,.1))+
-    scale_y_continuous(labels = percent)
+    scale_y_continuous(labels = percent)+
+    theme_Publication()
   
   # Volatility clustering
   extreme100limit <- tail(sort(absret), 100)[1]
@@ -96,7 +105,8 @@ summary.plots <- function(df, outlabel, factor) {
     ylab("")+
     coord_cartesian(ylim = c(0, 0.10))+
     scale_y_continuous(labels = percent)+
-    ggtitle("100 most extreme returns")
+    ggtitle("100 most extreme returns")+
+    theme_Publication()
   
   # Negative strings
   negextreme100limit <- head(sort(ret), 100)[100]
@@ -108,13 +118,14 @@ summary.plots <- function(df, outlabel, factor) {
     ylab("")+
     coord_cartesian(ylim = c(-.10, 0))+
     scale_y_continuous(labels = percent)+
-    ggtitle("100 most extreme negative returns")
+    ggtitle("100 most extreme negative returns")+
+    theme_Publication()
   
   # Grid plots and print to jpeg
   
   g <- arrangeGrob(out.ret, out.qq, out.acf, out.pacf, out.aacf, out.apacf, out.vol, out.negvol,
                    ncol = 2)
-  ggsave(file= paste('output/MarginalStats/MarginalStats', factor, outlabel, 'jpeg', sep = '.'), g, width = 8.3, height = 11.7, units = 'in', limitsize = F) #saves g
+  ggsave(file= paste('output/MarginalStats/MarginalStats', factor, outlabel, 'jpeg', sep = '.'), g, width = 14, height = 21, units = 'cm', limitsize = F) #saves g
   g
   
 }
@@ -154,7 +165,8 @@ summary.cumretplots <- function(df, outlabel) {
     xlab('')+
     ylab('Cumulative return')+
     theme(legend.position="bottom")+
-    scale_x_date(date_breaks = "2 years", date_labels = "%y")
+    scale_x_date(date_breaks = "2 years", date_labels = "%y")+
+    theme_Publication()
   
   # Plot cumulative standardized return series
   out.cumstdret <- df %>%
@@ -165,10 +177,11 @@ summary.cumretplots <- function(df, outlabel) {
     xlab('')+
     ylab('Cumulative return')+
     theme(legend.position="bottom")+
-    scale_x_date(date_breaks = "2 years", date_labels = "%y")
+    scale_x_date(date_breaks = "2 years", date_labels = "%y")+
+    theme_Publication()
   
   g <- arrangeGrob(out.cumret, out.cumstdret)
-  ggsave(filename = paste('output/cumretPlot', outlabel, 'jpeg', sep = '.'), g, 'jpeg', dpi = 300, width = 8.3, height = 11.7, units = "in", limitsize = F)
+  ggsave(filename = paste('output/cumretPlot', outlabel, 'jpeg', sep = '.'), g, 'jpeg', dpi = 300, width = 14, height = 10, units = "cm", limitsize = F)
   g
   
 }
