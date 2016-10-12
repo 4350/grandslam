@@ -19,7 +19,6 @@ library(devtools)
 
 # Reset workspace and load return data
 rm(list = ls())
-#load('data/derived/daily-estim.RData')
 load('data/derived/weekly-estim.RData')
 load('data/derived/garch_stdres.RData')
 
@@ -66,9 +65,10 @@ g <- ggplot(plotdf.ret, aes(x = qs, y = value)
   coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
   scale_x_continuous(labels = scales::percent) +
   facet_grid(order2 ~ order) +
-  ggtitle('Threshold correlations of weekly data (95% confidence bounds)')
+  ggtitle('Threshold correlations of weekly data (95% confidence bounds)') + 
+  theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
 
-ggsave(file = 'output/thresholdCorrelations/Weekly.jpeg', g, width = 16.6, height = 11.7, units = 'in')
+ggsave(file = 'output/thresholdCorrelations/Weekly.jpeg', g, width = 14, height = 21, units = 'cm')
 
 # Rolling correlations ----------------------------------------------------
 
@@ -78,34 +78,25 @@ rollCorrList.ret = roll_corr(df = df.estim %>% select(-Date),
                                    window = 45
                                    )
 
-rollCorrList.res = roll_corr(df = df.stdres %>% select(-Date), 
-                             df.date = df.stdres %>% select(Date), 
-                             window = 45
-)
 
 # Bind to one df for plot
 plotdf.ret <- bind_rows(rollCorrList.ret$HML, rollCorrList.ret$RMW, rollCorrList.ret$CMA)
-plotdf.res <- bind_rows(rollCorrList.res$HML, rollCorrList.res$RMW, rollCorrList.res$CMA)
 
-# Do threshold plot and save ----------------------------------------------
+# Do roll plot and save ----------------------------------------------
 g <- ggplot(plotdf.ret, aes(x = Date, y = value)
 ) +
   geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
               fill = 'grey10',
-              alpha = 0.1
-  ) +
-  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-              data = plotdf.res,
-              fill = 'grey10',
-              alpha = 0.1
+              alpha = 0.3
   ) +
   geom_line(aes(color = 'Return series')) +
-  geom_line(aes(x = Date, y = value, color = 'Residual series'), data = plotdf.res) +
   theme_Publication() +
   ylab('') +
   xlab('Quantiles') +
+  scale_x_date(date_labels = "%y") +
   coord_cartesian(ylim = c(-1, 1)) + 
   facet_grid(order2 ~ order) +
-  ggtitle('Rolling 45-week correlations (95% confidence bounds)')
+  ggtitle('Rolling 45-week correlations (95% confidence bounds)')#+
+  #theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
 
-ggsave(file = 'output/rollingCorrelations/45weekly.jpeg', g, width = 16.6, height = 11.7, units = 'in')
+ggsave(file = 'output/rollingCorrelations/45weekly.jpeg', g, width = 14, height = 21, units = 'cm')

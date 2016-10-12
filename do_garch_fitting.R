@@ -13,10 +13,9 @@ load_all('wimbledon')
 # Reset Workspace ----
 rm(list = ls())
 load('data/derived/weekly-estim.RData')
-load('data/derived/weekly-full.RData')
 
-# Calculate number of weeks out of sample ---- 
-nOOS <- nrow(df) - nrow(df.estim)
+# Set OOS to zero
+nOOS <- 0
 
 # Estimate GARCH specifications ----
 speclist <- list(

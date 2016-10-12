@@ -1,0 +1,238 @@
+%!TEX root = ../main.tex
+% TABLES NEED TO BE MODIFIED IN THE FOLLOWING WAYS
+% 1) Change {tabular} to {tabularx}{\textwidth} and make leftmost column an X column
+%     and change top and bottom \hline to \toprule \bottomrule
+%
+% paste the following at start but before & \multicolumn
+%
+% \begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+% \\[-1.8ex] \midrule
+% \\[-1.8ex] 
+%
+% paste the following at end after R2 row but before Note row
+% \bottomrule \\[-1.8ex] 
+%
+% 2) Change the variable names to greeks
+% 3) Change specification names if needed
+% 4) Change R^2 to LLH
+% 5) Add label and caption
+% 6) Paste this to get table heading description
+%
+% \begin{tabularx}{\textwidth}{X}
+% \\[-1.8ex]\toprule
+%\\[-1.8ex] 
+% text goes here
+% \end{tabularx}
+%
+% 6) Copy the whole table, only change caption, label, factor/spec labels and (1)-(3) to (4)-(6)
+\begin{table}[!htbp] \centering 
+  \caption{GARCH results: Mkt.RF, HML, SMB} 
+  \label{tab:garch1} 
+\begin{tabularx}{\textwidth}{X}
+\\[-1.8ex]\toprule
+\\[-1.8ex] 
+Parameter estimates from ARMA(p,q)-GJR-GARCH(1,1) models. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. The mean equations is given by: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and the variance equation is given by $\sigma_{t}^2 = \omega + (a + \xi I_{t-1}) \epsilon_{t-1}^2 + b \sigma^2_{t-1}$. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}.
+\end{tabularx}
+\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\midrule
+\\[-1.8ex] 
+ & \multicolumn{3}{c}{Factor series} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\\[-1.8ex] & \multicolumn{1}{c}{Mkt.RF} & \multicolumn{1}{c}{HML} & \multicolumn{1}{c}{SMB}\\ 
+\hline \\[-1.8ex] 
+ $\mu$ & 0.001^{***} & 0.001^{***} & 0.000 \\ 
+  & (0.000) & (0.000) & (0.000) \\ 
+  & & & \\ 
+ $\phi_1$ &  & 0.698^{***} & 0.794^{***} \\ 
+  &  & (0.087) & (0.044) \\ 
+  & & & \\ 
+ $\theta_1$ &  & -0.558^{***} & -0.641^{***} \\ 
+  &  & (0.097) & (0.050) \\ 
+  & & & \\ 
+ $\alpha$ & 0.089^{***} & 0.105^{***} & 0.114^{**} \\ 
+  & (0.010) & (0.004) & (0.047) \\ 
+  & & & \\ 
+ $\beta$ & 0.864^{***} & 0.872^{***} & 0.840^{***} \\ 
+  & (0.005) & (0.003) & (0.064) \\ 
+  & & & \\ 
+ $\eta$ & 0.360^{***} & -0.112 & 0.132 \\ 
+  & (0.097) & (0.069) & (0.091) \\ 
+  & & & \\ 
+ skew & -2.350^{*} & 0.332 & -0.958 \\ 
+  & (1.262) & (0.321) & (3.414) \\ 
+  & & & \\ 
+ $\nu$ & 13.435^{***} & 10.273^{***} & 11.665 \\ 
+  & (4.342) & (2.255) & (28.454) \\ 
+  & & & \\ 
+ $\omega$ & 0.000 & 0.000 & 0.000 \\ 
+  &  &  & \\ 
+  & & & \\ 
+\hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{2,479} & \multicolumn{1}{c}{2,479} & \multicolumn{1}{c}{2,479} \\ 
+LLH & \multicolumn{1}{c}{6,313} & \multicolumn{1}{c}{7,847} & \multicolumn{1}{c}{7,670} \\ 
+\bottomrule \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabularx} 
+\end{table}
+% Table created by stargazer v.5.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: ons, okt 12, 2016 - 12:31:30
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{GARCH results: Mom, RMW, CMA} 
+  \label{tab:garch2} 
+\begin{tabularx}{\textwidth}{X}
+\\[-1.8ex]\toprule
+\\[-1.8ex] 
+Parameter estimates from ARMA(p,q)-GJR-GARCH(1,1) models. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. The mean equations is given by: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and the variance equation is given by $\sigma_{t}^2 = \omega + (a + \xi I_{t-1}) \epsilon_{t-1}^2 + b \sigma^2_{t-1}$. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}.
+\end{tabularx}
+\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\midrule
+\\[-1.8ex] 
+ & \multicolumn{3}{c}{Factor series} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\\[-1.8ex] & \multicolumn{1}{c}{Mom} & \multicolumn{1}{c}{RMW} & \multicolumn{1}{c}{CMA}\\ 
+\hline \\[-1.8ex] 
+ $\mu$ & 0.002^{***} & 0.001^{**} & 0.001^{***} \\ 
+  & (0.000) & (0.000) & (0.000) \\ 
+  & & & \\ 
+ $\phi_1$ & 0.117^{***} & 0.155^{***} & 0.125^{***} \\ 
+  & (0.026) & (0.026) & (0.022) \\ 
+  & & & \\ 
+ $\theta_1$ &  & &  \\ 
+  &  &  &  \\ 
+  & & & \\ 
+ $\alpha$ & 0.128^{***} & 0.070^{***} & 0.092^{***} \\ 
+  & (0.009) & (0.007) & (0.004) \\ 
+  & & & \\ 
+ $\beta$ & 0.851^{***} & 0.924^{***} & 0.890^{***} \\ 
+  & (0.000) & (0.002) & (0.000) \\ 
+  & & & \\ 
+ $\eta$ & -0.342^{***} & 0.069 & -0.151^{**} \\ 
+  & (0.057) & (0.293) & (0.064) \\ 
+  & & & \\ 
+ skew & -2.410 & -0.135 & 0.403 \\ 
+  & (2.916) & (0.526) & (0.654) \\ 
+  & & & \\ 
+ $\nu$ & 13.414 & 12.501 & 11.740^{**} \\ 
+  & (17.056) & (90.255) & (5.744) \\ 
+  & & & \\ 
+ $\omega$ & 0.000 & 0.000 & 0.000 \\ 
+  &  &  & \\ 
+  & & & \\ 
+\hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{2,479} & \multicolumn{1}{c}{2,479} & \multicolumn{1}{c}{2,479} \\ 
+LLH & \multicolumn{1}{c}{7,164} & \multicolumn{1}{c}{8,832} & \multicolumn{1}{c}{8,522} \\ 
+\bottomrule \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabularx} 
+\end{table}
+% Table created by stargazer v.5.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: ons, okt 12, 2016 - 12:37:02
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Copula results: Constant specifications} 
+  \label{tab:copula1} 
+\begin{tabularx}{\textwidth}{X}
+\\[-1.8ex]\toprule
+\\[-1.8ex] 
+Parameter estimates from the copula models on 
+\end{tabularx}
+\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\midrule
+\\[-1.8ex] 
+ & \multicolumn{3}{c}{Constant copula models} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
+\\[-1.8ex] & \multicolumn{1}{c}{Gaussian} & \multicolumn{1}{c}{Student-\textit{t}} & \multicolumn{1}{c}{Skewed Student-\textit{t}}\\ 
+\hline \\[-1.8ex] 
+ $\nu$ &  & 6.508 & 6.566 \\ 
+  &  & () & () \\ 
+  & & & \\ 
+ $\gamma_{Mkt.RF}$ &  &  & -0.019 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{HML}$ &  &  & 0.090 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{SMB}$ &  &  & -0.083 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{Mom}$ &  &  & -0.172 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{RMW}$ &  &  & 0.011 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{CMA}$ &  &  & 0.079 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\alpha$ & 0 & 0 & 0 \\ 
+  &  &  &  \\ 
+  & & & \\ 
+ $\beta$ & 0 & 0 & 0 \\ 
+  &  &  &  \\ 
+  & & & \\ 
+\hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{2,479} & \multicolumn{1}{c}{2,479} & \multicolumn{1}{c}{2,479} \\ 
+LLH & \multicolumn{1}{c}{1,096} & \multicolumn{1}{c}{1,463} & \multicolumn{1}{c}{1,475} \\ 
+\bottomrule \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabularx} 
+\end{table} 
+
+% Table created by stargazer v.5.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: ons, okt 12, 2016 - 12:37:02
+% Requires LaTeX packages: dcolumn 
+\begin{table}[!htbp] \centering 
+  \caption{Copula results: \textit{c}DCC specifications} 
+  \label{tab:copula2} 
+\begin{tabularx}{\textwidth}{X}
+\\[-1.8ex]\toprule
+\\[-1.8ex] 
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+\end{tabularx}
+\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\midrule
+\\[-1.8ex] 
+ & \multicolumn{3}{c}{Dynamic copula models} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\\[-1.8ex] & \multicolumn{1}{c}{Gaussian} & \multicolumn{1}{c}{Student-\textit{t}} & \multicolumn{1}{c}{Skewed Student-\textit{t}}\\ 
+\hline \\[-1.8ex] 
+ $\nu$ &  & 11.785 & 11.801 \\ 
+  &  & () & () \\ 
+  & & & \\ 
+ $\gamma_{Mkt.RF}$ &  &  & -0.019 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{HML}$ &  &  & 0.065 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{SMB}$ &  &  & -0.162 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{Mom}$ &  &  & -0.149 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{RMW}$ &  &  & 0.081 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\gamma_{CMA}$ &  &  & 0.004 \\ 
+  &  &  & () \\ 
+  & & & \\ 
+ $\alpha$ & 0.066 & 0.069 & 0.069 \\ 
+  & () & () & () \\ 
+  & & & \\ 
+ $\beta$ & 0.915 & 0.912 & 0.912 \\ 
+  & () & () & () \\ 
+  & & & \\ 
+\hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{2,479} & \multicolumn{1}{c}{2,479} & \multicolumn{1}{c}{2,479} \\ 
+LLH & \multicolumn{1}{c}{2,568} & \multicolumn{1}{c}{2,743} & \multicolumn{1}{c}{2,752} \\ 
+\bottomrule \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabularx} 
+\end{table} 
+

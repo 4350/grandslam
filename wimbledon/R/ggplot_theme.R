@@ -6,14 +6,14 @@
 #' import_font('fontpath'), but font needs to be .tty
 #' afterwards run fonts() to see its inside :)
 
-theme_Publication <- function(base_size=11, base_family="Minion Pro") {
+theme_Publication <- function(base_size=9, base_family="Minion Pro") {
   library(grid)
   library(ggthemes)
   half_line <- base_size/2
   (theme_foundation(base_size = base_size, base_family = base_family)
   + theme(plot.title = element_text(family = "Minion Pro", 
                                     face = "bold",
-                                    size = rel(1.2), 
+                                    size = rel(1), 
                                     hjust = 0.5),
           text = element_text(family = "Minion Pro", 
                               face = "plain",
@@ -25,10 +25,8 @@ theme_Publication <- function(base_size=11, base_family="Minion Pro") {
                               angle = 0, 
                               margin = margin(), 
                               debug = FALSE),
-          panel.background = element_rect(colour = NA, fill = 'grey92'),
           plot.background = element_rect(colour = NA),
-          panel.border = element_rect(colour = NA),
-          axis.title = element_text(face = "bold",size = rel(1)),
+          axis.title = element_text(face = "plain",size = rel(0.9)),
           axis.title.x = element_text(margin = margin(t = 0.8 * half_line,
                                                       b = 0.8 * half_line/2)),
           axis.title.y = element_text(angle = 90,
@@ -36,13 +34,16 @@ theme_Publication <- function(base_size=11, base_family="Minion Pro") {
                                                       l = 0.8 * half_line/2)),
           axis.text = element_text(size = rel(0.8), colour = "grey30"), 
           axis.line = element_blank(),
-          axis.ticks = element_line(colour = "grey20"),
+          axis.ticks = element_line(colour = "grey20"), 
+          axis.ticks.length = unit(half_line/2, "pt"), 
           axis.text.x = element_text(margin = margin(t = 0.8*half_line/2), 
                                      vjust = 1), 
           axis.text.y = element_text(margin = margin(r = 0.8*half_line/2),
                                      hjust = 1),
-          panel.grid.major = element_line(colour = "white"), 
-          panel.grid.minor = element_blank(), 
+          panel.background = element_rect(fill = "grey92", colour = NA),
+          panel.border = element_blank(), 
+          panel.grid.major = element_line(colour = "white", size = 0.25), 
+          panel.grid.minor = element_blank(),
           legend.key = element_rect(colour = NA),
           legend.position = "bottom",
           legend.direction = "horizontal",

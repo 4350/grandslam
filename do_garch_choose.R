@@ -6,6 +6,8 @@
 
 # Libraries ----
 library(devtools)
+library(dplyr)
+library(rugarch)
 load_all('wimbledon')
 
 # Reset Worksspace ----
@@ -32,8 +34,8 @@ bestfits <- list(
   HML = fits$HML$ARMA11,
   SMB = fits$SMB$ARMA11,
   Mom = fits$Mom$ARMA10,
-  RMW = fits$RMW$ARMA10,  
-  CMA = fits$CMA$ARMA10
+  RMW = fits$RMW$ARMA11,  
+  CMA = fits$CMA$ARMA11
 )
 model.GARCH <- bestfits
 save(model.GARCH, file = 'data/derived/model_GARCH.RData')
@@ -117,8 +119,8 @@ empdens <- lapply(bestfits, function(fit) garch.empirical.density(fit))
 library(ggplot2)
 library(ggfortify)
 library(gridExtra)
-source('func/garch_diagplots.R')
+library(extrafont)
 lapply(
-  list('Mkt.RF','HML','SMB','Mom','CMA','RMW'),
+  list('Mkt.RF','HML','SMB','Mom','RMW','CMA'),
   function(varlist) garch.diagplots(df.stdres, varlist, newsimp, empdens)
 )
