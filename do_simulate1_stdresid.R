@@ -11,9 +11,9 @@ load_all('wimbledon')
 rm(list = ls())
 
 # First index for which we simulate distribution t + 1
-kTStart <- 2520
+kTStart <- 1
 kTEnd <- 2765
-kNSim <- 1e5
+kNSim <- 1e4
 kModelName <- 'dynamic_ghskt'
 
 output.directory <- file.path('data/derived/stdresid', kModelName)
