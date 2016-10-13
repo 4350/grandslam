@@ -109,6 +109,9 @@ for (t in times) {
 all_cdb <- cdb
 all_weights <- weights
 
+save(list(cdb = cdb, weights = weights),
+     sprintf('data/derived/cdb_%s_all.RData', MODEL_NAME))
+
 # Only Classic Value -----------------------------------------------------
 
 times <- 1:nrow(distribution_simple)
@@ -134,6 +137,9 @@ for (t in times) {
 classic_cdb <- cdb
 classic_weights <- weights
 
+save(list(cdb = cdb, weights = weights),
+     sprintf('data/derived/cdb_%s_classic.RData', MODEL_NAME))
+
 # Only Modern Value ------------------------------------------------------
 
 times <- 1:nrow(distribution_simple)
@@ -158,3 +164,6 @@ for (t in times) {
 
 modern_cdb <- cdb
 modern_weights <- weights
+
+save(list(cdb = cdb, weights = weights),
+     sprintf('data/derived/cdb_%s_modern.RData', MODEL_NAME))
