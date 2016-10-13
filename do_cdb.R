@@ -10,7 +10,10 @@
 
 library(tictoc)
 library(Rsolnp)
-library(foreach)
+library(ggplot2)
+library(tidyr)
+library(devtools)
+load_all('wimbledon')
 rm(list = ls())
 
 MODEL_NAME <- 'dynamic_ghskt'
@@ -80,7 +83,10 @@ optimize_cbd <- function(q, distribution_t, eqfun = sum, eqB = 1,
     eqB = eqB,
     LB = rep(0, N),
     
-    control = list(trace = 0),
+    # Optimizer keeps climbing the multidimensional mountains with tiny
+    # tiny steps. Take some strides (default delta = 1e-7)!!!
+    control = list(trace = 0,
+                   delta = 1e-6),
     ...
   )
 }
