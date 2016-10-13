@@ -65,10 +65,10 @@ g <- ggplot(plotdf.ret, aes(x = qs, y = value)
   coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
   scale_x_continuous(labels = scales::percent) +
   facet_grid(order2 ~ order) +
-  ggtitle('Threshold correlations of weekly data (95% confidence bounds)') + 
+  #ggtitle('Threshold correlations of weekly data (95% confidence bounds)') + 
   theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
 
-ggsave(file = 'output/thresholdCorrelations/Weekly.jpeg', g, width = 14, height = 21, units = 'cm')
+ggsave(file = 'output/thresholdCorrelations/Weekly.jpeg', g, width = 14, height = 16, units = 'cm')
 
 # Rolling correlations ----------------------------------------------------
 
