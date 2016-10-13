@@ -15,7 +15,7 @@ load_all('wimbledon')
 rm(list = ls())
 
 kModelName <- 'dynamic_ghskt'
-kNSim <- 1e5
+kNSim <- 1e4
 
 # Load filtered dataset (and models)
 load(paste0('data/derived/filtered_', kModelName, '.RData'))
@@ -49,7 +49,7 @@ garch.path.t <- function(t) {
 
 # Run for each t ---------------------------------------------------------
 
-tt <- 2480:2766
+tt <- 2:2766
 distribution <- array(
   NA,
   dim = c(
