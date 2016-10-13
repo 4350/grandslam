@@ -167,3 +167,35 @@ classic_weights <- weights
 
 cdb_results <- list(cdb = cdb, weights = weights)
 save(cdb_results, file = sprintf('data/derived/cdb_%s_classic.RData', MODEL_NAME))
+
+
+# Plotting ---------------------------------------------------------------
+
+rm(list = ls())
+
+MODEL_NAME <- 'dynamic_ghskt'
+
+path_template <- 'data/derived/cdb_%s_%s.RData'
+load('data/derived/weekly-full.RData')
+
+load(sprintf(path_template, MODEL_NAME, 'all'))
+results_all <- cdb_results
+
+load(sprintf(path_template, MODEL_NAME, 'classic'))
+results_classic <- cdb_results
+
+load(sprintf(path_template, MODEL_NAME, 'modern'))
+results_modern <- cdb_results
+
+cdb <- data.frame(Week = df$Date[-length(df$Date)],
+                  All = results_all$cdb,
+                  Classic = results_classic$cdb,
+                  Modern = results_modern$cdb)
+
+cdb_long <- gather(cdb, Strategy, CDB, -Week)
+
+ggplot(cdb_long, aes(Week, CDB, colour = Strategy)) +
+  geom_line() +
+  theme_Publication() +
+  scale_colour_Publication() +
+  coord_cartesian(ylim = c(0.40, 1.00))
