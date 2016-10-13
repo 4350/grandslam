@@ -31,13 +31,13 @@ optimizeFn <- function(theta, dist, data, cluster = NULL) {
 
 # Asymmetric Student's t Optimization ----
 theta.ghskt <- c(
-   6.56539043,
-  -0.01912332,
-   0.08972005,
-  -0.08280076,
-  -0.17185179,
-   0.01118687,
-   0.07844633
+  11.80294,
+  -0.05473225,
+  0.07062225,
+  -0.17046365,
+  -0.12501372,
+  0.09492990,
+  0.02159156
 )
 
 ui <- rbind(
@@ -84,7 +84,7 @@ save(
 )
 
 # Symmetric Student's t optimization ----
-theta.ght <- c(6.508058)
+theta.ght <- c(11.80294)
 cluster <- prepare.cluster()
 
 optim.ght <- optim(
