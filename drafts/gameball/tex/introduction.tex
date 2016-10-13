@@ -1,0 +1,32 @@
+%!TEX root = ../main.tex
+\section{Introduction}
+Background:
+\begin{itemize}
+	\item \textcite{FF2015} find $HML$ to give no alpha in a portfolio of the remaining four factors. $HML$ is possible a bad proxy for something else
+	\item Quant crash in 2007 highlights risk of leveraged investors taking similar positions in factor strategies \autocite{KhandaniLo2011}
+	\item The $HML$ strategy is, together with $Mom$ the most crowded factor strategies (\textcite{Pedersen2015}, \textcite{AQREMN} and \textcite{McKEMN})
+	\item \textcite{ChristoffersenLanglois2013} documents asymmetric tail dependence for four equity factors, however not including $RMW$ and $CMA$
+\end{itemize}
+
+Research question:
+What role does $HML$ have in investing, from a risk management perspective? What are the effects of replacing $HML$ with $RMW$ and $CMA$ for a diversified factor investor?
+
+Hypotheses:
+\begin{enumerate}
+	\item $RMW$ and $CMA$ offer greater diversification benefits than $HML$, as measured by CDB (conditional diversification benefit, \autocite{ChristoffersenErrunzaJacobLanglois2012})
+	\item Out of sample, a mean-variance investor ignoring $HML$ will realize nearly the same Sharpe ratio as in the unconstrained case, but significantly decrease other risk measures including skewness, MDD
+\end{enumerate}
+
+Method:
+\begin{itemize}
+	\item To answer these questions, we need a model for the conditional joint distribution function. Given the previous knowledge about financial return data, we want the model to capture (asymmetric) tail dependency, time-varying dependency, fat tails, volatility clustering and leverage effects. This is the \textit{c}DCC copula model.
+\end{itemize}	
+
+Tease results:
+\begin{itemize}
+	\item There are asymmetric dependencies between all equity factor strategies that are not captured by linear correlation and Gaussian dependency
+	\item A fair share of the asymmetry and dynamics on a multivariate level can be explained by ARMA-ARCH effects on the marginal series. Past history of the own variable can explain a lot
+	\item A skewed Student-\textit{t} copula can generate the tail dependency in the data fairly well
+	\item Something copula
+	\item Something dynamic
+\end{itemize}	
