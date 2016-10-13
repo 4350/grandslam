@@ -78,7 +78,7 @@ optimize_cbd <- function(q, distribution_t, eqfun = sum, eqB = 1,
     fn,
     eqfun = eqfun,
     eqB = eqB,
-    LB = rep(0, 6),
+    LB = rep(0, N),
     
     control = list(trace = 0),
     ...
@@ -89,7 +89,7 @@ optimize_cbd <- function(q, distribution_t, eqfun = sum, eqB = 1,
 
 # XXX It may be the case that there is an off-by-one error here; I think
 # the first distribution is actually the distribution of t = 2 et cetera.
-times <- 1:nrow(distribution_simple)
+times <- 1:dim(distribution_simple)[3]
 cdb <- rep(NA, length(times))
 weights <- matrix(NA, ncol = 6, nrow = length(times))
 
@@ -109,53 +109,22 @@ for (t in times) {
 all_cdb <- cdb
 all_weights <- weights
 
-save(list(cdb = cdb, weights = weights),
-     sprintf('data/derived/cdb_%s_all.RData', MODEL_NAME))
+cdb_results <- list(cdb = cdb, weights = weights)
+save(cdb_results, file = sprintf('data/derived/cdb_%s_all.RData', MODEL_NAME))
 
-# Only Classic Value -----------------------------------------------------
+# Only Modern Value -----------------------------------------------------
 
-times <- 1:nrow(distribution_simple)
+# Drop classic value from the returns. Note: Replace global distribution
+# because it takes so much SPACE!!!
+distribution_simple <- distribution_simple[, c(1, 3:6), ]
+
+times <- 1:dim(distribution_simple)[3]
 cdb <- rep(NA, length(times))
-weights <- matrix(NA, ncol = 6, nrow = length(times))
-
-# eqfun that forces weights to sum to 1 and weight[HML] == 0
-eqfun <- function(x) c(sum(x), x[2])
-x0 <- rep(1 / 5, 6)
-x0[2] <- 0
+weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
 
 for (t in times) {
   tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cbd(q = 0.05, distribution_simple[,, t],
-                     x0 = x0,
-                     eqfun = eqfun, eqB = c(1, 0))
-  toc()
-  
-  cdb[t] <- -tail(op$values, 1)
-  weights[t, ] <- op$pars
-}
-
-classic_cdb <- cdb
-classic_weights <- weights
-
-save(list(cdb = cdb, weights = weights),
-     sprintf('data/derived/cdb_%s_classic.RData', MODEL_NAME))
-
-# Only Modern Value ------------------------------------------------------
-
-times <- 1:nrow(distribution_simple)
-cdb <- rep(NA, length(times))
-weights <- matrix(NA, ncol = 6, nrow = length(times))
-
-# eqfun that forces weights to sum to 1 and weight[RMW, CMA] == 0
-eqfun <- function(x) c(sum(x), x[5], x[6])
-x0 <- rep(1 / 4, 6)
-x0[5] <- 0; x0[6] <- 0
-
-for (t in times) {
-  tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cbd(q = 0.05, distribution_simple[,, t],
-                     x0 = x0,
-                     eqfun = eqfun, eqB = c(1, 0, 0))
+  op <- optimize_cbd(q = 0.05, distribution_simple[,, t])
   toc()
   
   cdb[t] <- -tail(op$values, 1)
@@ -165,5 +134,30 @@ for (t in times) {
 modern_cdb <- cdb
 modern_weights <- weights
 
-save(list(cdb = cdb, weights = weights),
-     sprintf('data/derived/cdb_%s_modern.RData', MODEL_NAME))
+cdb_results <- list(cdb = cdb, weights = weights)
+save(cdb_results, file = sprintf('data/derived/cdb_%s_modern.RData', MODEL_NAME))
+
+# Only Classic Value ------------------------------------------------------
+
+# Drop RMW and CMA from the distributions. This is a lot faster than having
+# constraints in the optimizer
+distribution_simple <- distribution_simple[, c(1:4), ]
+
+times <- 1:dim(distribution_simple)[3]
+cdb <- rep(NA, length(times))
+weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
+
+for (t in times) {
+  tic(sprintf('Optimal CDB at t = %d', t))
+  op <- optimize_cbd(q = 0.05, distribution_simple[,, t])
+  toc()
+  
+  cdb[t] <- -tail(op$values, 1)
+  weights[t, ] <- op$pars
+}
+
+classic_cdb <- cdb
+classic_weights <- weights
+
+cdb_results <- list(cdb = cdb, weights = weights)
+save(cdb_results, file = sprintf('data/derived/cdb_%s_classic.RData', MODEL_NAME))
