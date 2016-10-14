@@ -31,7 +31,7 @@ By examining marginal factor strategy returns, we find evidence of non-normality
 
 The most important goal of this application GARCH model is not to have high predictive power of asset return series, but to sanitize the data to be used in multivariate analysis. We focus on parsimonious models with few lags, but enough flexibility to capture salient features of the summary plots of the marginal series, such as volatility clustering and leverage effect.
 
-The selection process is as follows: for each factor strategy, ARMA-GJR-GARCH models are estimated with different ARMA lag orders (up to 3,3) and a fixed GJR-GARCH order of (1,1). We then compute the Bayesian Information Criteria (BIC) for each specification, and for each factor select the model with the lowest BIC as the primary candidate. The primary candidate specification is then checked for remaining serial correlation and ARCH effects in residuals. All of the primary candidate models pass the diagnostic tests.
+The selection process is as follows: for each factor strategy, ARMA-GJR-GARCH models are estimated with different ARMA lag orders (up to 3,3) and a fixed GJR-GARCH order of (1,1). We then compute the Bayesian Information Criterion (BIC, \textcite{Schwarz1978}) for each specification, and for each factor select the model with the lowest BIC as the primary candidate. The primary candidate specification is then checked for remaining serial correlation and ARCH effects in residuals. All of the primary candidate models pass the diagnostic tests.
 
 We use the GJR-GARCH model with ARMA mean equation
 \begin{align}
@@ -124,7 +124,7 @@ This is a step-by-step description of the procedure used to find the copula corr
 \begin{tabularx}{\textwidth}{X}
 \\[-1.8ex]\toprule
 \\[-1.8ex] 
-\footnotesize Parameter estimates from ARMA(p,q)-GJR-GARCH(1,1) models. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. The mean equations is given by: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and the variance equation is given by $\sigma_{t}^2 = \omega + (a + \eta I_{t-1}) \epsilon_{t-1}^2 + b \sigma^2_{t-1}$. $\zeta, \varrho$ are the skewness and degree of freedom parameters of the Skewed Student-\textit{t} innovations. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests with automatic lag selection from \textcite{FisherGallagher2012}.
+\footnotesize Parameter estimates from ARMA-GJR-GARCH models. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. All data 1963-07-05 - 2016-07-01. Mean equation: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and variance equation: $\sigma_{t}^2 = \omega + (a + \eta I_{t-1}) \epsilon_{t-1}^2 + b \sigma^2_{t-1}$. $\zeta, \varrho$ are the skewness and degree of freedom parameters of the Skewed Student-\textit{t} innovations. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests with automatic lag selection from \textcite{FisherGallagher2012}.
 \end{tabularx}
 \begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
 \\[-1.8ex]\midrule
@@ -164,6 +164,7 @@ This is a step-by-step description of the procedure used to find the copula corr
 \hline \\[-1.8ex] 
 Observations & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} \\ 
 LLH & \multicolumn{1}{c}{7,052} & \multicolumn{1}{c}{8,791} & \multicolumn{1}{c}{8,571} \\ 
+Variance persistence $(a+b)$ & \multicolumn{1}{c}{0.939} & \multicolumn{1}{c}{0.981} & \multicolumn{1}{c}{0.954} \\
 Ljung-Box p-value & \multicolumn{1}{c}{0.111} & \multicolumn{1}{c}{0.992} & \multicolumn{1}{c}{0.631} \\ 
 ARCH-LM p-value & \multicolumn{1}{c}{0.962} & \multicolumn{1}{c}{0.148} & \multicolumn{1}{c}{0.885} \\ 
 \bottomrule \\[-1.8ex] 
@@ -179,7 +180,7 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.962} & \multicolumn{1}{c}{0.148} & \multi
 \begin{tabularx}{\textwidth}{X}
 \\[-1.8ex]\toprule
 \\[-1.8ex] 
-\footnotesize Parameter estimates from ARMA(p,q)-GJR-GARCH(1,1) models. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. The mean equations is given by: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and the variance equation is given by $\sigma_{t}^2 = \omega + (a + \eta I_{t-1}) \epsilon_{t-1}^2 + b \sigma^2_{t-1}$. $\zeta, \varrho$ are the skewness and degree of freedom parameters of the Skewed Student-\textit{t} innovations. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests with automatic lag selection from \textcite{FisherGallagher2012}.
+\footnotesize Parameter estimates from ARMA-GJR-GARCH models. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. All data 1963-07-05 - 2016-07-01. Mean equation: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and variance equation: $\sigma_{t}^2 = \omega + (a + \eta I_{t-1}) \epsilon_{t-1}^2 + b \sigma^2_{t-1}$. $\zeta, \varrho$ are the skewness and degree of freedom parameters of the Skewed Student-\textit{t} innovations. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests with automatic lag selection from \textcite{FisherGallagher2012}.
 \end{tabularx}
 \begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
 \\[-1.8ex]\midrule
@@ -219,6 +220,7 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.962} & \multicolumn{1}{c}{0.148} & \multi
 \hline \\[-1.8ex] 
 Observations & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} \\ 
 LLH & \multicolumn{1}{c}{7,972} & \multicolumn{1}{c}{9,874} & \multicolumn{1}{c}{9,585} \\
+Variance persistence $(a+b)$ & \multicolumn{1}{c}{0.983} & \multicolumn{1}{c}{0.992} & \multicolumn{1}{c}{0.983} \\
 Ljung-Box p-value & \multicolumn{1}{c}{0.065} & \multicolumn{1}{c}{0.062} & \multicolumn{1}{c}{0.634} \\ 
 ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multicolumn{1}{c}{0.926} \\  
 \bottomrule \\[-1.8ex] 

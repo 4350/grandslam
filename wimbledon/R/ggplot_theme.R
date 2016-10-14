@@ -6,7 +6,7 @@
 #' import_font('fontpath'), but font needs to be .tty
 #' afterwards run fonts() to see its inside :)
 
-theme_Publication <- function(base_size=9, base_family="Minion Pro") {
+theme_Publication <- function(base_size=11, base_family="Minion Pro") {
   library(grid)
   library(ggthemes)
   half_line <- base_size/2
@@ -51,8 +51,8 @@ theme_Publication <- function(base_size=9, base_family="Minion Pro") {
           legend.key.size= unit(0.2, "cm"),
           legend.margin = unit(0, "cm"),
           legend.title = element_blank(), 
-          legend.text = element_text(size = rel(0.8)),
-          plot.margin=unit(c(10,5,5,5),"mm"),
+          legend.text = element_text(size = rel(0.9)),
+          plot.margin=unit(c(1,1,1,1),"mm"),
           strip.background=element_rect(colour = NA, fill="grey85"),
           strip.text = element_text(face = "bold", colour = "grey10", size = rel(0.8)),
           strip.text.x = element_text(margin = margin(t = half_line,

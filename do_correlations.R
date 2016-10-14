@@ -46,29 +46,50 @@ plotdf.res <- bind_rows(thCorrList.res$HML, thCorrList.res$RMW, thCorrList.res$C
 
 
 # Do threshold plot and save ----------------------------------------------
-g <- ggplot(plotdf.ret, aes(x = qs, y = value)
-            ) +
-  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-              fill = 'grey10',
-              alpha = 0.1
-              ) +
-  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-              data = plotdf.res,
-              fill = 'grey10',
-              alpha = 0.1
-              ) +
-  geom_line(aes(color = 'Return series')) +
-  geom_line(aes(x = qs, y = value, color = 'Residual series'), data = plotdf.res) +
-  theme_Publication() +
-  ylab('') +
-  xlab('Quantiles') +
-  coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
-  scale_x_continuous(labels = scales::percent) +
-  facet_grid(order2 ~ order) +
-  #ggtitle('Threshold correlations of weekly data (95% confidence bounds)') + 
-  theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
 
-ggsave(file = 'output/thresholdCorrelations/Weekly.jpeg', g, width = 14, height = 16, units = 'cm')
+.plot_th_corr <- function(plotdf.ret, plotdf.res, COLFACTORS, OUTNAME) {
+  # Select the column factors for plot this plot
+  plotdf.ret <- plotdf.ret[plotdf.ret$order == COLFACTORS,]
+  plotdf.res <- plotdf.res[plotdf.res$order == COLFACTORS,]
+  
+  # Then do plot
+  g <- ggplot(plotdf.ret, aes(x = qs, y = value)
+  ) +
+    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = 'grey10',
+                alpha = 0.1
+    ) +
+    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                data = plotdf.res,
+                fill = 'grey10',
+                alpha = 0.1
+    ) +
+    geom_line(aes(color = 'Return series')) +
+    geom_line(aes(x = qs, y = value, color = 'Residual series'), data = plotdf.res) +
+    theme_Publication() +
+    scale_colour_Publication() +
+    ylab('Correlation') +
+    xlab('Quantiles') +
+    coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
+    scale_x_continuous(labels = scales::percent) +
+    facet_grid(order ~ order2)
+    #ggtitle('Threshold correlations of weekly data (95% confidence bounds)') + 
+    #theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
+  
+  # Save plot
+  OUTPATH <- 'output/thresholdCorrelations/threshold_%s.png'
+  ggsave(sprintf(OUTPATH, OUTNAME), 
+    g, device = 'png', width = 14, height = 16, units = 'cm'
+    )
+
+}
+
+# Do the plots ------------------------------------------------------------
+
+
+.plot_th_corr(plotdf.ret, plotdf.res, c('Mkt.RF', 'SMB','Mom'), 'Nonvalue')
+.plot_th_corr(plotdf.ret, plotdf.res, c('HML','RMW','CMA'), 'Value')
+
 
 # Rolling correlations ----------------------------------------------------
 
@@ -87,16 +108,17 @@ g <- ggplot(plotdf.ret, aes(x = Date, y = value)
 ) +
   geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
               fill = 'grey10',
-              alpha = 0.3
+              alpha = 0.1
   ) +
   geom_line(aes(color = 'Return series')) +
   theme_Publication() +
-  ylab('') +
+  scale_colour_Publication() +
+  ylab('Correlation') +
   xlab('Quantiles') +
   scale_x_date(date_labels = "%y") +
   coord_cartesian(ylim = c(-1, 1)) + 
-  facet_grid(order2 ~ order) +
-  ggtitle('Rolling 45-week correlations (95% confidence bounds)')#+
+  facet_grid(order ~ order2)
+  #ggtitle('Rolling 45-week correlations (95% confidence bounds)')#+
   #theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
 
-ggsave(file = 'output/rollingCorrelations/45weekly.jpeg', g, width = 14, height = 21, units = 'cm')
+ggsave('output/rollingCorrelations/rolling45.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)

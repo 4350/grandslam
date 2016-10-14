@@ -194,8 +194,14 @@ cdb <- data.frame(Week = df$Date[-length(df$Date)],
 
 cdb_long <- gather(cdb, Strategy, CDB, -Week)
 
-ggplot(cdb_long, aes(Week, CDB, colour = Strategy)) +
+g <- ggplot(cdb_long, aes(Week, CDB, colour = Strategy)) +
   geom_line() +
+  xlab('')+
   theme_Publication() +
   scale_colour_Publication() +
   coord_cartesian(ylim = c(0.40, 1.00))
+
+OUTPATH <- 'output/CDB/CDB_%s.png'
+ggsave(sprintf(OUTPATH, MODEL_NAME), 
+       g, device = 'png', width = 14, height = 8, units = 'cm'
+)
