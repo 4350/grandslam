@@ -146,7 +146,9 @@ summary.plots <- function(df, outlabel, factor) {
 #' @export
 #' 
 summary.cumretplots <- function(df, outlabel) {
-  # Long format data series
+  # Make simple returns
+  df[,2:ncol(df)] <- exp(df[,2:ncol(df)])-1
+  # Long format for plot
   df <- gather(df, "factor", "ret", 2:ncol(df))
   
   # Mutate to create cumulative and standardized returns at 10% annual vol
@@ -160,26 +162,30 @@ summary.cumretplots <- function(df, outlabel) {
   out.cumret <- df %>%
     ggplot(aes(x=Date, y=cumret, group=factor)) +
     geom_line(aes(color=factor))+
-    ggtitle('Cumulative returns to factor strategies')+
+    #ggtitle('Cumulative returns to factor strategies')+
     xlab('')+
     ylab('Cumulative return')+
     theme(legend.position="bottom")+
     scale_x_date(date_breaks = "2 years", date_labels = "%y")+
-    theme_Publication()
+    theme_Publication()+
+    guides(color = guide_legend(nrow = 1))+
+    scale_colour_Publication()
   
   # Plot cumulative standardized return series
   out.cumstdret <- df %>%
     ggplot(aes(x=Date, y=cumstdret, group=factor)) +
     geom_line(aes(color=factor))+
-    ggtitle('Cumulative returns to factor strategies (standardized 10% annual vol)')+
+    #ggtitle('Cumulative returns to factor strategies (standardized 10% annual vol)')+
     xlab('')+
     ylab('Cumulative return')+
     theme(legend.position="bottom")+
     scale_x_date(date_breaks = "2 years", date_labels = "%y")+
-    theme_Publication()
+    theme_Publication()+
+    guides(color = guide_legend(nrow = 1))+
+    scale_colour_Publication()
   
-  g <- arrangeGrob(out.cumret, out.cumstdret)
-  ggsave(filename = paste('output/cumretPlot', outlabel, 'jpeg', sep = '.'), g, 'jpeg', dpi = 300, width = 14, height = 21, units = "cm", limitsize = F)
-  g
+  # Save out
+  ggsave(filename = 'output/cumretPlot.png', out.cumret, 'png', dpi = 300, width = 14, height = 6, units = "cm", limitsize = F)
+  ggsave(filename = 'output/cumretStdPlot.png', out.cumstdret, 'png', dpi = 300, width = 14, height = 6, units = "cm", limitsize = F)
   
 }

@@ -72,13 +72,13 @@ The VaR and ES are then found by
 where $F_{i, T+1}^{-1}(\alpha | I^{sim}_T)$ is the inverse empirical CDF (based on simulated data set $I^{sim}_t$) of asset $i$ at time $T+1$.
 
 \subsection{Conditional diversification benefits}
-If the copula has time-varying dynamics, this implies that the level of diversification benefits are also time-varying. We use a measure of conditional diversification benefits from \textcite{ChristoffersenErrunzaJacobLanglois2012} to determine how modern and classic value differ in terms of diversification benefits. 
+As the copula has time-varying dependece, it must also have time-varying diversification benefits. We use a measure of conditional diversification benefits from \textcite{ChristoffersenErrunzaJacobLanglois2012} to determine how modern and classic value differ in terms of diversification benefits. 
 
 The method is based on time-varying expected shortfall, expressed in percentage terms as
 \begin{align}
     ES^p_{i,t}(r_{i,t}) = -\mathbb{E}_{t-1}[r_{i,t} | r_{i,t} \leq F_{i,t}^{-1}(p)]
 \end{align}
-where $r_{i,t}$ are simple returns of assets $i$, to ensure that the weighted average return property of a portfolio holds, and $F_{i,t}^{-1}(p)$ is the conditional inverse CDF, which is also equivalent to the negative estimate of $p\%$ Value-at-Risk (VaR).
+where $r_{i,t}$ are simple returns of assets $i$ (to ensure that the weighted average return property of a portfolio holds) and $F_{i,t}^{-1}(p)$ is the conditional inverse CDF of returns for the $p\%$ quantile, which is also equivalent to the negative estimate of $p\%$ Value-at-Risk (VaR).
 
 For the portfolio setting, return and expected shortfall are denoted as
 \begin{align}
@@ -88,21 +88,18 @@ For the portfolio setting, return and expected shortfall are denoted as
 where $w_{i,t}$ are the dynamic portfolio weights and $F_{t}^{-1}(p)$ is the inverse CDF of the portfolio return $R$ at the $p\%$ quantile.
 
 Unlike Value-at-Risk, expected shortfall is a coherent risk measure that is sub-additive across assets. Therefore, the combined risk measure of a portfolio is always smaller than or equal to the sum of the marginal risk measures.
-
 \begin{align} \label{eq:es1}
-    ES^p_t(w_t) \leq \sum\limits^N_{i=1} w_{i,t} ES^p_t(R_{i,t}) && \forall w_t \in \mathbb{R}
+    ES^p_t(w_t) \leq \sum\limits^N_{i=1} w_{i,t} ES^p_t(r_{i,t}) && \forall w_t \in \mathbb{R}
 \end{align}
-where $w_{i,t}$ are the dynamic portfolio weights.
-
-From the equality in \autoref{eq:es1}, we know that the upper bound of $ES$, where there are no diversification benefits of the portfolio, is
+where $w_{i,t}$ are the dynamic portfolio weights. From the equality in \autoref{eq:es1}, we know that a upper bound on $ES$ is
 \begin{align}
     \overline{ES}^p_t(w_t) = \sum\limits^N_{i=1} w_{i,t} ES^p_t(R_{i,t})
 \end{align}
-Similarly, a lower bound on the portfolio's $ES$ is
+This corresponds to the case of zero diversification benefits. Similarly, a lower bound on the portfolio's $ES$ is
 \begin{align}
     \underline{ES}^p_t(w_t) = -F^{-1}_t(w_t, p) 
 \end{align}
-where $F^-1_t(w_t, q)$ is the inverse CDF for the portfolio. The lower bound is therefore equivalent to the case when the portfolio's $ES$ is equivalent to the portfolio's $VaR$.
+where $F^-1_t(w_t, q)$ is the inverse CDF at time $t$ for the portfolio return with weights $w_t$. The lower bound is, in other words, equivalent to the case when the portfolio's $ES$ is equivalent to the portfolio's $VaR$.
 
 The conditional diversification benefit statistic is now defined as
 \begin{align}

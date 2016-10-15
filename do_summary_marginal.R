@@ -10,6 +10,7 @@ library(ggfortify)
 library(gridExtra)
 library(devtools)
 library(extrafont)
+library(stargazer)
 
 # Reset workspace and load return data ----
 rm(list = ls())
@@ -19,7 +20,8 @@ load('data/derived/weekly-estim.RData')
 load_all('wimbledon')
 
 # Descriptive statistics tables ---
-summary.table(df.estim, 'Estim')
+sum.table <- summary.table(df.estim, 'Estim')
+#stargazer(sum.table, summary = FALSE)
 
 # Marginal plots ----
 varlist = list('Mkt.RF','HML','SMB','Mom','RMW','CMA')
