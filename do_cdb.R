@@ -169,6 +169,88 @@ cdb_results <- list(cdb = cdb, weights = weights)
 save(cdb_results, file = sprintf('data/derived/cdb_%s_classic.RData', MODEL_NAME))
 
 
+# RMW --------------------------------------------------------------------
+
+distribution_simple <- distribution_simple[, c(1:5), ]
+
+times <- 1:dim(distribution_simple)[3]
+cdb <- rep(NA, length(times))
+weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
+
+for (t in times) {
+  tic(sprintf('Optimal CDB at t = %d', t))
+  op <- optimize_cbd(q = 0.05, distribution_simple[,, t])
+  toc()
+  
+  cdb[t] <- -tail(op$values, 1)
+  weights[t, ] <- op$pars
+}
+
+classic_cdb <- cdb
+classic_weights <- weights
+
+cdb_results <- list(cdb = cdb, weights = weights)
+save(cdb_results, file = sprintf('data/derived/cdb_%s_RMW.RData', MODEL_NAME))
+
+# CMA --------------------------------------------------------------------
+
+distribution_simple <- distribution_simple[, c(1:4, 6), ]
+
+times <- 1:dim(distribution_simple)[3]
+cdb <- rep(NA, length(times))
+weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
+
+for (t in times) {
+  tic(sprintf('Optimal CDB at t = %d', t))
+  op <- optimize_cbd(q = 0.05, distribution_simple[,, t])
+  toc()
+  
+  cdb[t] <- -tail(op$values, 1)
+  weights[t, ] <- op$pars
+}
+
+classic_cdb <- cdb
+classic_weights <- weights
+
+cdb_results <- list(cdb = cdb, weights = weights)
+save(cdb_results, file = sprintf('data/derived/cdb_%s_CMA.RData', MODEL_NAME))
+
+
+# Equal Weights ----------------------------------------------------------
+
+ew_cdb <- function(distribution) {
+  times <- 1:dim(distribution)[3]
+  weights <- rep(1 / ncol(distribution), ncol(distribution))
+  
+  cdb <- rep(NA, length(times))
+  
+  foreach(t = times, .combine = 'c') %do% {
+    risk_measures(weights = weights,
+                  q = 0.05,
+                  returns = distribution[,, t])$cdb
+  }
+}
+
+do_ew_cdb <- function(model_name, name, factors) {
+  load(sprintf('data/derived/distribution_%s.RData', model_name))
+  distribution <- distribution[, factors, ]
+  
+  distribution_simple <- exp(distribution) - 1
+  rm(distribution)
+  
+  cdb <- ew_cdb(distribution_simple)
+  rm(distribution_simple)
+  
+  filename <- sprintf('data/derived/cdb_%s_%s_ew.RData', model_name, name)
+  save(cdb, file = filename)
+}
+
+do_ew_cdb('dynamic_ghskt', 'all', c(1:6))
+do_ew_cdb('dynamic_ghskt', 'classic', c(1:4))
+do_ew_cdb('dynamic_ghskt', 'modern', c(1, 3:6))
+do_ew_cdb('dynamic_ghskt', 'RMW', c(1:5))
+do_ew_cdb('dynamic_ghskt', 'CMA', c(1:4, 6))
+
 # Plotting ---------------------------------------------------------------
 
 rm(list = ls())
