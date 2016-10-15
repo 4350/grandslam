@@ -43,7 +43,7 @@ To capture time-varying dependency, as motivated by rolling correlation and thre
     \intertext{where the core process is}
     Q_t &= (1 - \alpha - \beta) S + \alpha z_{t-1} z_{t-1}^\top + \beta Q_{t-1}
 \end{align}
-The $Q_t$ process is comprised of three components that are weighted according to $\alpha, \beta$: (1) $S$, a time-invariant component, to be interpreted similarly to a long-term mean in a regular GARCH process as $E[Q_t] = S$, (2) $z_{t-1} z_{t-1}^\top$, an innovation component from the copula shocks, and (3) $Q_{t-1}$, an autoregressive component of order one. In order for the the correlation matrix $R_t$ to be positive definite, $Q_t$ has to be positive definite, which is ascertained by requiring that $\alpha \geq 0$, $\beta \geq 0$ and $(\alpha + \beta) < 1$.
+The $Q_t$ process is comprised of three components that are weighted according to $\alpha, \beta$: (1) $S$, a time-invariant component, to be interpreted similarly to a long-term mean in a regular GARCH process as $\mathbb{E}[Q_t] = S$, (2) $z_{t-1} z_{t-1}^\top$, an innovation component from the copula shocks, and (3) $Q_{t-1}$, an autoregressive component of order one. In order for the the correlation matrix $R_t$ to be positive definite, $Q_t$ has to be positive definite, which is ascertained by requiring that $\alpha \geq 0$, $\beta \geq 0$ and $(\alpha + \beta) < 1$.
 
 The parameters $\alpha, \beta$ are simultaneously estimated with the skewed Student-\textit{t} parameters $\nu$ and $\gamma$ using ML for the copula function, whose log-likelihood function is again found by rearranging Sklar's theorem (\autoref{eq:sklar}) and taking logs on both sides
 \begin{align} \label{eq:cdccllf}
@@ -71,6 +71,52 @@ The VaR and ES are then found by
 \end{align}
 where $F_{i, T+1}^{-1}(\alpha | I^{sim}_T)$ is the inverse empirical CDF (based on simulated data set $I^{sim}_t$) of asset $i$ at time $T+1$.
 
-\subsection{Conditional benefit of diversification}
+\subsection{Conditional diversification benefits}
+If the copula has time-varying dynamics, this implies that the level of diversification benefits are also time-varying. We use a measure of conditional diversification benefits from \textcite{ChristoffersenErrunzaJacobLanglois2012} to determine how modern and classic value differ in terms of diversification benefits. 
 
-[PENDING]
+The method is based on time-varying expected shortfall, expressed in percentage terms as
+\begin{align}
+    ES^p_{i,t}(r_{i,t}) = -\mathbb{E}_{t-1}[r_{i,t} | r_{i,t} \leq F_{i,t}^{-1}(p)]
+\end{align}
+where $r_{i,t}$ are simple returns of assets $i$, to ensure that the weighted average return property of a portfolio holds, and $F_{i,t}^{-1}(p)$ is the conditional inverse CDF, which is also equivalent to the negative estimate of $p\%$ Value-at-Risk (VaR).
+
+For the portfolio setting, return and expected shortfall are denoted as
+\begin{align}
+    R_{t} = \sum\limits^N_{i=1} w_{i,t} r_{i,t} \\
+    ES^p_t(w_t) = -\mathbb{E}_{t-1}[R_{t} | R_{t} \leq F_{t}^{-1}(p)]
+\end{align}
+where $w_{i,t}$ are the dynamic portfolio weights and $F_{t}^{-1}(p)$ is the inverse CDF of the portfolio return $R$ at the $p\%$ quantile.
+
+Unlike Value-at-Risk, expected shortfall is a coherent risk measure that is sub-additive across assets. Therefore, the combined risk measure of a portfolio is always smaller than or equal to the sum of the marginal risk measures.
+
+\begin{align} \label{eq:es1}
+    ES^p_t(w_t) \leq \sum\limits^N_{i=1} w_{i,t} ES^p_t(R_{i,t}) && \forall w_t \in \mathbb{R}
+\end{align}
+where $w_{i,t}$ are the dynamic portfolio weights.
+
+From the equality in \autoref{eq:es1}, we know that the upper bound of $ES$, where there are no diversification benefits of the portfolio, is
+\begin{align}
+    \overline{ES}^p_t(w_t) = \sum\limits^N_{i=1} w_{i,t} ES^p_t(R_{i,t})
+\end{align}
+Similarly, a lower bound on the portfolio's $ES$ is
+\begin{align}
+    \underline{ES}^p_t(w_t) = -F^{-1}_t(w_t, p) 
+\end{align}
+where $F^-1_t(w_t, q)$ is the inverse CDF for the portfolio. The lower bound is therefore equivalent to the case when the portfolio's $ES$ is equivalent to the portfolio's $VaR$.
+
+The conditional diversification benefit statistic is now defined as
+\begin{align}
+    CDB_t(w_t,p) = \frac{\overline{ES}^p_t(w_t) - ES^p_t(w_t)}{\overline{ES}^p_t(w_t) - \underline{ES}^p_t(w_t)}
+\end{align}
+
+The intuition behind the statistic is best understood by focusing on the second term of the numerator and the denominator: when diversification benefits are high, the expected shortfall of a portfolio is relatively close to the Value-at-Risk, which makes the ratio close to one. When diversification benefits are poor, the expected shortfall is hardly different from the weighted average of individual expected shortfalls, and the ratio is close to zero.
+
+The statistic is dependent on the calculation of $ES^p_t(w_t)$ which can only be found by simulation. In line with \textcite{ChristoffersenErrunzaJacobLanglois2012}, we maximize $CDB_t(w_t,p)$ at each time $t$ by simulating 10,000 draws of 1-week-ahead returns, using the the skewed Student-\textit{t} copula model with \textit{c}DCC correlation dynamics. This yields a series of optimal $\{CDB^*\}$ for corresponding optimal dynamic weights $\{w^*_t\}$.
+
+Note that it is not neccesarily the case that more assets improve the diversification benefit of a portfolio, as additional assets may well increase the upper and the lower bounds of expected shortfall.
+
+In the empirical results, we report three different series of $CDB^*$ when $p=5\%$, with different restrictions on portfolio weights in the optimization: First, all six factor strategies $(Mkt.RF, HML, SMB, Mom, RMW, CMA)$ are available in the factor universe. Second, $RMW$ and $CMA$ are removed by setting their weights to zero, leaving only classic value $HML$ among the value factors. Third, $HML$ is removed by setting its weight to zero, leaving $RMW$ and $CMA$ among the value factors.
+
+There are also two general restrictions on the portfolios: First, all factor weights must be positive, as the interpretation of a negative factor weight is the same as betting against the factor. Note that this does not mean that short sales are prohibited, as factor strategies are inherently long-short. Second, all factor weights must sum to 1, as we do not consider the case of leverage.
+
+[Further on, we will also consider the optimal series of $CDB$ for modern and classic value with 1) equal weights and 2) mean-variance optimal weights]

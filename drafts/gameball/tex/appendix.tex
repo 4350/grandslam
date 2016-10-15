@@ -14,9 +14,9 @@ where $\gamma$ is the skewness vector, $\mu$ is the location vector, $R = A A^\t
 \end{align}
 where $\nu$ is the degree of freedom. Furthermore
 \begin{align}
-    E[X] &= \mu + E[W] \gamma \\
-    Var[X] &= E[Cov(X|W)] + Cov(E[X|W]) \\
-    &= Var(W) \gamma \gamma^\top + E[W] R \nonumber
+    \mathbb{E}[X] &= \mu + \mathbb{E}[W] \gamma \\
+    Var[X] &= \mathbb{E}[Cov(X|W)] + Cov(\mathbb{E}[X|W]) \\
+    &= Var(W) \gamma \gamma^\top + \mathbb{E}[W] R \nonumber
 \end{align}
 These moments describe the link between the copula correlation matrix $R$ and the skewed Student-\textit{t} distribution's dispersion matrix $R$. Covariances are finite when $\nu > 4$. The multivariate density function is given by
 \begin{align} \label{eq:dskewt}
