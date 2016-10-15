@@ -26,6 +26,31 @@ load('data/derived/garch_stdres.RData')
 # Load functions
 load_all('wimbledon')
 
+
+# Function ----------------------------------------------------------------
+
+# Quick fix to add standard correlations to a graph data frame
+
+.append_standard_corr <- function(plot_df, corr_df) {
+  # Check which unique pairs to do correlations between
+  label_pairs <- unique(select(plot_df, c(order2, order)))
+  
+  # Get these correlations
+  standard_corr <- apply(label_pairs, 1, function(var_pair, corr_df) {
+    cor(corr_df[,var_pair])[1,2]
+  },
+  corr_df = corr_df
+  )
+  
+  # Make data frame from the labels and corrs
+  data.frame(
+    standard_corr = round(standard_corr,2),
+    order2 = label_pairs[,1],
+    order = label_pairs[,2]
+  )
+  
+}
+
 # Threshold correlations --------------------------------------------------
 
 # Loop for each value factors to get threshold correlation for all factors
@@ -47,10 +72,12 @@ plotdf.res <- bind_rows(thCorrList.res$HML, thCorrList.res$RMW, thCorrList.res$C
 
 # Do threshold plot and save ----------------------------------------------
 
-.plot_th_corr <- function(plotdf.ret, plotdf.res, COLFACTORS, OUTNAME) {
+.plot_th_corr <- function(plotdf.ret, plotdf.res, df.labels, ROWFACTORS, OUTNAME) {
   # Select the column factors for plot this plot
-  plotdf.ret <- plotdf.ret[plotdf.ret$order == COLFACTORS,]
-  plotdf.res <- plotdf.res[plotdf.res$order == COLFACTORS,]
+  plotdf.ret <- plotdf.ret[plotdf.ret$order == ROWFACTORS,]
+  plotdf.res <- plotdf.res[plotdf.res$order == ROWFACTORS,]
+  
+  df.labels <- df.labels %>% dplyr::filter(order %in% ROWFACTORS)
   
   # Then do plot
   g <- ggplot(plotdf.ret, aes(x = qs, y = value)
@@ -72,6 +99,8 @@ plotdf.res <- bind_rows(thCorrList.res$HML, thCorrList.res$RMW, thCorrList.res$C
     xlab('Quantiles') +
     coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
     scale_x_continuous(labels = scales::percent) +
+    #annotate("rect", xmin = 0.375, xmax = 0.625, ymin = -0.50, ymax = -0.25, alpha = 0.8, fill = 'grey80')+
+    geom_text(data = df.labels, aes(x = 0.50, y = -0.45, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
     facet_grid(order ~ order2)
     #ggtitle('Threshold correlations of weekly data (95% confidence bounds)') + 
     #theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
@@ -86,9 +115,11 @@ plotdf.res <- bind_rows(thCorrList.res$HML, thCorrList.res$RMW, thCorrList.res$C
 
 # Do the plots ------------------------------------------------------------
 
+# Quick fix to append standard correlations to graphs
+df.labels <- .append_standard_corr(plotdf.ret, df.estim)
 
-.plot_th_corr(plotdf.ret, plotdf.res, c('Mkt.RF', 'SMB','Mom'), 'Nonvalue')
-.plot_th_corr(plotdf.ret, plotdf.res, c('HML','RMW','CMA'), 'Value')
+.plot_th_corr(plotdf.ret, plotdf.res, df.labels, c('Mkt.RF', 'SMB','Mom'), 'Nonvalue')
+.plot_th_corr(plotdf.ret, plotdf.res, df.labels, c('HML','RMW','CMA'), 'Value')
 
 
 # Rolling correlations ----------------------------------------------------
@@ -103,6 +134,9 @@ rollCorrList.ret = roll_corr(df = df.estim %>% select(-Date),
 # Bind to one df for plot
 plotdf.ret <- bind_rows(rollCorrList.ret$HML, rollCorrList.ret$RMW, rollCorrList.ret$CMA)
 
+# Quick fix to append standard correlations to graphs
+df.labels <- .append_standard_corr(plotdf.ret, df.estim)
+
 # Do roll plot and save ----------------------------------------------
 g <- ggplot(plotdf.ret, aes(x = Date, y = value)
 ) +
@@ -114,9 +148,12 @@ g <- ggplot(plotdf.ret, aes(x = Date, y = value)
   theme_Publication() +
   scale_colour_Publication() +
   ylab('Correlation') +
-  xlab('Quantiles') +
+  xlab('Year') +
   scale_x_date(date_labels = "%y") +
   coord_cartesian(ylim = c(-1, 1)) + 
+  #annotate("rect", xmin = as.Date('1986-01-01'), xmax = as.Date('1994-01-01'), ymin = -0.95, ymax = -0.5, alpha = 0.8, fill = 'grey80')+
+  #geom_text(data = df.labels, aes(x = as.Date('1990-01-01'), y = -0.725, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
+  geom_text(data = df.labels, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
   facet_grid(order ~ order2)
   #ggtitle('Rolling 45-week correlations (95% confidence bounds)')#+
   #theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 

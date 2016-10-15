@@ -8,15 +8,15 @@ The random vector X is distributed multivariate generalized hyperbolic if
 \begin{align}
     X \sim \mu + \sqrt{W} A Z + \gamma W
 \end{align}
-where $\gamma$ is the skewness vector, $\mu$ is the location vector, $R = A A^\top$ is the dispersion matrix, $W$ follows a generalized inverse-gamma distribution $W \sim GIG(\lambda, \chi, \psi)$ and Z is multivariate normal $Z \sim N(\mu^N, R)$, with $W, Z$ independent. The skewed Student-\textit{t} is nested with parameters
+where $\mu$ is the location vector, $\gamma$ is the skewness vector, $R = A A^\top$ is the dispersion matrix, $W$ follows a generalized inverse-gamma distribution $W \sim GIG(\lambda, \chi, \psi)$ and Z is multivariate normal $Z \sim N(\mu^N, R)$, with $W, Z$ independent. The skewed Student-\textit{t} is nested with parameters
 \begin{align}
     \lambda = \frac{\nu}{-2} && \chi = \nu - 2 && \psi = 0
 \end{align}
 where $\nu$ is the degree of freedom. Furthermore
 \begin{align}
-    E[X] &= \mu + E[W] \gamma \\
-    Var[X] &= E[Cov(X|W)] + Cov(E[X|W]) \\
-    &= Var(W) \gamma \gamma^\top + E[W] R \nonumber
+    \mathbb{E}[X] &= \mu + \mathbb{E}[W] \gamma \\
+    Var[X] &= \mathbb{E}[Cov(X|W)] + Cov(\mathbb{E}[X|W]) \\
+    &= Var(W) \gamma \gamma^\top + \mathbb{E}[W] R \nonumber
 \end{align}
 These moments describe the link between the copula correlation matrix $R$ and the skewed Student-\textit{t} distribution's dispersion matrix $R$. Covariances are finite when $\nu > 4$. The multivariate density function is given by
 \begin{align} \label{eq:dskewt}
@@ -27,13 +27,11 @@ where $K(\cdot)$ is the modified Bessel function of the second kind, $Q(x) = (x-
 \newpage
 \section{Appendix B. ARMA-GARCH modeling of marginal distributions} \label{App:AppendixB}
 
-By examining marginal factor strategy returns, we find evidence of non-normality, autocorrelation, volatility clustering and leverage effects, in line with stylized factors on financial return series (\textcite{Bollerslev1986}, \textcite{Black1976}, \textcite{glosten1993relation}). [Add text and reference to the marginal summary stats and the marginal plots to provide evidence]. An ARMA-GARCH model allows us to filter away such marginal asymmetries, while leaving any multivariate asymmetry to the copula specification. 
+By examining marginal factor strategy returns, we find evidence of non-normality, autocorrelation, volatility clustering and leverage effects, in line with stylized factors on financial return series (\textcite{Bollerslev1986}, \textcite{Black1976}, \textcite{glosten1993relation}). An ARMA-GARCH model allows us to filter away such marginal asymmetries, while leaving any multivariate asymmetry to the copula specification. 
 
 The most important goal of this application GARCH model is not to have high predictive power of asset return series, but to sanitize the data to be used in multivariate analysis. We focus on parsimonious models with few lags, but enough flexibility to capture salient features of the summary plots of the marginal series, such as volatility clustering and leverage effect.
 
-The selection process is as follows: for each factor strategy, ARMA-GJR-GARCH models are estimated with different ARMA lag orders (up to 3,3) and a fixed GJR-GARCH order of (1,1). We then compute the Bayesian Information Criterion (BIC, \textcite{Schwarz1978}) for each specification, and for each factor select the model with the lowest BIC as the primary candidate. The primary candidate specification is then checked for remaining serial correlation and ARCH effects in residuals. All of the primary candidate models pass the diagnostic tests.
-
-We use the GJR-GARCH model with ARMA mean equation
+The selection process is as follows: for each factor strategy, ARMA-GJR-GARCH models are estimated with different ARMA lag orders (up to 3,3) and a fixed GJR-GARCH order of (1,1). We then compute the Bayesian Information Criterion (BIC, \textcite{Schwarz1978}) for each specification, and for each factor select the model with the lowest BIC as the primary candidate. The primary candidate specification is then checked for remaining serial correlation and ARCH effects in residuals. All of the primary candidate models pass the diagnostic tests. We use the GJR-GARCH model with ARMA mean equation
 \begin{align}
     r_t &= \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}  \\
     \sigma_{t}^2 &= \omega + (a + \eta I_{t-1}) \epsilon_{t-1}^2 + b \sigma^2_{t-1}
@@ -65,7 +63,7 @@ We rely on the multi-step maximum likelihood estimation of the copula model, whi
 \section{Appendix D. Copula correlation matrix estimation with \textit{c}DCC dynamics} \label{App:AppendixD}
 This is a step-by-step description of the procedure used to find the copula correlation matrix $\{\hat{R_t}\}$ in the \textit{c}DCC case, and has been adapted from \textcite{Aielli2013}.
 \begin{enumerate}[(i)]
-    \item Re-standardize uniform residuals from univariate ARMA-GJR-GARCH models $\{u_{i}\}$ using the inverse skewed Student-\textit{t} distribution with copula parameters $\gamma, \nu$,  and scale to zero mean and unit variance using the conditional mean and standard deviation\footnote{Unless the copula is normal, the re-standardized residuals $\{\varepsilon^c_i\}$ will not have zero mean and unit variance, which is required for the estimation of the sample correlation matrix $\hat{S}$.}
+    \item Re-standardize uniform residuals from univariate ARMA-GJR-GARCH models $\{u_{i}\}$ using the inverse skewed Student-\textit{t} distribution with copula parameters $\nu, \gamma$,  and scale to zero mean and unit variance using the conditional mean and standard deviation\footnote{Unless the copula is normal, the re-standardized residuals $\{\varepsilon^c_i\}$ will not have zero mean and unit variance, which is required for the estimation of the sample correlation matrix $\hat{S}$.}
     \begin{align}
         \varepsilon^c_{i,t} = t^{-1}_{\gamma, \nu}(u_{i,t})
     \end{align}
@@ -87,7 +85,7 @@ This is a step-by-step description of the procedure used to find the copula corr
     \begin{align}
         \hat{Q_t} = (1 - \alpha - \beta) \hat{S} + \alpha z_{t-1} z_{t-1}^\top + \beta Q_{t-1}
     \end{align}
-    \item Standardize $\hat{Q_t}$ to the copula correlation matrix $\hat{R_t}$ (\autoref{eq:qtrtlink}) and calculate the sum of log-likelihoods for a given parameter set $\Theta = \{\alpha, \beta, \gamma, \nu\}$ (\autoref{eq:cdccllf})
+    \item Standardize $\hat{Q_t}$ to the copula correlation matrix $\hat{R_t}$ (\autoref{eq:qtrtlink}) and calculate the sum of log-likelihoods for a given parameter set $\Theta = \{\nu, \gamma, \alpha, \beta\}$ (\autoref{eq:cdccllf})
 \end{enumerate}
 \newpage
 \section{Appendix E. ARMA-GJR-GARCH estimation results}
@@ -159,8 +157,6 @@ This is a step-by-step description of the procedure used to find the copula corr
   & (3.081) & (2.160) & (6.233) \\ 
   & & & \\ 
  $\omega$ & 0.000 & 0.000 & 0.000 \\ 
-  &  &  & \\ 
-  & & & \\ 
 \hline \\[-1.8ex] 
 Observations & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} \\ 
 LLH & \multicolumn{1}{c}{7,052} & \multicolumn{1}{c}{8,791} & \multicolumn{1}{c}{8,571} \\ 
@@ -215,8 +211,6 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.962} & \multicolumn{1}{c}{0.148} & \multi
   & (11.139) & (3.656) & (2.447) \\ 
   & & & \\ 
  $\omega$ & 0.000 & 0.000 & 0.000 \\ 
-  &  &  & \\ 
-  & & & \\ 
 \hline \\[-1.8ex] 
 Observations & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} \\ 
 LLH & \multicolumn{1}{c}{7,972} & \multicolumn{1}{c}{9,874} & \multicolumn{1}{c}{9,585} \\
