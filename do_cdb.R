@@ -207,26 +207,50 @@ load_cdb <- function(name) {
   )
 }
 
+plot_cdb <- function(cdb, name, width, height) {
+  cdb_long <- gather(cdb, Routine, CDB, Optimized, factor_key = TRUE)
+  
+  g <- ggplot(cdb_long, aes(Week, CDB, colour = Strategy)) +
+    geom_line() +
+    xlab('')+
+    theme_Publication() +
+    scale_colour_Publication() +
+    coord_cartesian(ylim = c(0.40, 1.00))
+  
+  
+  ggsave(filename = sprintf('output/CDB/%s.png', name),
+         plot = g, units = c('cm'), width = width, height = height)
+}
+
+# All/Modern/Classic -----------------------------------------------------
+
 cdb <- bind_rows(
   All = load_cdb('all'),
-  RMW = load_cdb('RMW'),
-  CMA = load_cdb('CMA'),
-  HML = load_cdb('classic'),
+  Modern = load_cdb('modern'),
+  Classic = load_cdb('HML'),
   .id = 'Strategy'
 )
 
-# next part --------------------------------------------------------------
+plot_cdb(cdb, 'modern-classic', width = 14, height = 7)
 
-cdb_long <- gather(cdb, Routine, CDB, Optimized, EW)
-ggplot(cdb_long, aes(Week, CDB, colour = Routine)) +
-  geom_line() +
-  xlab('')+
-  theme_Publication() +
-  scale_colour_Publication() +
-  coord_cartesian(ylim = c(0.40, 1.00)) +
-  facet_grid(Strategy ~ .)
+# RMW + CMA or HML -------------------------------------------------------
 
-# OUTPATH <- 'output/CDB/CDB_%s.png'
-# ggsave(sprintf(OUTPATH, MODEL_NAME),
-#        g, device = 'png', width = 14, height = 8, units = 'cm'
-# )
+cdb <- bind_rows(
+  `RMW + CMA` = load_cdb('RMW+CMA'),
+  `RMW + HML` = load_cdb('RMW+HML'),
+  .id = 'Strategy'
+)
+
+plot_cdb(cdb, 'rmw_cma-rmw_hml', width = 14, height = 7)
+
+
+# 3-factors --------------------------------------------------------------
+
+cdb <- bind_rows(
+  RMW = load_cdb('RMW'),
+  CMA = load_cdb('CMA'),
+  HML = load_cdb('HML'),
+  .id = 'Strategy'
+)
+
+plot_cdb(cdb, 'rmw-cma-hml', width = 14, height = 7)
