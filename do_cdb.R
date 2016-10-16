@@ -137,6 +137,9 @@ do_best_cdb(MODEL_NAME, 'HML', c('Mkt.RF', 'HML', 'SMB', 'Mom'))
 do_best_cdb(MODEL_NAME, 'RMW', c('Mkt.RF', 'SMB', 'Mom', 'RMW'))
 do_best_cdb(MODEL_NAME, 'CMA', c('Mkt.RF', 'SMB', 'Mom', 'CMA'))
 
+do_best_cdb(MODEL_NAME, 'RMW+HML', c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'HML'))
+do_best_cdb(MODEL_NAME, 'RMW+CMA', c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'))
+
 # Equal Weights ----------------------------------------------------------
 
 ew_cdb <- function(distribution) {
@@ -171,6 +174,9 @@ do_ew_cdb('dynamic_ghskt', 'HML', c(1:4))
 do_ew_cdb('dynamic_ghskt', 'modern', c(1, 3, 4, 5, 6))
 do_ew_cdb('dynamic_ghskt', 'RMW', c(1, 3, 4, 5))
 do_ew_cdb('dynamic_ghskt', 'CMA', c(1, 3, 4, 6))
+
+do_ew_cdb('dynamic_ghskt', 'RMW+HML', c(1, 2, 3, 4, 5   ))
+do_ew_cdb('dynamic_ghskt', 'RMW+CMA', c(1,    3, 4, 5, 6))
 
 # Plotting ---------------------------------------------------------------
 
