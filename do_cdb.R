@@ -122,7 +122,7 @@ do_best_cdb <- function(model_name, strategy, selectors) {
   rm(distribution_simple)
   
   save(cdb_results,
-       file = sprintf('data/derived/cdb_%s.RData', strategy, model_name))
+       file = sprintf('data/derived/cdb_%s_%s.RData', strategy, model_name))
 }
 
 # CDB Optimization -------------------------------------------------------
