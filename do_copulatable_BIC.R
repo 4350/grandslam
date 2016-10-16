@@ -31,20 +31,25 @@ out.data <- lapply(model_list, function(model) {
   Parameters = model$params
   Observations = T
   ll = model$ll
-  Persistence = model$params$alpha + model$params$beta
   nParams = length(unlist(model$params)) - (model$params$alpha == 0) - (model$params$beta == 0) + (N * (N-1) / 2)
-  BIC = -2 * log(ll) + nParams * log(T)
+  BIC = -2 * ll + nParams * log(T)
+  Persistence = model$params$alpha + model$params$beta
+  
     
-  out.df <- data.frame(value =
+  out.data <- data.frame(value =
     unlist(
       list(
         Parameters,
         Observations = Observations,
         ll = ll,
-        Persistence = Persistence,
         nParams = nParams,
-        BIC = BIC
+        BIC = BIC,
+        Persistence = Persistence
       )
     )
   )
+  
+  out.data <- round(out.data, digits = 3)
 })
+
+print(out.data, digits = 3)
