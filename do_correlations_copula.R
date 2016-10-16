@@ -70,4 +70,4 @@ g <- ggplot(gathered, aes(x = Date, y = value)) +
   coord_cartesian(ylim = c(-1, 1), xlim = c(df$Date[1], df$Date[length(df$Date)]))
 
 ggsave(sprintf('output/rollingCorrelations/copula_%s.png', MODEL_NAME),
-       g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
+       g, device = 'png', width = 14, height = 18, units = 'cm', dpi = 300, limitsize = F)
