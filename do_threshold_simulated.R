@@ -75,9 +75,9 @@ g <- ggplot(value,
               alpha = 0.1
   ) +
   geom_line(aes(color = "Standardized Residuals")) +
-  geom_line(aes(y = gauss, color = 'Simulated Gaussian')) +
-  geom_line(aes(y = ght, color = "Simulated Student's t")) +
-  geom_line(aes(y = ghskt, color = "Simulated Skewed Student's t")) +
+  geom_line(aes(y = gauss, color = 'Gaussian')) +
+  geom_line(aes(y = ght, color = "Student's t")) +
+  geom_line(aes(y = ghskt, color = "Skewed Student's t")) +
   theme_Publication() +
   scale_colour_Publication() +
   ylab('Correlation') +
@@ -85,6 +85,8 @@ g <- ggplot(value,
   coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
   scale_x_continuous(labels = scales::percent) +
   facet_grid(order ~ order2)
+
+g
 
 ggsave(
   'output/thresholdCorrelations/copula_value.png',
@@ -103,9 +105,9 @@ g <- ggplot(nonvalue, aes(x = qs, y = value)) +
               alpha = 0.1
   ) +
   geom_line(aes(color = "Standardized Residuals")) +
-  geom_line(aes(y = gauss, color = 'Simulated Gaussian')) +
-  geom_line(aes(y = ght, color = "Simulated Student's t")) +
-  geom_line(aes(y = ghskt, color = "Simulated Skewed Student's t")) +
+  geom_line(aes(y = gauss, color = 'Gaussian')) +
+  geom_line(aes(y = ght, color = "Student's t")) +
+  geom_line(aes(y = ghskt, color = "Skewed Student's t")) +
   theme_Publication() +
   scale_colour_Publication() +
   ylab('Correlation') +
