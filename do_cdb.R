@@ -218,8 +218,9 @@ plot_cdb <- function(cdb, name, width, height) {
     coord_cartesian(ylim = c(0.40, 1.00))
   
   
-  ggsave(filename = sprintf('output/CDB/%s.png', name),
+  ggsave(filename = sprintf('output/CDB/cdb--%s.png', name),
          plot = g, units = c('cm'), width = width, height = height)
+  g
 }
 
 # All/Modern/Classic -----------------------------------------------------
