@@ -3,7 +3,7 @@ library(grid)
 library(tidyr)
 
 rm(list = ls())
-path <- 'data/derived/bootstrap/ghskt/runs/RNG 00403 - BLL 0020 - REP 1000'
+path <- 'data/derived/bootstrap/ghskt/runs/RNG 00403 - BLL 0045 - REP 1000'
 
 filenames <- file.path(path, list.files(path))
 bootstraps <- do.call('rbind', lapply(filenames, read.csv))
