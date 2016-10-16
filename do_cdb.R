@@ -5,7 +5,6 @@
 #' This is a minor thing in the grander scheme of things -- but it does ensure
 #' the weighted average property holds.
 
-
 # Setup ------------------------------------------------------------------
 
 library(tictoc)
@@ -13,19 +12,12 @@ library(Rsolnp)
 library(ggplot2)
 library(tidyr)
 library(devtools)
-library(foreach)
 load_all('wimbledon')
 rm(list = ls())
 
 MODEL_NAME <- 'dynamic_ghskt'
 
-# Load the distribution and convert to the distributions of simple returns
-# Clear the old for memory purposes (the file is approx 1.2 Gb)
-load(sprintf('data/derived/distribution_%s.RData', MODEL_NAME))
-distribution_simple <- exp(distribution) - 1
-rm(distribution)
-
-# Functions --------------------------------------------------------------
+# Functions
 
 #' Compute VaR, ES and CDB for a portfolio
 #'
@@ -92,130 +84,55 @@ optimize_cdb <- function(q, distribution_t, eqfun = sum, eqB = 1,
   )
 }
 
-# "Unconstrained" Optimization -------------------------------------------
-
-# XXX It may be the case that there is an off-by-one error here; I think
-# the first distribution is actually the distribution of t = 2 et cetera.
-times <- 1:dim(distribution_simple)[3]
-cdb <- rep(NA, length(times))
-weights <- matrix(NA, ncol = 6, nrow = length(times))
-
-for (t in times) {
-  tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
-  toc()
+best_cdb <- function(distribution) {
+  times <- 1:dim(distribution)[3]
+  cdb <- rep(NA, length(times))
+  weights <- matrix(NA, ncol = ncol(distribution), nrow = length(times))
   
-  if (op$convergence > 0) {
-    warning(sprintf("No convergence for t = %d", t))
+  for (t in times) {
+    tic(sprintf('Optimal CDB at t = %d', t))
+    op <- optimize_cdb(q = 0.05, distribution[,, t])
+    toc()
+
+    if (op$convergence > 0) {
+      warning(sprintf('No convergence for t = %d', t))
+    }
+
+    cdb[t] <- -tail(op$values, 1)
+    weights[t, ] <- op$pars
   }
   
-  cdb[t] <- -tail(op$values, 1)
-  weights[t, ] <- op$pars
+  list(
+    cdb = cdb,
+    weights = weights
+  )
 }
 
-all_cdb <- cdb
-all_weights <- weights
-
-cdb_results <- list(cdb = cdb, weights = weights)
-save(cdb_results, file = sprintf('data/derived/cdb_%s_all.RData', MODEL_NAME))
-
-# Only Modern Value -----------------------------------------------------
-
-# Drop classic value from the returns. Note: Replace global distribution
-# because it takes so much SPACE!!!
-distribution_simple <- distribution_simple[, c(1, 3:6), ]
-
-times <- 1:dim(distribution_simple)[3]
-cdb <- rep(NA, length(times))
-weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
-
-for (t in times) {
-  tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
-  toc()
+do_best_cdb <- function(model_name, strategy, selectors) {
+  load(sprintf('data/derived/distribution_%s.RData', model_name))
+  distribution_simple <- exp(distribution) - 1
+  rm(distribution)
   
-  cdb[t] <- -tail(op$values, 1)
-  weights[t, ] <- op$pars
-}
-
-modern_cdb <- cdb
-modern_weights <- weights
-
-cdb_results <- list(cdb = cdb, weights = weights)
-save(cdb_results, file = sprintf('data/derived/cdb_%s_modern.RData', MODEL_NAME))
-
-# Only Classic Value ------------------------------------------------------
-
-# Drop RMW and CMA from the distributions. This is a lot faster than having
-# constraints in the optimizer
-distribution_simple <- distribution_simple[, c(1:4), ]
-
-times <- 1:dim(distribution_simple)[3]
-cdb <- rep(NA, length(times))
-weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
-
-for (t in times) {
-  tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
-  toc()
+  # Restrict to the given subset
+  colnames(distribution_simple) <- c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA')
+  distribution_simple <- distribution_simple[, selectors, ]
   
-  cdb[t] <- -tail(op$values, 1)
-  weights[t, ] <- op$pars
-}
-
-classic_cdb <- cdb
-classic_weights <- weights
-
-cdb_results <- list(cdb = cdb, weights = weights)
-save(cdb_results, file = sprintf('data/derived/cdb_%s_classic.RData', MODEL_NAME))
-
-
-# RMW --------------------------------------------------------------------
-
-distribution_simple <- distribution_simple[, c(1:5), ]
-
-times <- 1:dim(distribution_simple)[3]
-cdb <- rep(NA, length(times))
-weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
-
-for (t in times) {
-  tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
-  toc()
   
-  cdb[t] <- -tail(op$values, 1)
-  weights[t, ] <- op$pars
-}
-
-classic_cdb <- cdb
-classic_weights <- weights
-
-cdb_results <- list(cdb = cdb, weights = weights)
-save(cdb_results, file = sprintf('data/derived/cdb_%s_RMW.RData', MODEL_NAME))
-
-# CMA --------------------------------------------------------------------
-
-distribution_simple <- distribution_simple[, c(1:4, 6), ]
-
-times <- 1:dim(distribution_simple)[3]
-cdb <- rep(NA, length(times))
-weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
-
-for (t in times) {
-  tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
-  toc()
+  cdb_results <- best_cdb(distribution_simple)
+  rm(distribution_simple)
   
-  cdb[t] <- -tail(op$values, 1)
-  weights[t, ] <- op$pars
+  save(cdb_results,
+       file = sprintf('data/derived/cdb_%s.RData', strategy, model_name))
 }
 
-classic_cdb <- cdb
-classic_weights <- weights
+# CDB Optimization -------------------------------------------------------
 
-cdb_results <- list(cdb = cdb, weights = weights)
-save(cdb_results, file = sprintf('data/derived/cdb_%s_CMA.RData', MODEL_NAME))
+do_best_cdb(MODEL_NAME, 'all',
+            c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'))
 
+do_best_cdb(MODEL_NAME, 'HML', c('Mkt.RF', 'HML', 'SMB', 'Mom'))
+do_best_cdb(MODEL_NAME, 'RMW', c('Mkt.RF', 'SMB', 'Mom', 'RMW'))
+do_best_cdb(MODEL_NAME, 'CMA', c('Mkt.RF', 'SMB', 'Mom', 'CMA'))
 
 # Equal Weights ----------------------------------------------------------
 
