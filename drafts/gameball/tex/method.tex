@@ -21,14 +21,14 @@ Copulae provide a numerically feasible way to estimate a multivariate distributi
 \begin{align} \label{eq:sklar}
     f_t(r_{1,t+1}, ..., r_{N, t+1}) &= c_t(u_{1, t+1}, ... u_{N, t+1}) \prod^N_{i=1} f_{i,t}(r_{i, t+1})
 \end{align}
-where $c_t(u_{1, t+1}, ... u_{N, t+1})$ is the copula density function, in this application taking uniform transformations of residuals from the AR-GARCH model, $\{u_i\}$, as arguments. This relies on a two-step maximum likelihood procedure (also known as the inference-by-margins (IFM) procedure) introduced by~\textcite{Joe1997}, which starts by estimating with the marginal distributions and subsequently estimates the copula function, using the margin residuals as given. For details on the marginal estimation procedure, see \autoref{App:AppendixB} The IFM method drastically improves the speed of the optimization process in large data sets; however, it is not efficient as shown by~\textcite{ChenFanTsyrennikov2006}, who instead propose a sieve ML estimation. This paper still employs IFM, as the efficiency loss is small in most cases~\autocite{Patton2006}.  
+where $c_t(u_{1, t+1}, ... u_{N, t+1})$ is the copula density function, in this application taking uniform transformations of residuals from the AR-GARCH model, $\{u_i\}$, as arguments. This relies on a two-step maximum likelihood procedure (also known as the inference-by-margins (IFM) procedure) introduced by~\textcite{Joe1997}, which starts by estimating with the marginal distributions and subsequently estimates the copula function, using the margin residuals as given. For details on the marginal estimation procedure, see \autoref{App:AppendixB} The IFM method drastically improves the speed of the optimization process in large data sets; however, it is not efficient as shown by~\textcite{ChenFanTsyrennikov2006}, who instead propose a sieve ML estimation. This paper still employs IFM, as the efficiency loss is small in most cases~\autocite{Patton2006}. 
 
 We focus on a skewed Student-\textit{t} copula, parameterized by $\Theta = \{\nu, \gamma, R\}$ using the constant correlation specification, and by $\Theta^{cDCC} = \{\nu, \gamma, \alpha, \beta, R\}$ using the dynamic correlation process. The analysis closely follows in the footsteps of~\textcite{Aielli2013} and~\textcite{ChristoffersenErrunzaJacobLanglois2012}. The skewed Student-\textit{t} distribution is described in detail in \autoref{App:AppendixA}.
 
-The normal and Student-\textit{t} copulae are both nested in the skewed Student-\textit{t} model, as the degree of freedom and skewness parameters go to infinity and zero respectively. Results are presented for all three copulae, with and without correlation dynamics.
+The normal and Student-\textit{t} copulae are both nested in the skewed Student-\textit{t} model, as the degree of freedom and skewness parameters go to infinity and zero respectively. Results are presented for all three copulae, with and without correlation dynamics. The model selection criteria is BIC (\textcite{Schwarz1978}).
 
 \subsection{Constant correlation specification}
-As a benchmark model, we consider the case of a constant correlation matrix between the factor strategies' ARMA-GJR-GARCH residuals.  
+As a benchmark model, we consider the case of a constant correlation matrix between the factor strategies' ARMA-GJR-GARCH residuals. 
 
 The copula parameters $\Theta = \{\nu, \gamma, R_t\}$ are estimated using ML of the copula function, where $\nu$ is the degree of freedom, $\gamma$ is the vector of skewness parameters and $R$ is the constant copula correlation matrix. Rearranging Sklar's Theorem in \autoref{eq:sklar} and taking logs, the copula log-likelihood function is
 \begin{align} \label{eq:constantllf}
@@ -108,12 +108,25 @@ The conditional diversification benefit statistic is now defined as
 
 The intuition behind the statistic is best understood by focusing on the second term of the numerator and the denominator: when diversification benefits are high, the expected shortfall of a portfolio is relatively close to the Value-at-Risk, which makes the ratio close to one. When diversification benefits are poor, the expected shortfall is hardly different from the weighted average of individual expected shortfalls, and the ratio is close to zero.
 
-The statistic is dependent on the calculation of $ES^p_t(w_t)$ which can only be found by simulation. In line with \textcite{ChristoffersenErrunzaJacobLanglois2012}, we maximize $CDB_t(w_t,p)$ at each time $t$ by simulating 10,000 draws of 1-week-ahead returns, using the the skewed Student-\textit{t} copula model with \textit{c}DCC correlation dynamics. This yields a series of optimal $\{CDB^*\}$ for corresponding optimal dynamic weights $\{w^*_t\}$.
+The statistic is dependent on the calculation of $ES^p_t(w_t)$ which can only be found by simulation. In line with \textcite{ChristoffersenErrunzaJacobLanglois2012}, we maximize $CDB_t(w_t,p)$ at each time $t$ by simulating 10,000 draws of 1-week-ahead returns, using the skewed Student-\textit{t} copula model with \textit{c}DCC correlation dynamics. This yields a series of optimal $\{CDB^*\}$ for corresponding optimal dynamic weights $\{w^*_t\}$.
 
 Note that it is not neccesarily the case that more assets improve the diversification benefit of a portfolio, as additional assets may well increase the upper and the lower bounds of expected shortfall.
 
 In the empirical results, we report three different series of $CDB^*$ when $p=5\%$, with different restrictions on portfolio weights in the optimization: First, all six factor strategies $(Mkt.RF, HML, SMB, Mom, RMW, CMA)$ are available in the factor universe. Second, $RMW$ and $CMA$ are removed by setting their weights to zero, leaving only classic value $HML$ among the value factors. Third, $HML$ is removed by setting its weight to zero, leaving $RMW$ and $CMA$ among the value factors.
 
-There are also two general restrictions on the portfolios: First, all factor weights must be positive, as the interpretation of a negative factor weight is the same as betting against the factor. Note that this does not mean that short sales are prohibited, as factor strategies are inherently long-short. Second, all factor weights must sum to 1, as we do not consider the case of leverage.
+There are also two general restrictions on the portfolios: First, all factor weights must be positive, as the interpretation of a negative factor weight is the same as betting against the factor. Note that this does not mean that short sales are prohibited, as factor strategies are inherently long-short. Second, factor weights must sum to 1, as we do not consider the case of leverage.
 
 [Further on, we will also consider the optimal series of $CDB$ for modern and classic value with 1) equal weights and 2) mean-variance optimal weights]
+
+\subsection{Mean-variance investing}
+As the classic value factor is shown to add no alpha to a portfolio of the remaining four factors in the five-factor model \autocite{FF2015}, we examine the impact of excluding $HML$ from the investible universe.
+
+By simulating 10,000 draws of 1-week-ahead returns, using the skewed Student-\textit{t} copula model with \textit{c}DCC correlation dynamics, we can estimate the conditional expected return vector and variance-covariance matrix. This allows us to conduct mean-variance investing based on estimates from the copula model. As previously, we impose the two general restrictions that all factor weights must be positive, and that factor weights must sum to 1, which makes the tangency portfolio without a risk-free asset the optimal portfolio. At the end of each week $t$, the optimization problem becomes
+\begin{align}
+    \max_{w} w^\top \mu - \frac{\gamma}{2}\,w^\top \Sigma w && s.t. w^\top \mathbf{1}_N = 1
+\end{align}
+where $w$ is the set of weights, $\mu$ is the expected return, $\gamma$ is the risk aversion, $\Sigma$ is the variance-covariance matrix, and $\mathbf{1}_N$ is a vector of ones. The tangency portfolio solution is
+\begin{align}
+    w^* = \frac{1}{\mu^\top \Sigma^{-1} \mathbf{1}_N} \, \Sigma^{-1} \mu
+\end{align}
+In parallel, we consider two investible asset universes, one with all six factor strategies and one without $HML$. We then consider the impact of excluding $HML$ on a number of realized performance measures including: Sharpe ratio, maximum drawdown and skewness. [The hypothesis is that there will only be a minor impact on the Sharpe ratio, while maximum drawdown and skewness improve]
