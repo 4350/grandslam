@@ -164,10 +164,10 @@ do_ew_cdb <- function(model_name, name, factors) {
 }
 
 do_ew_cdb('dynamic_ghskt', 'all', c(1:6))
-do_ew_cdb('dynamic_ghskt', 'classic', c(1:4))
-do_ew_cdb('dynamic_ghskt', 'modern', c(1, 3:6))
-do_ew_cdb('dynamic_ghskt', 'RMW', c(1:5))
-do_ew_cdb('dynamic_ghskt', 'CMA', c(1:4, 6))
+do_ew_cdb('dynamic_ghskt', 'HML', c(1:4))
+do_ew_cdb('dynamic_ghskt', 'modern', c(1, 3, 4, 5, 6))
+do_ew_cdb('dynamic_ghskt', 'RMW', c(1, 3, 4, 5))
+do_ew_cdb('dynamic_ghskt', 'CMA', c(1, 3, 4, 6))
 
 # Plotting ---------------------------------------------------------------
 
