@@ -41,7 +41,7 @@ To capture time-varying dependency, as motivated by rolling correlation and thre
 \begin{align} \label{eq:qtrtlink}
     R_t &= Q_t^{-1/2} Q_t Q_t^{-1/2}
     \intertext{where the core process is}
-    Q_t &= (1 - \alpha - \beta) S + \alpha z_{t-1} z_{t-1}^\top + \beta Q_{t-1}
+    Q_t &= (1 - \alpha - \beta) S + \alpha z_{t-1} z_{t-1}^\top + \beta Q_{t-1} \label{eq:qprocess}
 \end{align}
 The $Q_t$ process is comprised of three components that are weighted according to $\alpha, \beta$: (1) $S$, a time-invariant component, to be interpreted similarly to a long-term mean in a regular GARCH process as $\mathbb{E}[Q_t] = S$, (2) $z_{t-1} z_{t-1}^\top$, an innovation component from the copula shocks, and (3) $Q_{t-1}$, an autoregressive component of order one. In order for the the correlation matrix $R_t$ to be positive definite, $Q_t$ has to be positive definite, which is ascertained by requiring that $\alpha \geq 0$, $\beta \geq 0$ and $(\alpha + \beta) < 1$.
 
@@ -52,6 +52,20 @@ The parameters $\alpha, \beta$ are simultaneously estimated with the skewed Stud
 where the density function $f$ is the skewed Student-\textit{t} given by \autoref{eq:dskewt}.
 
 The process of the copula estimation with \textit{c}DCC dynamics is quite involved, as it relies on moment matching and recursive estimation of parameters to estimate the copula correlation matrices $\{\hat{R_t}\}$. See \autoref{App:AppendixD} for a detailed description.
+
+\textbf{Extending the cDCC model with exogenous regressors}
+
+\Textcite{ChristoffersenErrunzaJacobLanglois2012} consider an extension of~\eqref{eq:qprocess}, where the long-running component $S$ is extended with a time-varying component in a general manner. Replace $S$ with a weighted average of a time-invariant component $\Omega$ and a time-varying component $\Upsilon_t$, to get:
+\begin{align}
+    S_t &= (1 - \phi) \Omega + \phi \Upsilon_t
+\end{align}
+$\Upsilon_t$ can support any number of common or factor-specific regressors, such as a common time-trend, conditional volatilities or arbitrage activity. We detail how we construct it in~\autoref{App:AppendixD}.
+
+\begin{quote}
+    \textit{Draft Note:} Using $\Upsilon_t$ we will be able to model how the dynamics of tail-dependency change with arbitrage activity, which relates to the second/extended parts of our paper. We have yet to get ahold of the data necessary to estimate this model. For practical purposes, we are looking to move forward with just one copula distribution (likely symmetric Student's t since the asymmetries don't appear that great).
+
+    At its most simple, we can use a simple time trend as in~\autocite{ChristoffersenErrunzaJacobLanglois2012}. However, we would like to use data from Lipper, for which we don't have access yet.
+\end{quote}
 
 \textbf{Copula-based expected shortfall}
 
