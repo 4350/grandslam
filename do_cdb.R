@@ -17,7 +17,7 @@ rm(list = ls())
 
 MODEL_NAME <- 'dynamic_ghskt'
 
-# Functions
+# Functions 
 
 #' Compute VaR, ES and CDB for a portfolio
 #'
@@ -93,11 +93,11 @@ best_cdb <- function(distribution) {
     tic(sprintf('Optimal CDB at t = %d', t))
     op <- optimize_cdb(q = 0.05, distribution[,, t])
     toc()
-
+    
     if (op$convergence > 0) {
       warning(sprintf('No convergence for t = %d', t))
     }
-
+    
     cdb[t] <- -tail(op$values, 1)
     weights[t, ] <- op$pars
   }
@@ -190,7 +190,7 @@ load_cdb_ew <- function(name) {
 load_cdb <- function(name) {
   optim <- load_cdb_optim(name)
   ew <- load_cdb_ew(name)
-
+  
   data.frame(
     Week = df$Date[-length(df$Date)],
     Optimized = load_cdb_optim(name),
