@@ -14,3 +14,6 @@ gathered.copula <- gather(bootstraps, 'param', 'value', 63:71)
 ggplot(gathered.copula, aes(value)) +
   geom_histogram(bins = 20) +
   facet_grid(. ~ param, scales = 'free')
+
+# Compare these values with levels from proper maximization
+data.frame(apply(bootstraps, 2, sd))
