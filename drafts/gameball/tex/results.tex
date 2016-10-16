@@ -46,9 +46,9 @@
 \end{figure}
 
 \begin{itemize}
-  \item There is a marked difference between the threshold correlations before and after applying a GARCH filter. We conclude that a large part of what intially seems as multivariate asymmetry is in fact due to simultaneous ARMA-GARCH effects on the marginal level (reference to market hml graph for example)
-  \item Still, there is a lot of tail dependence and asymmetry left. [A Gaussian model with linear correlations approaches zero correlation when the quantile goes to zero and one respectively.] Refernce tail dependency to any graph, reference asymmetry to mkt hml, rmw hml, mom hml, mom cma. 
-  \item Market HML is not what you want! others are nicer. supports hypothesis indicative  
+  \item There is a marked difference between the threshold correlations before and after applying a GARCH filter. We conclude that a large part of what intially seems as multivariate asymmetry is in fact due to simultaneous ARMA-GARCH effects on the marginal level (see~\autoref{diag:thresholdnonvalue})
+  \item Still, there is a lot of tail dependence and asymmetry left. A Gaussian model with linear correlations approaches zero correlation when the quantile goes to zero and one respectively. Particularly between value factors (see~\autoref{diag:thresholdvalue}), there is both marked asymmetry and tail dependency in the residual series.
+  \item Considering~\autoref{diag:thresholdnonvalue}, the correlation between Market and HML is increasing in the lower quantiles -- opposite what you want. This could be indicative that HML offers poor protection in bad times, the increased recession risk being part of the traditional explanation behind the value premium.
 \end{itemize}
 \subsection{Copula results}
 % TABLES NEED TO BE MODIFIED IN THE FOLLOWING WAYS
@@ -190,11 +190,39 @@ Correlation $(Q)$ persistence $(\alpha+\beta)$ & \multicolumn{1}{c}{0.980} & \mu
 \textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
 \end{tabularx} 
 \end{table} 
+
+\begin{figure}[H]
+  \caption{Constant Copula Threshold Correlations - Value factors vs. non-value factors}
+  \label{diag:thresholdnonvalue_copula}
+  % \toprule
+  \centering
+  \begin{minipage}{\textwidth}
+  \includegraphics[scale=1]{graphics/threshold_Nonvalue_copula.png}  
+  % \bottomrule
+  \vspace{3mm}
+  \footnotesize
+  We report threshold correlations on standardized residuals, empirical filtered from GARCH and simulated from constant copula models. Value factors in columns and non-value factors in rows. All data 1963-07-05 - 2016-07-01. Correlations from 10-90\% reported, due to limited data availablility in the tails. Threshold correlations are calculated as: $Corr(r_i, r_j \,|\, r_i < F_i^{-1}(p), r_j < F_j^{-1}(p)) \text{ for } p < 0.5$ and $Corr(r_i, r_j \,|\, r_i \geq F_i^{-1}(p), r_j \geq F_j^{-1}(p)) \text{ for } p \geq 0.5$ 
+  \end{minipage}
+\end{figure}
+\begin{figure}[H]
+  \caption{Constant Copula Threshold Correlations - Value factors vs. themselves}
+  \label{diag:thresholdvalue_copula}
+  % \toprule
+  \centering
+  \begin{minipage}{\textwidth}
+  \includegraphics[scale=1]{graphics/threshold_Value_copula.png}  
+  % \bottomrule
+  \vspace{3mm}
+  \footnotesize
+  We report threshold correlations on standardized residuals, empirical filtered from GARCH and simulated from constant copula models. Value factors against each other. All data 1963-07-05 - 2016-07-01. Correlations from 10-90\% reported, due to limited data availablility in the tails. Threshold correlations are calculated as: $Corr(r_i, r_j \,|\, r_i < F_i^{-1}(p), r_j < F_j^{-1}(p)) \text{ for } p < 0.5$ and $Corr(r_i, r_j \,|\, r_i \geq F_i^{-1}(p), r_j \geq F_j^{-1}(p)) \text{ for } p \geq 0.5$ 
+  \end{minipage}
+\end{figure}
+
 \begin{itemize}
-  \item Large step up in LLH from constant to dynamic copula. Consistent with fact that correlations vary over time. Reference to graph
-  \item Asymmetry parameters generally significantly estimated, but the change in LLH is not as great as for the change from the normal specification
-  \item Comment on variance non-persistence
-  \item Vuong test conclusion
+  \item Looking at threshold correlations of the constant copula models (see~\autoref{diag:thresholdnonvalue_copula} and \autoref{diag:thresholdvalue_copula}), we see that the asymmetric copula can approach to capture some of the important asymmetric patterns. The Gaussian copula's threshold correlations fail to do so.
+  \item Log-likelihood is strongly improved by estimating a dynamic copula -- dependency appears to vary over time (see~\autoref{diag:rolling_copula}). 
+  \item Asymmetry parameters are not very significant (note: we need to bootstrap more values to get proper standard errors). The improvement in log-likelihood from symmetric to skewd Student's t is not very large. A lot of asymmetry is apparently taken care of at the marginal level; importance of asymmetric tail dependency diminished. BIC statistic also prefers symmetric Student's t -- asymmetric introduces 6 additional parameters.
+  \item Sum of $\alpha$ and $\beta$ is high so that correlation does not return quickly to ``average'' level -- near unit root.
 \end{itemize}
 
 \begin{figure}[H]
@@ -226,6 +254,6 @@ Correlation $(Q)$ persistence $(\alpha+\beta)$ & \multicolumn{1}{c}{0.980} & \mu
   \end{minipage}
 \end{figure}
 \begin{itemize}
-  \item Modern value is better diversified than classic value. Introducing $RMW$ and $CMA$ to the factor universe makes expected shortfall closer to the theoretical upper bound (smaller losses). [Maybe we want to make portfolios of 5 factors to show that a 5 factor portfolio with HML instead of either RMW or CMA is not better..]
-  \item It seems to be in times of non-crisis that classic value underperforms more - note that the $CDB$ is relatively more clustered around crises of 1973-1976, 1999-2001, 2008-2010.
+  \item Looking at~\autoref{diag:cdb1}, if we take a portfolio consisting of ``modern'' value as our benchline, there appears to be little improvement in conditional diversification benefit by adding HML (``all''). On the contrary, in a portfolio not including RMW or CMA (``classic''), the optimal level of diversification benefit is often considerably lower than the modern or full portfolio.
+  \item There are some notable failures of classic value by looking at~\autoref{diag:cdb1}, for crisis years 1973--1976, 1999--2001 and 2008--2010. It appears that not holding RMW or CMA can be especially problematic in such times.
 \end{itemize}
