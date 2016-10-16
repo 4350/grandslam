@@ -175,33 +175,49 @@ rm(list = ls())
 
 MODEL_NAME <- 'dynamic_ghskt'
 
-path_template <- 'data/derived/cdb_%s_%s.RData'
 load('data/derived/weekly-full.RData')
 
-load(sprintf(path_template, MODEL_NAME, 'all'))
-results_all <- cdb_results
+load_cdb_optim <- function(name) {
+  load(sprintf('data/derived/cdb_%s_%s.RData', MODEL_NAME, name))
+  cdb_results$cdb
+}
 
-load(sprintf(path_template, MODEL_NAME, 'classic'))
-results_classic <- cdb_results
+load_cdb_ew <- function(name) {
+  load(sprintf('data/derived/cdb_%s_%s_ew.RData', MODEL_NAME, name))
+  cdb
+}
 
-load(sprintf(path_template, MODEL_NAME, 'modern'))
-results_modern <- cdb_results
+load_cdb <- function(name) {
+  optim <- load_cdb_optim(name)
+  ew <- load_cdb_ew(name)
 
-cdb <- data.frame(Week = df$Date[-length(df$Date)],
-                  All = results_all$cdb,
-                  Classic = results_classic$cdb,
-                  Modern = results_modern$cdb)
+  data.frame(
+    Week = df$Date[-length(df$Date)],
+    Optimized = load_cdb_optim(name),
+    EW = load_cdb_ew(name)
+  )
+}
 
-cdb_long <- gather(cdb, Strategy, CDB, -Week)
+cdb <- bind_rows(
+  All = load_cdb('all'),
+  RMW = load_cdb('RMW'),
+  CMA = load_cdb('CMA'),
+  HML = load_cdb('classic'),
+  .id = 'Strategy'
+)
 
-g <- ggplot(cdb_long, aes(Week, CDB, colour = Strategy)) +
+# next part --------------------------------------------------------------
+
+cdb_long <- gather(cdb, Routine, CDB, Optimized, EW)
+ggplot(cdb_long, aes(Week, CDB, colour = Routine)) +
   geom_line() +
   xlab('')+
   theme_Publication() +
   scale_colour_Publication() +
-  coord_cartesian(ylim = c(0.40, 1.00))
+  coord_cartesian(ylim = c(0.40, 1.00)) +
+  facet_grid(Strategy ~ .)
 
-OUTPATH <- 'output/CDB/CDB_%s.png'
-ggsave(sprintf(OUTPATH, MODEL_NAME), 
-       g, device = 'png', width = 14, height = 8, units = 'cm'
-)
+# OUTPATH <- 'output/CDB/CDB_%s.png'
+# ggsave(sprintf(OUTPATH, MODEL_NAME),
+#        g, device = 'png', width = 14, height = 8, units = 'cm'
+# )
