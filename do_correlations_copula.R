@@ -3,6 +3,7 @@
 
 library(devtools)
 library(dplyr)
+library(tidyr)
 library(ggplot2)
 load_all('wimbledon')
 
