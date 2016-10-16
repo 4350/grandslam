@@ -12,6 +12,7 @@ library(Rsolnp)
 library(ggplot2)
 library(tidyr)
 library(devtools)
+library(foreach)
 load_all('wimbledon')
 rm(list = ls())
 
@@ -79,7 +80,7 @@ optimize_cdb <- function(q, distribution_t, eqfun = sum, eqB = 1,
     # Optimizer keeps climbing the multidimensional mountains with tiny
     # tiny steps. Take some strides (default delta = 1e-7)!!!
     control = list(trace = 0,
-                   delta = 1e-6),
+                   delta = 1e-5),
     ...
   )
 }
@@ -117,7 +118,6 @@ do_best_cdb <- function(model_name, strategy, selectors) {
   colnames(distribution_simple) <- c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA')
   distribution_simple <- distribution_simple[, selectors, ]
   
-  
   cdb_results <- best_cdb(distribution_simple)
   rm(distribution_simple)
   
@@ -129,6 +129,9 @@ do_best_cdb <- function(model_name, strategy, selectors) {
 
 do_best_cdb(MODEL_NAME, 'all',
             c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'))
+
+do_best_cdb(MODEL_NAME, 'modern',
+            c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'))
 
 do_best_cdb(MODEL_NAME, 'HML', c('Mkt.RF', 'HML', 'SMB', 'Mom'))
 do_best_cdb(MODEL_NAME, 'RMW', c('Mkt.RF', 'SMB', 'Mom', 'RMW'))
