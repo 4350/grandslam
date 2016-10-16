@@ -150,7 +150,7 @@ g <- ggplot(plotdf.ret, aes(x = Date, y = value)
   ylab('Correlation') +
   xlab('Year') +
   scale_x_date(date_labels = "%y") +
-  coord_cartesian(ylim = c(-1, 1)) + 
+  coord_cartesian(ylim = c(-1, 1), xlim = c(df.estim$Date[1], df.estim$Date[length(df.estim$Date)])) +
   #annotate("rect", xmin = as.Date('1986-01-01'), xmax = as.Date('1994-01-01'), ymin = -0.95, ymax = -0.5, alpha = 0.8, fill = 'grey80')+
   #geom_text(data = df.labels, aes(x = as.Date('1990-01-01'), y = -0.725, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
   geom_text(data = df.labels, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
