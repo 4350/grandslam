@@ -13,6 +13,7 @@ library(Rsolnp)
 library(ggplot2)
 library(tidyr)
 library(devtools)
+library(foreach)
 load_all('wimbledon')
 rm(list = ls())
 
@@ -61,7 +62,7 @@ risk_measures <- function(weights, q, returns) {
   )
 }
 
-optimize_cbd <- function(q, distribution_t, eqfun = sum, eqB = 1,
+optimize_cdb <- function(q, distribution_t, eqfun = sum, eqB = 1,
                          LB = NULL, x0 = NULL, ...) {
   N <- ncol(distribution_t)
   
@@ -101,7 +102,7 @@ weights <- matrix(NA, ncol = 6, nrow = length(times))
 
 for (t in times) {
   tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cbd(q = 0.05, distribution_simple[,, t])
+  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
   toc()
   
   if (op$convergence > 0) {
@@ -130,7 +131,7 @@ weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
 
 for (t in times) {
   tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cbd(q = 0.05, distribution_simple[,, t])
+  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
   toc()
   
   cdb[t] <- -tail(op$values, 1)
@@ -155,7 +156,7 @@ weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
 
 for (t in times) {
   tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cbd(q = 0.05, distribution_simple[,, t])
+  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
   toc()
   
   cdb[t] <- -tail(op$values, 1)
@@ -179,7 +180,7 @@ weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
 
 for (t in times) {
   tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cbd(q = 0.05, distribution_simple[,, t])
+  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
   toc()
   
   cdb[t] <- -tail(op$values, 1)
@@ -202,7 +203,7 @@ weights <- matrix(NA, ncol = ncol(distribution_simple), nrow = length(times))
 
 for (t in times) {
   tic(sprintf('Optimal CDB at t = %d', t))
-  op <- optimize_cbd(q = 0.05, distribution_simple[,, t])
+  op <- optimize_cdb(q = 0.05, distribution_simple[,, t])
   toc()
   
   cdb[t] <- -tail(op$values, 1)
