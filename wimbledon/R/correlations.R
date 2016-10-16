@@ -245,10 +245,10 @@ do.th.sim <- function(file) {
   factors.all   = c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
   
   df <- get.simulation.results(file)
-  stdres <- df[, 14:19] / df[, 8:13]
-  colnames(stdres) <- factors.all
+  df <- df[, -1]
+  colnames(df) <- factors.all
   
-  th_corr(stdres, 1)
+  th_corr(df, 1)
 }
 
 #' Consolidates all simulation runs into one matrix

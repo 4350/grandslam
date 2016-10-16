@@ -21,6 +21,8 @@ load_all('wimbledon')
 rm(list = ls())
 load('data/derived/garch_stdres.RData')
 
+FACTORS <- c("Mkt.RF", "HML", "SMB", "Mom", "RMW", "CMA")
+
 # Empircal data
 df.empirical <- df.stdres %>% select(-Date)
 rm(df.stdres)
@@ -28,9 +30,11 @@ rm(df.stdres)
 # Calculate threshold correlation data frame lists ------------------------
 
 # Get simulated df lists
-th.corr.gauss <- do.th.sim('data/derived/simulation/constant_gauss/')
-th.corr.ght   <- do.th.sim('data/derived/simulation/constant_ght/')
-th.corr.ghskt <- do.th.sim('data/derived/simulation/constant_ghskt/')
+#sim <- get.simulation.results('data/derived/stdresid/constant_gauss')
+
+th.corr.gauss <- do.th.sim('data/derived/stdresid/constant_gauss')
+th.corr.ght   <- do.th.sim('data/derived/stdresid/constant_ght')
+th.corr.ghskt <- do.th.sim('data/derived/stdresid/constant_ghskt')
 
 # Get empirical df list
 th.corr.empirical <- th_corr(df.empirical, 0)
@@ -59,23 +63,37 @@ for (values in factors.value) {
 plotdf <- bind_rows(allThCorrList$HML, allThCorrList$RMW, allThCorrList$CMA)
 
 
-# Do threshold plot and save ----------------------------------------------
-g <- ggplot(plotdf, aes(x = qs, y = value)
-            ) +
+# Unconditional ----------------------------------------------------------
+
+stdresid <- read.csv('data/derived/stdresid/constant_gauss/100000_1.csv')
+stdresid <- data.frame(stdresid[, -1])
+colnames(stdresid) <- FACTORS
+
+# Do Good Threshold Plot -------------------------------------------------
+
+series <- c('HML', 'RMW', 'CMA')
+# row_series <- c('HML', 'RMW', 'CMA')
+# 
+# unconditional <- data.frame(factor = FACTORS, unconditional)
+# unconditional <- gather(unconditional, factor2, value, -factor, factor_key = TRUE)
+
+plotdf <- dplyr::filter(plotdf, order %in% series)
+
+ggplot(plotdf,
+       aes(x = qs, y = value)) +
   geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
               fill = 'grey10',
               alpha = 0.1
-              ) +
-  geom_line(aes(color = "Empirical distribution")) +
-  geom_line(aes(x = qs, y = gauss, color = "Simulated Gaussian"), linetype = 2) +
-  geom_line(aes(x = qs, y = ght, color = "Simulated Student-t"), linetype = 3) +
-  geom_line(aes(x = qs, y = ghskt, color = "Simulated Skewed Student-t"), linetype = 4) +
+  ) +
+  geom_line(aes(color = "Standardized Residuals")) +
+  geom_line(aes(y = gauss, color = 'Simulated Gaussian')) +
+  geom_line(aes(y = ght, color = "Simulated Student's t")) +
+  geom_line(aes(y = ghskt, color = "Simulated Skewed Student's t")) +
   theme_Publication() +
-  ylab('') +
+  scale_colour_Publication() +
+  ylab('Correlation') +
   xlab('Quantiles') +
-  coord_cartesian(xlim = c(0, 1), ylim = c(-0.5, 1)) +
+  coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
   scale_x_continuous(labels = scales::percent) +
-  facet_grid(order2 ~ order) +
-  ggtitle('Threshold correlations of weekly data (95% confidence bounds)')
+  facet_grid(order2 ~ order)
 
-ggsave(file = 'output/thresholdCorrelations/WeeklySimulated.jpeg', g, width = 16.6, height = 11.7, units = 'in')
