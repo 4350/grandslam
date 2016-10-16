@@ -221,5 +221,5 @@ garch.diagplots <- function(df, factor, newsimp, empdens) {
   g <- arrangeGrob(out.ret, out.qq, out.acf, out.pacf,
                    out.aacf, out.apacf, out.newsimpact, out.empiricaldensity,
                    ncol = 2)
-  ggsave(file= paste('output/garch_diagnostics/garch_diagnostics', factor, '.jpeg', sep = ''), g, width = 14.0, height = 21.0, units = 'cm', limitsize = F) #saves g
+  ggsave(file= paste('output/garch_diagnostics/garch_diagnostics', factor, '.png', sep = ''), g, width = 14.0, height = 21.0, units = 'cm', limitsize = F) #saves g
 }

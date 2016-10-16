@@ -125,7 +125,7 @@ summary.plots <- function(df, outlabel, factor) {
   
   g <- arrangeGrob(out.ret, out.qq, out.acf, out.pacf, out.aacf, out.apacf, out.vol, out.negvol,
                    ncol = 2)
-  ggsave(file= paste('output/MarginalStats/MarginalStats', factor, outlabel, 'jpeg', sep = '.'), g, width = 14, height = 21, units = 'cm', limitsize = F) #saves g
+  ggsave(file= paste('output/MarginalStats/MarginalStats', factor, outlabel, 'png', sep = '.'), g, width = 14, height = 21, units = 'cm', limitsize = F) #saves g
   g
   
 }
