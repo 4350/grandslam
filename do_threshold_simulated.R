@@ -63,23 +63,12 @@ for (values in factors.value) {
 plotdf <- bind_rows(allThCorrList$HML, allThCorrList$RMW, allThCorrList$CMA)
 
 
-# Unconditional ----------------------------------------------------------
-
-stdresid <- read.csv('data/derived/stdresid/constant_gauss/100000_1.csv')
-stdresid <- data.frame(stdresid[, -1])
-colnames(stdresid) <- FACTORS
 
 # Do Good Threshold Plot -------------------------------------------------
 
-series <- c('HML', 'RMW', 'CMA')
-# row_series <- c('HML', 'RMW', 'CMA')
-# 
-# unconditional <- data.frame(factor = FACTORS, unconditional)
-# unconditional <- gather(unconditional, factor2, value, -factor, factor_key = TRUE)
+value <- dplyr::filter(plotdf, order %in% factors.value)
 
-plotdf <- dplyr::filter(plotdf, order %in% series)
-
-ggplot(plotdf,
+g <- ggplot(value,
        aes(x = qs, y = value)) +
   geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
               fill = 'grey10',
@@ -95,5 +84,37 @@ ggplot(plotdf,
   xlab('Quantiles') +
   coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
   scale_x_continuous(labels = scales::percent) +
-  facet_grid(order2 ~ order)
+  facet_grid(order ~ order2)
 
+ggsave(
+  'output/thresholdCorrelations/copula_value.png',
+  g, device = 'png', width = 14, height = 16, units = 'cm'
+)
+
+# Against non-Value ------------------------------------------------------
+
+nonvalue <- dplyr::filter(plotdf,
+                          order2 %in% factors.value,
+                          order %in% c('Mkt.RF', 'SMB', 'Mom'))
+
+g <- ggplot(nonvalue, aes(x = qs, y = value)) +
+  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+              fill = 'grey10',
+              alpha = 0.1
+  ) +
+  geom_line(aes(color = "Standardized Residuals")) +
+  geom_line(aes(y = gauss, color = 'Simulated Gaussian')) +
+  geom_line(aes(y = ght, color = "Simulated Student's t")) +
+  geom_line(aes(y = ghskt, color = "Simulated Skewed Student's t")) +
+  theme_Publication() +
+  scale_colour_Publication() +
+  ylab('Correlation') +
+  xlab('Quantiles') +
+  coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
+  scale_x_continuous(labels = scales::percent) +
+  facet_grid(order ~ order2)
+
+ggsave(
+  'output/thresholdCorrelations/copula_nonvalue.png',
+  g, device = 'png', width = 14, height = 16, units = 'cm'
+)
