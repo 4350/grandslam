@@ -12,7 +12,8 @@ MODEL_NAME = 'dynamic_ghskt'
 #'  weights sum to one and that all weights are positive. 'Standard' tangency
 #'  can have extreme weights.
 
-do_optimize_mv <- function(model_name, strategy, selectors) {
+do_optimize_mv <- function(model_name, selectors) {
+  # Load distribution simulated data
   load(sprintf('data/derived/distribution_%s.RData', model_name))
   distribution_simple <- exp(distribution) - 1
   rm(distribution)
@@ -24,8 +25,7 @@ do_optimize_mv <- function(model_name, strategy, selectors) {
   mv_results <- optimize_mv(distribution_simple)
   rm(distribution_simple)
   
-  save(mv_results,
-       file = sprintf('data/derived/mv_weights_%s_%s.RData', strategy, model_name))
+  return(mv_results)
 }
 
 # Give me distribution 3 dimensional array and i give you the mv weights
@@ -98,9 +98,63 @@ sharpe_ratio <- function(weights, mu, sigma) {
 }
 
 
-# Get optimal weights for different asset universes -----------------------
+get_mv_portfolio_results <- function(model_name, strategy, selectors, realized) {
+  # Load MV results and SR
+  mv_results <- do_optimize_mv(model_name, selectors)
+  colnames(mv_results$weights) <- selectors
+  
+  T = nrow(mv_results$weights)
+  N = ncol(mv_results$weights)
+  
+  # Get realized returns and dates
+  load('data/derived/weekly-estim.RData')
+  dates <- tail(df.estim[,'Date'], T)
+  realized <- tail(df.estim[, selectors], T)
+  rm(df.estim)
+  
+  # Calculate portfolio return
+  portfolio_return <- rowSums(mv_results$weights * realized)
+  
+  out.list <- list(
+    Date = dates,
+    sr = mv_results$sr,
+    weights = mv_results$weights,
+    portfolio_return = portfolio_return
+  )
+  
+  save(out.list, file = sprintf('data/derived/mv_results_%s_%s.Rdata', strategy, model_name))
+}
 
-do_optimize_mv(MODEL_NAME, 'All', c('Mkt.RF','HML','SMB','Mom','RMW','CMA'))
-do_optimize_mv(MODEL_NAME, 'Four+HML', c('Mkt.RF','SMB','Mom','RMW','CMA'))
-do_optimize_mv(MODEL_NAME, 'Four+CMA', c('Mkt.RF', 'HML','SMB','Mom','RMW'))
 
+
+
+# Get results for different portfolios ------------------------------------
+
+get_mv_portfolio_results(MODEL_NAME, 'All', c('Mkt.RF','HML','SMB','Mom','RMW','CMA'))
+get_mv_portfolio_results(MODEL_NAME, 'Four+HML', c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'))
+get_mv_portfolio_results(MODEL_NAME, 'Four+CMA', c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'))
+
+
+# Load and use MV results -------------------------------------------------
+rm(list = ls())
+
+load('data/derived/mv_results_All_dynamic_ghskt.Rdata')
+six_all <- out.list
+load('data/derived/mv_results_Four+CMA_dynamic_ghskt.Rdata')
+five_CMA <- out.list
+load('data/derived/mv_results_Four+HML_dynamic_ghskt.Rdata')
+five_HML <- out.list
+
+rm(out.list)
+
+plot(five_HML$portfolio_return, type = 'l', col = 'red')
+lines(five_CMA$portfolio_return, type = 'l', col = 'blue')
+
+plot(five_HML$portfolio_return - five_CMA$portfolio_return, type = 'l')
+
+d1 <- density(five_HML$portfolio_return)
+d2 <- density(five_CMA$portfolio_return)
+plot(range(d1$x, d2$x), range(d1$y, d2$y), type = "n", xlab = "x",
+     ylab = "Density")
+lines(d1, col = "red")
+lines(d2, col = "blue")
