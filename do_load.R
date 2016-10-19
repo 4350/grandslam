@@ -87,3 +87,18 @@ df.estim <- df %>%
 # Save for later loading
 save(df, file = "data/derived/daily-full.RData")
 save(df.estim, file = "data/derived/daily-estim.RData")
+
+
+# Load US recession data from NBER and convert to weekly data set ---------
+
+usrec <- read.csv('data/source/fed_USRECD-daily.csv')
+usrec <- usrec %>% mutate(DATE = as.Date(DATE), 
+                          Date = as.Date(cut(DATE, 'week')) + 4,
+                          recdummy = USRECD
+                          ) %>%
+  filter(DATE == Date) %>%
+  select(Date, recdummy) %>%
+  filter(Date >= '1963-07-05')
+
+# Save for later loading
+save(usrec, file = "data/derived/usrec-weekly.RData")
