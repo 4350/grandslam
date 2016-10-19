@@ -158,3 +158,6 @@ plot(range(d1$x, d2$x), range(d1$y, d2$y), type = "n", xlab = "x",
      ylab = "Density")
 lines(d1, col = "red")
 lines(d2, col = "blue")
+
+m(five_CMA$weights[,5], type = 'l')
+plot(five_HML$weights[,2], type = 'l')
