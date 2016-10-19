@@ -27,9 +27,7 @@ where $K(\cdot)$ is the modified Bessel function of the second kind, $Q(x) = (x-
 \newpage
 \section{Appendix B. ARMA-GARCH modeling of marginal distributions} \label{App:AppendixB}
 
-By examining marginal factor strategy returns (see \autoref{App:AppendixF}), we find evidence of non-normality, autocorrelation, volatility clustering and leverage effects, in line with stylized factors on financial return series (\textcite{Bollerslev1986}, \textcite{Black1976}, \textcite{glosten1993relation}). An ARMA-GARCH model allows us to filter away such marginal asymmetries, while leaving any multivariate asymmetry to the copula specification. 
-
-The most important goal of this application GARCH model is not to have high predictive power of asset return series, but to sanitize the data to be used in multivariate analysis. We focus on parsimonious models with few lags, but enough flexibility to capture salient features of the summary plots of the marginal series, such as volatility clustering and leverage effect.
+By examining marginal factor strategy returns (see \autoref{App:AppendixF}), we find evidence of non-normality, autocorrelation, volatility clustering and leverage effects, in line with stylized factors on financial return series (\textcite{Bollerslev1986}, \textcite{Black1976}, \textcite{glosten1993relation}). An ARMA-GARCH model allows us to filter away such marginal asymmetries, while leaving any multivariate asymmetry to the copula specification. The goal of this GARCH model is not to have high predictive power of asset return series, but to sanitize the data to be used in multivariate analysis. We focus on parsimonious models with few lags, but enough flexibility to capture salient features of the summary plots of the marginal series, such as volatility clustering and leverage effect.
 
 The selection process is as follows: for each factor strategy, ARMA-GJR-GARCH models are estimated with different ARMA lag orders (up to 3,3) and a fixed GJR-GARCH order of (1,1). We then compute the Bayesian Information Criterion (BIC, \textcite{Schwarz1978}) for each specification, and for each factor select the model with the lowest BIC as the primary candidate. The primary candidate specification is then checked for remaining serial correlation and ARCH effects in residuals, using the weighted portmanteau tests of \textcite{FisherGallagher2012}. All of the primary candidate models pass the diagnostic tests (see \autoref{App:AppendixE}), and additional diagnostics plots are available (see \autoref{App:AppendixG}). We use the GJR-GARCH model with ARMA mean equation
 \begin{align}
@@ -250,17 +248,16 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
 \end{tabularx} 
 \end{table}
-\newpage
 \section{Appendix F. Marginal series inspection}
 \label{App:AppendixF}
 \begin{figure}[H]
   \caption{Marginal diagnostics plots - Mkt.RF}
   \label{diag:marginaldiagMkt.RF}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/marginal/MarginalStats.Mkt.RF.Estim.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the marginal series. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds. 
@@ -269,11 +266,11 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{Marginal diagnostics plots - HML}
   \label{diag:marginaldiagHML}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/marginal/MarginalStats.HML.Estim.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the marginal series. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds. 
@@ -282,11 +279,11 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{Marginal diagnostics plots - SMB}
   \label{diag:marginaldiagSMB}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/marginal/MarginalStats.SMB.Estim.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the marginal series. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds. 
@@ -295,11 +292,11 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{Marginal diagnostics plots - Mom}
   \label{diag:marginaldiagMom}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/marginal/MarginalStats.Mom.Estim.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the marginal series. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds. 
@@ -308,11 +305,11 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{Marginal diagnostics plots - RMW}
   \label{diag:marginaldiagRMW}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/marginal/MarginalStats.RMW.Estim.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the marginal series. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds. 
@@ -321,27 +318,26 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{Marginal diagnostics plots - CMA}
   \label{diag:marginaldiagCMA}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/marginal/MarginalStats.CMA.Estim.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the marginal series. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds. 
   \end{minipage}
 \end{figure}
-\newpage
 \section{Appendix G. GARCH model diagnostics}
 \label{App:AppendixG}
 \begin{figure}[H]
   \caption{GARCH diagnostics plots - Mkt.RF}
   \label{diag:garchdiagMkt.RF}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/garch/garch_diagnosticsMkt.RF.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the ARMA-GJR-GARCH residuals. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds.
@@ -350,11 +346,11 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{GARCH diagnostics plots - HML}
   \label{diag:garchdiagHML}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/garch/garch_diagnosticsHML.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the ARMA-GJR-GARCH residuals. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds.
@@ -363,11 +359,11 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{GARCH diagnostics plots - SMB}
   \label{diag:garchdiagSMB}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/garch/garch_diagnosticsSMB.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the ARMA-GJR-GARCH residuals. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds.
@@ -376,11 +372,11 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{GARCH diagnostics plots - Mom}
   \label{diag:garchdiagMom}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/garch/garch_diagnosticsMom.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the ARMA-GJR-GARCH residuals. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds.
@@ -389,11 +385,11 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{GARCH diagnostics plots - RMW}
   \label{diag:garchdiagRMW}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/garch/garch_diagnosticsRMW.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the ARMA-GJR-GARCH residuals. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds.
@@ -402,11 +398,11 @@ ARCH-LM p-value & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.912} & \multi
 \begin{figure}[H]
   \caption{GARCH diagnostics plots - CMA}
   \label{diag:garchdiagCMA}
-  % \toprule
+  \toprule
   \centering
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/garch/garch_diagnosticsCMA.png}  
-  % \bottomrule
+  \bottomrule
   \vspace{3mm}
   \footnotesize
   We report diagnostics plots for the ARMA-GJR-GARCH residuals. Autocorrelation and partial autocorrelation functions are plotted with 95\% confidence bounds.
