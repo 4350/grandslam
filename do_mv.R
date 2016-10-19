@@ -134,6 +134,42 @@ get_mv_portfolio_results(MODEL_NAME, 'All', c('Mkt.RF','HML','SMB','Mom','RMW','
 get_mv_portfolio_results(MODEL_NAME, 'Four+HML', c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'))
 get_mv_portfolio_results(MODEL_NAME, 'Four+CMA', c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'))
 
+get_mv_portfolio_results(MODEL_NAME, 'FF_5F_INCL_HML', c('Mkt.RF','HML','SMB','RMW','CMA'))
+get_mv_portfolio_results(MODEL_NAME, 'FF_5F_EXCL_HML', c('Mkt.RF','SMB','RMW','CMA'))
+
+
+# Load and use FF MV results ----------------------------------------------
+
+rm(list = ls())
+
+load('data/derived/mv_results_FF_5F_EXCL_HML_dynamic_ghskt.Rdata')
+FF_5F_EXCL_HML <- out.list
+load('data/derived/mv_results_FF_5F_INCL_HML_dynamic_ghskt.Rdata')
+FF_5F_INCL_HML <- out.list
+rm(out.list)
+
+plot(FF_5F_EXCL_HML$portfolio_return, type = 'l', col = 'red')
+lines(FF_5F_INCL_HML$portfolio_return, type = 'l', col = 'blue')
+
+plot(FF_5F_INCL_HML$portfolio_return - FF_5F_EXCL_HML$portfolio_return, type = 'l')
+mean(FF_5F_INCL_HML$portfolio_return - FF_5F_EXCL_HML$portfolio_return)
+
+d1 <- density(FF_5F_EXCL_HML$portfolio_return)
+d2 <- density(FF_5F_INCL_HML$portfolio_return)
+plot(range(d1$x, d2$x), range(d1$y, d2$y), type = "n", xlab = "x",
+     ylab = "Density")
+lines(d1, col = "red")
+lines(d2, col = "blue")
+
+plot(FF_5F_EXCL_HML$weights[,'CMA'], type = 'l', col = 'red')
+lines(FF_5F_INCL_HML$weights[,'CMA'], type = 'l', col = 'blue')
+
+plot(cumprod(1+FF_5F_EXCL_HML$portfolio_return))
+plot(cumprod(1+FF_5F_INCL_HML$portfolio_return))
+
+mean(FF_5F_EXCL_HML$portfolio_return)/sd(FF_5F_EXCL_HML$portfolio_return)
+mean(FF_5F_INCL_HML$portfolio_return)/sd(FF_5F_INCL_HML$portfolio_return)
+
 
 # Load and use MV results -------------------------------------------------
 rm(list = ls())
@@ -159,5 +195,4 @@ plot(range(d1$x, d2$x), range(d1$y, d2$y), type = "n", xlab = "x",
 lines(d1, col = "red")
 lines(d2, col = "blue")
 
-m(five_CMA$weights[,5], type = 'l')
 plot(five_HML$weights[,2], type = 'l')
