@@ -159,3 +159,37 @@ g <- ggplot(plotdf.ret, aes(x = Date, y = value)
   #theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
 
 ggsave('output/rollingCorrelations/rolling45.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
+
+
+# Do roll plot with NBER dummy --------------------------------------------
+load('data/derived/usrec-weekly.RData')
+
+g <- ggplot(plotdf.ret) +
+  geom_ribbon(aes(x = Date, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+              fill = 'grey10',
+              alpha = 0.1
+  ) +
+  geom_line(aes(x = Date, y = value, color = 'Return series')) +
+  geom_ribbon(data = usrec, 
+              mapping = aes(x = Date, ymin = -1, 
+                              ymax = -1 + 2 * recdummy, 
+                              linetype = NA, 
+                              fill = 'sienna2'
+                            ),
+              fill = 'sienna2',
+              alpha = 0.3
+  ) +
+  theme_Publication() +
+  scale_colour_Publication() +
+  ylab('Correlation') +
+  xlab('Year') +
+  scale_x_date(date_labels = "%y") +
+  coord_cartesian(ylim = c(-1, 1), xlim = c(df.estim$Date[1], df.estim$Date[length(df.estim$Date)])) +
+  #annotate("rect", xmin = as.Date('1986-01-01'), xmax = as.Date('1994-01-01'), ymin = -0.95, ymax = -0.5, alpha = 0.8, fill = 'grey80')+
+  #geom_text(data = df.labels, aes(x = as.Date('1990-01-01'), y = -0.725, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
+  geom_text(data = df.labels, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
+  facet_grid(order ~ order2)
+#ggtitle('Rolling 45-week correlations (95% confidence bounds)')#+
+#theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
+
+ggsave('output/rollingCorrelations/rolling45NBER.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
