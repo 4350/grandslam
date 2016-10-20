@@ -2,7 +2,7 @@
 # 
 # Prerequisites:
 # 
-# * Need to run `do_garch_fit` first to estimate all GARCH models
+# * Need to run `do_garch_fitting.R` first to estimate all GARCH models
 
 # Libraries ----
 library(devtools)
@@ -13,32 +13,93 @@ load_all('wimbledon')
 # Reset Worksspace ----
 rm(list = ls())
 load('data/derived/weekly-estim.RData')
-load('data/derived/garch_fits.RData')
 
-# Calculate BIC ----
-BIC <- sapply(fits, function(fit) {
-  sapply(fit, function(spec) {
-    BIC = tryCatch(infocriteria(spec)['Bayes',], error = function(err) NA)
+
+# BIC bestfits and save out stuff -----------------------------------------
+
+
+
+do_garch_BIC_bestfits <- function(df.estim, submodel, dist) {
+  # Load data
+  load(sprintf('data/derived/garch_fits_%s_%s.RData', submodel, dist))
+  
+  # Create folders for output
+  SAVEPATH = 'output/garch_diagnostics'
+  save.directory <- file.path(SAVEPATH, submodel, dist)
+  dir.create(save.directory, showWarnings = FALSE, recursive = TRUE)
+  
+  # Calculate BIC
+  BIC <- sapply(fits, function(fit) {
+    sapply(fit, function(spec) {
+      BIC = tryCatch(infocriteria(spec)['Bayes',], error = function(err) NA)
+    })
   })
-})
+  
+  # Rank BIC and write table of BICs
+  rankBIC <- apply(as.data.frame(BIC), 2, min_rank)
+  write.table(rankBIC, 
+              file = sprintf('%s/bic_table_%s_%s.csv',
+                                      file.path(SAVEPATH, submodel, dist),
+                                      submodel,
+                                      dist),
+              sep = ','
+              )
+  
+  # Pick models with highest BIC. Consolidate these fits in bestfits list
+  best_list_name <- rownames(rankBIC)[apply(rankBIC, 2, function(f) match(1,f))]
+  bestfits <- mapply(
+    function(f, best_spec_name) {
+      f[[best_spec_name]]
+    }, 
+    fits,
+    best_list_name
+  )
+  
+  # Save GARCH parameters of best fits to csv files
+  lapply(
+    colnames(df.estim[,-1]),
+    function(vars, SAVEPATH, submodel, dist) {
+      write.table(
+        bestfits[[vars]]@fit$robust.matcoef,
+        file = sprintf('%s/garch_params_%s_%s_%s.csv',
+                       file.path(SAVEPATH, submodel, dist),
+                       vars,
+                       submodel,
+                       dist),
+        sep = ','
+      )
+    },
+    SAVEPATH = SAVEPATH,
+    submodel = submodel,
+    dist = dist
+  )
+  
+  # Name the bestfits model.GARCH
+  model.GARCH <- bestfits
+  
+  # Do the QQ plots
+  
+  g_qq <- do_qq_plot(do_qq_data(model.GARCH))
+  ggsave(file = sprintf('output/garch_diagnostics/%s/%s/qqplot.png', submodel, dist),
+         g_qq, width = 14.0, height = 10, units = 'cm', limitsize = F
+         ) 
+  
+  
+  # Save model.GARCH to file
+  save(model.GARCH, file = sprintf('data/derived/model_GARCH_%s_%s.Rdata', submodel, dist))
+}
 
-rankBIC <- apply(as.data.frame(BIC), 2, min_rank)
-write.table(rankBIC, file = 'output/garch_diagnostics/bic_table.csv', sep = ',')
+do_garch_BIC_bestfits(df.estim, 'GJRGARCH', 'ghst')
+do_garch_BIC_bestfits(df.estim, 'GJRGARCH', 'std')
+do_garch_BIC_bestfits(df.estim, 'GJRGARCH', 'norm')
 
-# Pick models with highest BIC ----
-# Consolidate these fits in a list to extract all plots
+do_garch_BIC_bestfits(df.estim, 'GARCH', 'ghst')
+do_garch_BIC_bestfits(df.estim, 'GARCH', 'std')
+do_garch_BIC_bestfits(df.estim, 'GARCH', 'norm')
 
-# NOTE: Hard-coded! May want to verify this if changing sample
-bestfits <- list(
-  Mkt.RF = fits$Mkt.RF$ARMA00,
-  HML = fits$HML$ARMA11,
-  SMB = fits$SMB$ARMA11,
-  Mom = fits$Mom$ARMA10,
-  RMW = fits$RMW$ARMA11,  
-  CMA = fits$CMA$ARMA11
-)
-model.GARCH <- bestfits
-save(model.GARCH, file = 'data/derived/model_GARCH.RData')
+# Below only for the chosen -----------------------------------------------
+
+
 
 # Get and save residuals ----
 df.res <- data.frame(
@@ -94,19 +155,6 @@ save(df.u.e, file = 'data/derived/garch_unires_empirical.RData')
 
 # Output various other things ----
 
-# GARCH parameters
-varnames <- list('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA')
-lapply(
-  varnames,
-  function(vars) {
-    write.table(
-      bestfits[[vars]]@fit$robust.matcoef,
-      file = paste('output/garch_diagnostics/garch_params_', vars, '.csv', sep = ''),
-      sep = ','
-    )
-  }
-)
-
 newsimp <- lapply(bestfits, function(fit) {
   newsimpactlist <- rugarch::newsimpact(fit)
   data.frame(x = newsimpactlist$zx, y = newsimpactlist$zy)
@@ -114,6 +162,16 @@ newsimp <- lapply(bestfits, function(fit) {
 
 # Get list of empirical density data for all fits
 empdens <- lapply(bestfits, function(fit) garch.empirical.density(fit))
+
+
+
+# GARCH diagnostics -------------------------------------------------------
+
+# QQ PLOT
+# Sign bias
+
+
+
 
 # Make and save the nice diagnostic plots ----
 library(ggplot2)

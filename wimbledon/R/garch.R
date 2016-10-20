@@ -124,6 +124,83 @@ garch.empirical.density = function(x, ...)
   )
 }
 
+# QQ plots ----------------------------------------------------------------
+
+#' Gets the data for the qq plot for all factors best fits
+#' Based on rugarch but uses faster code for ghst quantile
+#' 
+do_qq_data <- function(model.GARCH) {
+  
+  # Get list of qq data for all fits
+  qq_data <- lapply(model.GARCH, function(fit) garch.qq(fit))
+  
+  # Give levels for facet
+  qq_data <- bind_rows(qq_data, .id = 'factor')
+  qq_data$order <- factor(qq_data$factor, levels = names(model.GARCH))
+  return(qq_data)
+}
+
+do_qq_plot <- function(qq_data) {
+  # Run ggplot on the qq_data
+  ggplot(qq_data, aes(x = theo_x, y = sample_y)) +
+    geom_point(size = 1) +
+    geom_abline(linetype = 2, intercept = 0, slope = 1) +
+    facet_wrap(~ order, nrow = 2, ncol = 3)+
+    theme_Publication() +
+    ylab('Sample quantile')+
+    xlab('Theoretical quantile')
+  
+}
+
+#' Function to get values for QQ plot
+#'
+#' @param x fitted model object
+#' @return out.df Data frame with quantiles for sample and theoretical
+#'
+#' @export
+garch.qq = function(x, ...)
+{
+  vmodel  = x@model$modeldesc$vmodel
+  zseries = as.numeric(residuals(x, standardize=TRUE))
+  distribution = x@model$modeldesc$distribution
+  idx = x@model$pidx
+  pars  = x@fit$ipars[,1]
+  skew  = pars[idx["skew",1]]
+  shape = pars[idx["shape",1]]
+  if(distribution == "ghst") ghlambda = -shape/2 else ghlambda = pars[idx["ghlambda",1]]
+  out.df <- .qqDist_re(y = zseries, dist = distribution, lambda = ghlambda, skew = skew, shape = shape)
+}
+
+
+#' Quantile-Quantile supporting functions from rugarch, reworked to return x, y
+#' and use special ghst qghyp function for speed
+.qqDist_re = function (y, dist = "norm", ylim = NULL, main = paste(dist, "- QQ Plot"),
+                    xlab = "Theoretical Quantiles", ylab = "Sample Quantiles", doplot = FALSE,
+                    datax = FALSE, cex.main = 0.8, shape = NULL, skew = NULL, ...)
+{	
+  y = as.vector(y)
+  if (has.na <- any(ina <- is.na(y))) {
+    yN = y
+    y = y[!ina]
+  }
+  if (0 == (n <- length(y))) stop("y is empty or has only NAs")
+  if (dist == "ghst") {
+    x = garch.qghyp.rugarch(p = ppoints(n), shape = shape, skew = skew)[order(order(y))]
+  } else {
+    x = qdist(distribution = dist, p = ppoints(n), ...)[order(order(y))]
+  }
+  
+  
+  if (has.na) {
+    y = x
+    x = yN
+    x[!ina] = y
+    y = yN
+  }
+  
+  data.frame(theo_x = x, sample_y = y)
+}
+
 #' Create nice graphs for diagnostics of ARMA-GARCH fits
 #'
 #' @param df Data frame - of standardized residuals
