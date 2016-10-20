@@ -201,6 +201,77 @@ garch.qq = function(x, ...)
   data.frame(theo_x = x, sample_y = y)
 }
 
+
+
+# End table GARCH diagnostics ---------------------------------------------
+
+do_garch_end_table <- function(object) {
+  # Count obs and get LLH and BIC
+  obs = length(object@fit$residuals)
+  LLH = object@fit$LLH
+  BIC = tryCatch(infocriteria(object)['Bayes',], error = function(err) NA)
+  # Get standardized residuals and dof
+  stdresid = object@fit$residuals/object@fit$sigma
+  modelinc = object@model$modelinc
+  df = sum(modelinc[2:3])
+  # Calculate LB tests
+  LB_5 = Weighted.Box.test(stdresid, lag = 5, type = "Ljung-Box", fitdf = df)$p.value
+  LB_10 = Weighted.Box.test(stdresid, lag = 10, type = "Ljung-Box", fitdf = df)$p.value
+  # Calculate ARCH LM tests
+  gdf = sum(modelinc[8:9])
+  LM_5 = Weighted.LM.test(as.vector(residuals(object)), sigma(object)^2, lag = 5, type = "correlation", fitdf = gdf)$p.value
+  LM_10 = Weighted.LM.test(as.vector(residuals(object)), sigma(object)^2, lag = 10, type = "correlation", fitdf = gdf)$p.value
+  # Calculate sign bias tests
+  SB_negative = .signbiasTest_re(object)[1]
+  SB_positive = .signbiasTest_re(object)[2]
+  # Put together out vector
+  out.v <- c(
+    obs = obs,
+    LLH = LLH,
+    BIC = BIC,
+    LB_5 = LB_5,
+    LB_10 = LB_10,
+    LM_5 = LM_5,
+    LM_10 = LM_10,
+    SB_negative = SB_negative,
+    SB_positive = SB_positive
+  ) %>% round(digits = 4)
+  return(out.v)
+}
+
+#' Adapted from rugarch to only output p-values for positive and negative
+.signbiasTest_re = function(object)
+{
+  if(is(object, "uGARCHfilter")) z = object@filter$z else z = z = object@fit$z
+  res = as.numeric(residuals(object))
+  z2 = z^2
+  n = length(z)
+  zminus = as.integer(res<0)
+  zplus = 1-zminus
+  czminus = zminus*res
+  czplus = zplus*res
+  cz = cbind(rep(1, n), zminus, czminus, czplus)
+  cz = cz[1:(n-1),]
+  z2 = matrix(z2[2:n],ncol = 1)
+  cm = data.frame(y = z2, const = cz[,1], zminus = cz[,2], czminus = cz[,3], czplus = cz[,4])
+  fitA = lm(y~const+zminus+czminus+czplus-1, data = cm)
+  resA = residuals(fitA)
+  sgmatrix = matrix(ncol = 3, nrow = 4)
+  rownames(sgmatrix) = c("Sign Bias","Negative Sign Bias","Positive Sign Bias","Joint Effect")
+  colnames(sgmatrix) = c("t-value","prob","sig")
+  sgmatrix[1:3,1:2] = abs(summary(fitA)$coef[2:4,3:4])
+  jeffect = rugarch:::.linear.hypothesis(fitA, c("zminus = 0", "czminus = 0","czplus  =  0"), test  =  "Chisq")
+  sgmatrix[4,1] = jeffect[5]$Chisq[2]
+  sgmatrix[4,2] = jeffect[6][2,]
+  sgmatrix = as.data.frame(sgmatrix)
+  sgmatrix[,3] = rugarch:::.stars(sgmatrix[,2])
+  return(sgmatrix[2:3,2])
+}
+
+#  ------------------------------------------------------------------------
+
+
+
 #' Create nice graphs for diagnostics of ARMA-GARCH fits
 #'
 #' @param df Data frame - of standardized residuals

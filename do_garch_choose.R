@@ -8,6 +8,15 @@
 library(devtools)
 library(dplyr)
 library(rugarch)
+library(WeightedPortTest)
+library(tidyr)
+library(ggplot2)
+library(scales)
+library(ggfortify)
+library(gridExtra)
+library(devtools)
+library(extrafont)
+
 load_all('wimbledon')
 
 # Reset Worksspace ----
@@ -85,6 +94,11 @@ do_garch_BIC_bestfits <- function(df.estim, submodel, dist) {
          ) 
   
   
+  # Save end table of test results etc
+  test.table <- sapply(model.GARCH, do_garch_end_table)
+  write.table(test.table, file = sprintf('output/garch_diagnostics/%s/%s/end_table_%s_%s.csv',
+                                         submodel, dist, submodel, dist), sep = ',')
+  
   # Save model.GARCH to file
   save(model.GARCH, file = sprintf('data/derived/model_GARCH_%s_%s.Rdata', submodel, dist))
 }
@@ -98,8 +112,6 @@ do_garch_BIC_bestfits(df.estim, 'GARCH', 'std')
 do_garch_BIC_bestfits(df.estim, 'GARCH', 'norm')
 
 # Below only for the chosen -----------------------------------------------
-
-
 
 # Get and save residuals ----
 df.res <- data.frame(
@@ -162,15 +174,6 @@ newsimp <- lapply(bestfits, function(fit) {
 
 # Get list of empirical density data for all fits
 empdens <- lapply(bestfits, function(fit) garch.empirical.density(fit))
-
-
-
-# GARCH diagnostics -------------------------------------------------------
-
-# QQ PLOT
-# Sign bias
-
-
 
 
 # Make and save the nice diagnostic plots ----
