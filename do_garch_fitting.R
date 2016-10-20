@@ -49,7 +49,7 @@ fits <- lapply(
       cluster,
       speclist,
       function(spec, factor, nOOS) {
-        ugarchfit(spec, factor, out.sample = nOOS, model = "hybrid")
+        ugarchfit(spec, factor, out.sample = nOOS, solver = "hybrid")
       },
       factor = factor,
       nOOS = nOOS

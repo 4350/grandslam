@@ -1,3 +1,5 @@
+#' @importFrom rugarch ugarchfit
+NULL
 
 #' Fit GARCH models to data
 #'
@@ -7,7 +9,9 @@
 #' @return
 #' @export
 garch_fit <- function(garch, data) {
-  foreach(i = seq_along(garch)) %dopar% ugarchfit(garch[[i]], data[, i])
+  foreach(i = seq_along(garch)) %dopar% {
+    ugarchfit(garch[[i]], data[, i], solver = 'hybrid')
+  }
 }
 
 #' Turns GARCH fits to specs with fixed.pars
@@ -60,9 +64,19 @@ garch_specgen <- function(p, q = 0, r = 1, s = 1, model = 'fGARCH', submodel = '
   spec
 }
 
+#' @export
 garch_uniform2stdresid <- function(garch, u) {
   foreach (i = seq_along(garch), .combine = 'cbind') %dopar% {
     .garch_qghyp(garch[[i]], u[, i])
+  }
+}
+
+#' @export
+garch_stdresid2uniform <- function(garch, stdresid) {
+  foreach(i = seq_along(garch), .combine= 'cbind') %do% {
+    pars <- garch[[i]]@model$pars[, 'Level']
+    
+    rugarch:::psghst(stdresid[, i], shape = pars['shape'], skew = pars['skew'])
   }
 }
 
