@@ -16,6 +16,7 @@ library(extrafont)
 library(zoo)
 library(scales)
 library(devtools)
+library(mvtnorm)
 
 # Reset workspace and load return data
 rm(list = ls())
@@ -50,6 +51,44 @@ load_all('wimbledon')
   )
   
 }
+
+
+# Threshold correlation fake data scatter for method ------------------------------
+
+# Generate data
+sigma = diag(2)
+sigma[1,2] = 0.5
+sigma[2,1] = 0.5
+rand_data <- data.frame(rmvnorm(n = 1000, mean = c(0,0), sigma = sigma))
+rand_data$cor = 0.5
+colnames(rand_data) = c('y1','y2')
+
+# Plot data
+g <- ggplot(rand_data, aes(x = y1, y = y2)
+) +
+  geom_point() +
+  theme_Publication() +
+  scale_colour_Publication() +
+  ylab('Factor 1 return') +
+  xlab('Factor 2 return') +
+  coord_cartesian(xlim = c(-4,4), ylim = c(-4, 4)) + 
+  annotate("rect", xmin = -4, xmax = 0, ymin = -4, ymax = 0, alpha = 0.4, fill = 'grey80', linetype = 1, color = 'black')+
+  annotate("text", x = -3.85, y = -0.2, label = 'A', family = 'Minion Pro')+
+  annotate("rect", xmin = -4, xmax = -1, ymin = -4, ymax = -1, alpha = 0.5, fill = 'grey80', linetype = 2, color = 'black')+
+  annotate("text", x = -3.85, y = -1.2, label = 'B', family = 'Minion Pro')+
+  annotate("rect", xmin = -4, xmax = -2, ymin = -4, ymax = -2, alpha = 0.6, fill = 'grey80', linetype = 3, color = 'black')+
+  annotate("text", x = -3.85, y = -2.2, label = 'C', family = 'Minion Pro')+
+  annotate("rect", xmin = 0, xmax = 4, ymin = 0, ymax = 4, alpha = 0.4, fill = 'grey80', linetype = 1, color = 'black')+
+  annotate("text", x = 3.85, y = 0.2, label = 'D', family = 'Minion Pro')+
+  annotate("rect", xmin = 1, xmax = 4, ymin = 1, ymax = 4, alpha = 0.5, fill = 'grey80', linetype = 2, color = 'black')+
+  annotate("text", x = 3.85, y = 1.2, label = 'E', family = 'Minion Pro')+
+  annotate("rect", xmin = 2, xmax = 4, ymin = 2, ymax = 4, alpha = 0.6, fill = 'grey80', linetype = 3, color = 'black')+
+  annotate("text", x = 3.85, y = 2.2, label = 'F', family = 'Minion Pro')
+
+# Save plot
+ggsave('output/thresholdCorrelations/threshold_explain.png', g, device = 'png', width = 14, height = 12, units = 'cm')
+
+
 
 # Threshold correlations --------------------------------------------------
 

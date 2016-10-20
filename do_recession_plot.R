@@ -29,8 +29,8 @@ below_above_quantile <- function(df, df_dates, q){
     data.frame(
       Date = df_dates,
       ret = f,
-      below = as.numeric(f < quantile(f, probs = q)),
-      above = as.numeric(f > quantile(f, probs = (1-q)))
+      retbelow = f * as.numeric(f < quantile(f, probs = q)),
+      retabove = f * as.numeric(f > quantile(f, probs = (1-q)))
     )
   }, df_dates = df_dates, q = q)
 }
@@ -47,8 +47,9 @@ plot_below_above$order <- factor(plot_below_above$factor, colnames(df))
 # Do plot with NBER dummy --------------------------------------------
 
 g <- ggplot(plot_below_above) +
-  geom_bar(stat = 'identity', aes(x = Date, y = ret*above, color = 'Top 10% percentile returns')) +
-  geom_bar(stat = 'identity', aes(x = Date, y = ret*below, color = 'Bottom 10% percentile returns')) +
+  geom_bar(stat = 'identity', aes(x = Date, y = retabove, color = 'Top 10% percentile returns')) +
+  geom_bar(stat = 'identity', aes(x = Date, y = retbelow, color = 'Bottom 10% percentile returns')) +
+  #geom_line(aes(x = Date, y = ret))+
   geom_ribbon(data = usrec, 
               mapping = aes(x = Date, ymin = -1, 
                             ymax = -1 + 2 * recdummy, 
@@ -68,5 +69,5 @@ g <- ggplot(plot_below_above) +
   facet_grid(order ~ .)
 
 
-ggsave('output/below_above_quantile.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
+ggsave('output/below_above_quantile_all.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
 
