@@ -112,6 +112,25 @@ do_garch_BIC_bestfits(df.estim, 'GARCH', 'std')
 do_garch_BIC_bestfits(df.estim, 'GARCH', 'norm')
 
 # Below only for the chosen -----------------------------------------------
+load('data/derived/model_GARCH_GARCH_ghst.Rdata')
+model.GARCH.GARCH <- model.GARCH
+rm(model.GARCH)
+load('data/derived/model_GARCH_GJRGARCH_ghst.Rdata')
+model.GARCH.GJRGARCH <- model.GARCH
+rm(model.GARCH)
+
+bestfits <- 
+  list(
+    Mkt.RF = model.GARCH.GJRGARCH$Mkt.RF,
+    HML = model.GARCH.GARCH$HML,
+    SMB = model.GARCH.GARCH$SMB,
+    Mom = model.GARCH.GARCH$Mom,
+    RMW = model.GARCH.GARCH$RMW,
+    CMA = model.GARCH.GJRGARCH$CMA
+  )
+
+model.GARCH <- bestfits
+save(model.GARCH, file = 'data/derived/model.GARCH_chosen.RData')
 
 # Get and save residuals ----
 df.res <- data.frame(
@@ -164,24 +183,3 @@ df.u.e <- data.frame(
   )
 )
 save(df.u.e, file = 'data/derived/garch_unires_empirical.RData')
-
-# Output various other things ----
-
-newsimp <- lapply(bestfits, function(fit) {
-  newsimpactlist <- rugarch::newsimpact(fit)
-  data.frame(x = newsimpactlist$zx, y = newsimpactlist$zy)
-})
-
-# Get list of empirical density data for all fits
-empdens <- lapply(bestfits, function(fit) garch.empirical.density(fit))
-
-
-# Make and save the nice diagnostic plots ----
-library(ggplot2)
-library(ggfortify)
-library(gridExtra)
-library(extrafont)
-lapply(
-  list('Mkt.RF','HML','SMB','Mom','RMW','CMA'),
-  function(varlist) garch.diagplots(df.stdres, varlist, newsimp, empdens)
-)
