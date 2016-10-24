@@ -83,6 +83,16 @@ do_garch_BIC_bestfits <- function(df.estim, submodel, dist) {
     dist = dist
   )
   
+  # Get and save standardized residuals ----
+  df.stdres <- data.frame(
+    Date = df.estim$Date,
+    as.data.frame(
+      lapply(bestfits,
+             function(factor) factor@fit$residuals/factor@fit$sigma)
+    )
+  )
+  save(df.stdres, file = sprintf('data/derived/garch_stdres_%s_%s.Rdata', submodel, dist))
+  
   # Name the bestfits model.GARCH
   model.GARCH <- bestfits
   
@@ -141,16 +151,6 @@ df.res <- data.frame(
   )
 )
 save(df.res, file = 'data/derived/garch_res.RData')
-
-# Get and save standardized residuals ----
-df.stdres <- data.frame(
-  Date = df.estim$Date,
-  as.data.frame(
-    lapply(bestfits,
-           function(factor) factor@fit$residuals/factor@fit$sigma)
-  )
-)
-save(df.stdres, file = 'data/derived/garch_stdres.RData')
 
 # Get and save uniform residuals ----
 df.u <- data.frame(
