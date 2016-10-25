@@ -1,4 +1,10 @@
-  
+# What we need to do here
+# Simulate for all copulae, and maybe for independence copula, as well as garchs by themselves.
+# Do this simulation out of sample, leaving e.g. everything after 2000 as the OOS
+# 
+# Cumulative returns of simulated stuff looks crazy high - what's going on?
+# How would we impose restrictions on how fast weights can change?
+# Think about how to scale sharpe ratio
   
 # Library and setup -------------------------------------------------------
 rm(list = ls())
@@ -13,32 +19,39 @@ library(ggfortify)
 library(gridExtra)
 library(devtools)
 library(extrafont)
+library(PerformanceAnalytics)
+library(stargazer)
 
 load_all('wimbledon')
 
 MODEL_NAME = 'dynamic_ghskt'
 
-# Functions ---------------------------------------------------------------
+# Functions used in optimization  ---------------------------------------------------------------
 
 #' Get the MV optimal portfolio results for a copula simulated 
 #' distribution, or for assumptions of mu and sigma over time.
 #' 
 #' Returns a list with dates, sharpe ratios (maximized by the optimizer),
 #' optimal weights constrained to sum to 1 and be greater or equal
-#' to zero, and the resulting realized portfolio return (based on df.estim)
+#' to zero, and the resulting realized portfolio return (based on df.realized's
+#' last T values)
 #' 
 #' @param model_name copula model, one of 'ghskt', 'ght', 'norm'
 #' @param strategy name for out file for this strategy
 #' @param selectors chosen allowed assets in this strategy, 
 #' choosing from Mkt.RF, HML, SMB, Mom, RMW, CMA
+#' @param df.realized data frame like df.estim, including dates and 6 factors
+#' of log returns, at least as long as the out-of-sample period which is given by
+#' the length of the distribution or mu and sigma
 #' 
 #' @return saves a list of results to RData files mv_results_...
 #' 
-do_optimize_mv <- function(model_name = NULL, mu = NULL, sigma = NULL, strategy, selectors) {
+do_optimize_mv <- function(model_name = NULL, mu = NULL, sigma = NULL, strategy, selectors, df.realized) {
   # Check for correct input
   if(is.null(model_name) && any(is.null(mu), is.null(sigma))) {
     stop('No copula model passed - then optimization requires both mu and sigma')
   }
+  # Whether it's on model or assumptions
   if(!is.null(model_name)) {
     based_on <- model_name
     # Load distribution simulated data and change to simple returns
@@ -62,14 +75,12 @@ do_optimize_mv <- function(model_name = NULL, mu = NULL, sigma = NULL, strategy,
   T = nrow(mv_results$weights)
   N = ncol(mv_results$weights)
   
-  # Load realized returns and dates
-  load('data/derived/weekly-estim.RData')
-  dates <- tail(df.estim[,'Date'], T)
+  # Use realized returns and dates
+  dates <- tail(df.realized[,'Date'], T)
   # Subset realized returns using selectors
-  realized <- tail(df.estim[, selectors], T)
+  realized <- tail(df.realized[, selectors], T)
   # Change daily returns to simple returns
   realized <- exp(realized) - 1
-  rm(df.estim)
   
   # Calculate the portfolios realized return
   portfolio_return <- rowSums(mv_results$weights * realized)
@@ -215,17 +226,85 @@ sharpe_ratio <- function(weights, mu_t, sigma_t) {
   sr <- (weights %*% mu_t) / sqrt(weights %*% sigma_t %*% weights)
 }
 
-# Get results for different copula portfolios ------------------------------------
+#' Get the fixed weights portfolio results for comparison
+#' with MV optimized portfolios. E.g. equal weights..
+#' 
+#' Returns a list with dates, chosen fixed weights, and 
+#' resulting realized portfolio return (based on df.realized's
+#' last T values)
+#' 
+#' @param model_name copula model, one of 'ghskt', 'ght', 'norm'
+#' @param strategy name for out file for this strategy
+#' @param selectors chosen allowed assets in this strategy, 
+#' choosing from Mkt.RF, HML, SMB, Mom, RMW, CMA
+#' @param weights vector of length 6 (all assets) with weights, sum to 1
+#' and all greater or equal to zero
+#' @param T length of out-of-sample period
+#' @param df.realized data frame like df.estim, including dates and 6 factors
+#' of log returns, at least as long as the out-of-sample period T
+#' 
+#' @return saves a list of results to RData files mv_results_...
+#' 
+do_fixed_weights_mv <- function(strategy, selectors, weights_fixed, T, df.realized) {
+  # Error check on weights
+  if(sum(weights_fixed) != 1 | any(weights_fixed < 0)) {
+    stop('Weights incorrectly inputted - need to sum to one and all be greater or equal to zero')
+  }
+  # Preliminary constants. Count number of active assets in selectors
+  based_on <- 'fixed_weights'
+  N_total = ncol(df.realized[,-1])
+  N_active = length(selectors)
+  
+  # Create results with weights. Sharpe ratio from optimization undefined here
+  mv_results <- list(
+    weights = matrix(weights_fixed, ncol = N_total, nrow = T),
+    sr = rep(NA, T)
+  )
+  # Name assets
+  colnames(mv_results$weights) <- colnames(df.realized[,-1])
+  
+  # Realized returns and dates
+  dates <- tail(df.realized[,'Date'], T)
+  # Subset realized returns using selectors
+  realized <- tail(df.realized[, selectors], T)
+  # Change daily returns to simple returns
+  realized <- exp(realized) - 1
+  
+  # Calculate the portfolios realized return
+  portfolio_return <- rowSums(mv_results$weights * realized)
+  
+  # Save list of data points as .RData file
+  results <- list(
+    Date = dates$Date,
+    sr = mv_results$sr,
+    weights = mv_results$weights,
+    portfolio_return = portfolio_return,
+    based_on = based_on,
+    strategy = strategy
+  )
+  # Give this a specific name
+  save(results, file = sprintf('data/derived/mv_results_%s_%s.Rdata', based_on, strategy))
+  return(results)
+}
 
-results_All <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'All', selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'))
-results_Four_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+HML', selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'))
-results_Four_CMA <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+CMA', selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'))
+# Get optimization results for different copula portfolios ------------------------------------
 
-results_5F_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_INCL_HML', selectors = c('Mkt.RF','HML','SMB','RMW','CMA'))
-results_5F <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_EXCL_HML', selectors = c('Mkt.RF','SMB','RMW','CMA'))
+results_All <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'All', selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'), df.realized = df.estim)
+results_Four_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+HML', selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'), df.realized = df.estim)
+results_Four_CMA <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+CMA', selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'), df.realized = df.estim)
 
+results_5F_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_INCL_HML', selectors = c('Mkt.RF','HML','SMB','RMW','CMA'), df.realized = df.estim)
+results_5F <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_EXCL_HML', selectors = c('Mkt.RF','SMB','RMW','CMA'), df.realized = df.estim)
 
-# Get results for different assumed mu and sigma --------------------------
+# And for EW portfolio
+
+results_EW_6F <- do_fixed_weights_mv(strategy = 'EW_6F', T = 2765, 
+                                  selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'), 
+                                  weights_fixed = rep(1/6, 6),
+                                  df.realized = df.estim
+                                  )
+
+# Get optimization results for different assumed mu and sigma --------------------------
 load('data/derived/weekly-estim.RData')
 
 # Function to create mu and sigma from sample
@@ -242,14 +321,19 @@ load('data/derived/weekly-estim.RData')
   array(sigma, dim = c(ncol(sigma), ncol(sigma), nOOS))
 }
 
-results_Sample_All <- do_optimize_mv(mu = .sample_mu(df.estim[,-1], 2765), sigma = .sample_sigma(df.estim[,-1], 2765), strategy = 'Sample',
-               selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'))
+results_Sample <- do_optimize_mv(mu = .sample_mu(df.estim[,-1], 2765), sigma = .sample_sigma(df.estim[,-1], 2765), strategy = 'Sample',
+               selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'), df.realized = df.estim)
 results_Sample_5F <- do_optimize_mv(mu = .sample_mu(df.estim[,c(-1,-5)], 2765), sigma = .sample_sigma(df.estim[,c(-1,-5)], 2765), strategy = 'Sample',
-                                     selectors = c('Mkt.RF','HML','SMB','RMW','CMA'))
+                                     selectors = c('Mkt.RF','HML','SMB','RMW','CMA'), df.realized = df.estim)
+
 
 # Load and use FF MV results ----------------------------------------------
+load('data/derived/mv_plot_data.RData')
 
-weights_smooth_plot <- function(results1, results2, name1, name2) {
+
+# Weights over time, smoothed and unsmoothed ------------------------------
+
+.weights_smooth_plot <- function(results1, results2, name1, name2) {
   
   prepare_plotdf <- function(results, name) {
     dates <- results$Date
@@ -274,7 +358,7 @@ weights_smooth_plot <- function(results1, results2, name1, name2) {
   
 }
 
-weights_plot <- function(results1, results2, name1, name2) {
+.weights_plot <- function(results1, results2, name1, name2) {
   
   prepare_plotdf <- function(results, name) {
     dates <- results$Date
@@ -298,77 +382,102 @@ weights_plot <- function(results1, results2, name1, name2) {
   
   
 }
-g <- weights_plot(results_5F_HML, results_Sample_5F, 'In-sample simulated dynamic ghskt copula','In-sample sample mu and sigma')
-g <- weights_smooth_plot(results_5F_HML, results_Sample_5F, 'In-sample simulated dynamic ghskt copula','In-sample sample mu and sigma')
+g <- .weights_plot(results_5F_HML, results_Sample_5F, 'In-sample simulated dynamic ghskt copula','In-sample sample mu and sigma')
+g <- .weights_smooth_plot(results_5F_HML, results_Sample_5F, 'In-sample simulated dynamic ghskt copula','In-sample sample mu and sigma')
 
-g <- weights_plot(results_Four_HML,results_Four_CMA, 'HML', 'CMA')
-g <- weights_smooth_plot(results_Four_HML,results_Four_CMA, 'Five factors HML', 'Five factors CMA')
+g <- .weights_plot(results_Four_HML,results_Four_CMA, 'HML', 'CMA')
+g <- .weights_smooth_plot(results_Four_HML,results_Four_CMA, 'Five factors HML', 'Five factors CMA')
 
-g <- weights_plot(results_Sample_All, results_All, 'Sample', 'Simulated')
-g <- weights_smooth_plot(results_Sample_All, results_All, 'Sample', 'Simulated')
-# Graph of return over time
-# Graph of diff in return over time
-# Graph of density of return comparison
+g <- .weights_plot(results_Sample, results_All, 'Sample', 'Simulated')
+g <- .weights_smooth_plot(results_Sample, results_All, 'Sample', 'Simulated')
+
+
+# Return over time --------------------------------------------------------
+#Something is funky here
+.cumret_plot <- function(results1, results2, name1, name2) {
+  
+  prepare_plotdf <- function(results, name) {
+    results <- data.frame(ret = results$portfolio_return,
+                          cumret = c(1,
+                                     cumprod(
+                                       1+results$portfolio_return[2:length(results$portfolio_return)]
+                                       )
+                                     ),
+                          id = name,
+                          Date = results$Date)
+    return(results)
+  }
+  
+  results1 <- prepare_plotdf(results1, name1)
+  results2 <- prepare_plotdf(results2, name2)
+  
+  g <- ggplot(mapping = aes(x = Date, y = cumret, color = id))+
+    geom_smooth(data = results1)+
+    geom_smooth(data = results2)+
+    theme_Publication()+
+    scale_colour_Publication()
+  
+  return(g)
+}
+
+g <- .cumret_plot(results_All, results_Sample, 'Simulated', 'Sample')
+g <- .cumret_plot(results_Sample, results_EW_6F, 'Sample', 'Equal weighted')
+#  Density plot ------------------------------------------------------------------------
+.density_plot <- function(results1, results2, name1, name2) {
+  
+  prepare_plotdf <- function(results, name) {
+    results <- data.frame(ret = results$portfolio_return,
+                          id = name,
+                          Date = results$Date)
+    return(results)
+  }
+  
+  results1 <- prepare_plotdf(results1, name1)
+  results2 <- prepare_plotdf(results2, name2)
+  
+  g <- ggplot(mapping = aes(ret, colour = id))+
+    geom_density(alpha = 0.1, data = results1)+
+    geom_density(alpha = 0.1, data = results2)+
+    theme_Publication()+
+    scale_colour_Publication()
+    
+}
+
+g <- .density_plot(results_5F, results_5F_HML, '5F', '5F+HML')
+g <- .density_plot(results_Sample, results_All, 'Sample', 'Simulated')
+g <- .density_plot(results_Four_CMA, results_Four_HML, 'Four CMA', 'Four HML')
+g <- .density_plot(results_Sample, results_Sample_5F, 'Sample All', 'Sample ex Momentum')
+g <- .density_plot(results_Sample, results_EW_6F, 'Sample All','Equal weighted All')
+#  ------------------------------------------------------------------------
 # Table of summary stats, MDD of returns, realized SR, mean return, sd, mean weights etc
 
+.summary_stats <- function(results) {
+  ret <- results$portfolio_return
+  
+  stats_list <- c('nobs','Maximum','Minimum','Mean','Median','Stdev','Skewness','Kurtosis')
+  
+  table <- ret %>%
+    basicStats() %>%
+      .[stats_list,] %>%
+        round(., digits = 4)
+  names(table) <- stats_list
+  
+  out <- as.data.frame(t(c(table, SR = (52*mean(ret)) / (sqrt(52) * sd(ret)), colMeans(results$weights))))
+  
+}
 
-#  ------------------------------------------------------------------------
-
-
-
-rm(list = ls())
-
-load('data/derived/mv_results_FF_5F_EXCL_HML_dynamic_ghskt.Rdata')
-FF_5F_EXCL_HML <- out.list
-load('data/derived/mv_results_FF_5F_INCL_HML_dynamic_ghskt.Rdata')
-FF_5F_INCL_HML <- out.list
-rm(out.list)
-
-plot(FF_5F_EXCL_HML$portfolio_return, type = 'l', col = 'red')
-lines(FF_5F_INCL_HML$portfolio_return, type = 'l', col = 'blue')
-
-plot(FF_5F_INCL_HML$portfolio_return - FF_5F_EXCL_HML$portfolio_return, type = 'l')
-mean(FF_5F_INCL_HML$portfolio_return - FF_5F_EXCL_HML$portfolio_return)
-
-d1 <- density(FF_5F_EXCL_HML$portfolio_return)
-d2 <- density(FF_5F_INCL_HML$portfolio_return)
-plot(range(d1$x, d2$x), range(d1$y, d2$y), type = "n", xlab = "x",
-     ylab = "Density")
-lines(d1, col = "red")
-lines(d2, col = "blue")
-
-plot(FF_5F_EXCL_HML$weights[,'CMA'], type = 'l', col = 'red')
-lines(FF_5F_INCL_HML$weights[,'CMA'], type = 'l', col = 'blue')
-
-plot(cumprod(1+FF_5F_EXCL_HML$portfolio_return))
-plot(cumprod(1+FF_5F_INCL_HML$portfolio_return))
-
-mean(FF_5F_EXCL_HML$portfolio_return)/sd(FF_5F_EXCL_HML$portfolio_return)
-mean(FF_5F_INCL_HML$portfolio_return)/sd(FF_5F_INCL_HML$portfolio_return)
+results_list = list(
+  results_EW_6F = results_EW_6F,
+  results_All = results_All,
+  results_Sample = results_Sample,
+  results_5F_HML = results_5F_HML,
+  results_Sample_5F = results_Sample_5F,
+  results_Four_CMA = results_Four_CMA,
+  results_Four_HML = results_Four_HML,
+  results_5F = results_5F
+)
 
 
-# Load and use MV results -------------------------------------------------
-rm(list = ls())
 
-load('data/derived/mv_results_All_dynamic_ghskt.Rdata')
-six_all <- out.list
-load('data/derived/mv_results_Four+CMA_dynamic_ghskt.Rdata')
-five_CMA <- out.list
-load('data/derived/mv_results_Four+HML_dynamic_ghskt.Rdata')
-five_HML <- out.list
-
-rm(out.list)
-
-plot(five_HML$portfolio_return, type = 'l', col = 'red')
-lines(five_CMA$portfolio_return, type = 'l', col = 'blue')
-
-plot(five_HML$portfolio_return - five_CMA$portfolio_return, type = 'l')
-
-d1 <- density(five_HML$portfolio_return)
-d2 <- density(five_CMA$portfolio_return)
-plot(range(d1$x, d2$x), range(d1$y, d2$y), type = "n", xlab = "x",
-     ylab = "Density")
-lines(d1, col = "red")
-lines(d2, col = "blue")
-
-plot(five_HML$weights[,2], type = 'l')
+summary_table <- bind_rows(sapply(results_list, .summary_stats), .id = 'id')
+stargazer(summary_table, type = 'text', summary = FALSE)
