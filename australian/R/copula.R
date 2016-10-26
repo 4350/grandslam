@@ -52,13 +52,15 @@ copula_filter <- function(spec, u, X = NULL) {
     spec@dynamics@Omega <- .copula_Omega(spec, shocks_std, Upsilon)
   }
 
-  Correlation <- .copula_Correlation(.copula_Q(spec, shocks_std, Upsilon))
+  Q <- .copula_Q(spec, shocks_std, Upsilon)
+  Correlation <- .copula_Correlation(Q)
 
   scores <- .copula_scores(spec, shocks, Correlation)
 
   list(
     spec = spec,
     shocks = shocks,
+    Q = Q,
     Correlation = Correlation,
     scores = scores,
     ll = sum(scores)
