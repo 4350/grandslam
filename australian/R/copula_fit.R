@@ -37,12 +37,27 @@ copula_fit <- function(spec, u, X = NULL, distribution = 'norm',
                               constant = constant,
                               upsilon = upsilon)
   }
+  else if (length(pars$pars) == 1) {
+    stopifnot(length(pars$ci) == 2)
+    stopifnot(distribution == 't')
+    
+    optimized <- stats::optim(
+      pars$pars,
+      copula_optimize,
+      
+      spec = spec,
+      u = u,
+      X = X,
+      distribution = distribution,
+      constant = constant,
+      upsilon = upsilon,
+      
+      method = 'Brent',
+      lower = pars$ci[1],
+      upper = -pars$ci[2]
+    )
+  }
   else {
-    method <- "Nelder-Mead"
-    if (length(pars$pars) == 1) {
-      method <- "Brent"
-    }
-
     optimized <- stats::constrOptim(
       pars$pars,
       copula_optimize,
@@ -57,8 +72,7 @@ copula_fit <- function(spec, u, X = NULL, distribution = 'norm',
 
       ui = pars$ui,
       ci = pars$ci,
-
-      method = method,
+      
       control = list(
         trace = 6,
         maxit = 1000
