@@ -1,10 +1,14 @@
-# What we need to do here
-# Simulate for all copulae, and maybe for independence copula, as well as garchs by themselves.
-# Do this simulation out of sample, leaving e.g. everything after 2000 as the OOS
-# 
-# Cumulative returns of simulated stuff looks crazy high - what's going on?
-# How would we impose restrictions on how fast weights can change?
-# Think about how to scale sharpe ratio
+#' What we need to do here
+#' Simulate for all copulae, and maybe for independence copula, as well as garchs by themselves.
+#' Do this simulation out of sample, leaving e.g. everything after 2000 as the OOS
+#' 
+#' Cumulative returns of simulated stuff looks crazy high - what's going on?
+#' How would we impose restrictions on how fast weights can change?
+#' moving average? can you rebalance any amount? yes, the amount should be about depth in the market,
+#' can you sell the whole fund without price impact, not about number of trades, will be the same
+#' even if we only rebalance 1%. so.. the rebalancing limits is rather about getting robust
+#' performance, following equal weights mindset, risk parity etc. then maybe 2x equal weights? 50%?
+#' Think about how to scale sharpe ratio. Should be oK as we do.
   
 # Library and setup -------------------------------------------------------
 rm(list = ls())
@@ -453,7 +457,7 @@ g <- .density_plot(results_Sample, results_EW_6F, 'Sample All','Equal weighted A
 
 .summary_stats <- function(results) {
   ret <- results$portfolio_return
-  
+  # get the standard error on skewness, kurtosis?
   stats_list <- c('nobs','Maximum','Minimum','Mean','Median','Stdev','Skewness','Kurtosis')
   
   table <- ret %>%
@@ -461,7 +465,8 @@ g <- .density_plot(results_Sample, results_EW_6F, 'Sample All','Equal weighted A
       .[stats_list,] %>%
         round(., digits = 4)
   names(table) <- stats_list
-  
+  # add maximum drawdown
+  # box plot, percentile ranges, oos
   out <- as.data.frame(t(c(table, SR = (52*mean(ret)) / (sqrt(52)*sd(ret)), colMeans(results$weights))))
   
 }
