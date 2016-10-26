@@ -64,6 +64,11 @@ garch_specgen <- function(p, q = 0, r = 1, s = 1, model = 'fGARCH', submodel = '
   spec
 }
 
+#' Turn uniform to stdresid for a list of GARCH models
+#'
+#' @param garch N list of GARCH models
+#' @param u TxN uniforms
+#'
 #' @export
 garch_uniform2stdresid <- function(garch, u) {
   foreach (i = seq_along(garch), .combine = 'cbind') %dopar% {
@@ -71,11 +76,16 @@ garch_uniform2stdresid <- function(garch, u) {
   }
 }
 
+#' Turn standardized residuals to uniforms. Only works with ghst GARCH
+#'
+#' @param garch N list of GARCH models
+#' @param stdresid TxN matrix of stdresid
+#'
 #' @export
 garch_stdresid2uniform <- function(garch, stdresid) {
   foreach(i = seq_along(garch), .combine= 'cbind') %do% {
     pars <- garch[[i]]@model$pars[, 'Level']
-    
+
     rugarch:::psghst(stdresid[, i], shape = pars['shape'], skew = pars['skew'])
   }
 }
