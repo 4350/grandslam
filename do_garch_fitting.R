@@ -68,9 +68,9 @@ do_garch_fit <- function(df.estim, submodel, dist, nOOS = 0) {
   stopCluster(cluster)
   rm(cluster)  
   if(nOOS != 0) {
-    save(fits, file = sprintf('data/derived/oos_garch_fits_%s_%s.RData', submodel, dist))
+    save(fits, file = sprintf('data/derived/garch/oos_garch_fits_%s_%s.RData', submodel, dist))
   } else {
-    save(fits, file = sprintf('data/derived/garch_fits_%s_%s.RData', submodel, dist))
+    save(fits, file = sprintf('data/derived/garch/garch_fits_%s_%s.RData', submodel, dist))
   }
 }
 
