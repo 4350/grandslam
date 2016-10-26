@@ -482,7 +482,5 @@ results_list = list(
   results_5F = results_5F
 )
 
-
-
 summary_table <- bind_rows(sapply(results_list, .summary_stats), .id = 'id')
 stargazer(summary_table, type = 'text', summary = FALSE)

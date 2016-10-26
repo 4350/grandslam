@@ -21,8 +21,8 @@ library(mvtnorm)
 # Reset workspace and load return data
 rm(list = ls())
 load('data/derived/weekly-estim.RData')
-ID = 'garch_stdres_GJRGARCH_ghst.Rdata'
-load(sprintf('data/derived/%s', ID))
+ID = 'model_GARCH_chosen_stdres.RData'
+load(sprintf('data/derived/garch/%s', ID))
 
 
 # Load functions
@@ -73,45 +73,108 @@ plotdf.ret <- bind_rows(thCorrList.ret$HML, thCorrList.ret$RMW, thCorrList.ret$C
 plotdf.res <- bind_rows(thCorrList.res$HML, thCorrList.res$RMW, thCorrList.res$CMA)
 
 
+# Prepare scatter data ----------------------------------------------------
+
+# Return scatter data frame
+
+do_scatter_df <- function(df) {
+  factors_value = c('HML','RMW','CMA')
+  out_list <- lapply(
+    factors_value, 
+    function(value, df) {
+      
+      df <- df[,-1]
+      factors_all = c('Mkt.RF','HML','SMB','Mom','RMW','CMA')
+      
+      bind_rows(
+        lapply(
+          factors_all, 
+          function(other_factor, df) {
+            out.df <- data.frame(
+              value1 = as.vector(df[,other_factor]),
+              value2 = as.vector(df[,value]),
+              order = other_factor,
+              order2 = value
+            )
+            colnames(out.df) <- c('value1','value2','order','order2')
+            return(out.df)
+          },
+          df = df
+        )
+      )
+    }, 
+    df = df
+  )
+  bind_rows(out_list)
+}
+
+plotdf.scatter.ret <- do_scatter_df(df.estim)
+plotdf.scatter.res <- do_scatter_df(df.stdres)
+
+
 # Do threshold plot and save ----------------------------------------------
 
-.plot_th_corr <- function(plotdf.ret, plotdf.res, df.labels, ROWFACTORS, OUTNAME) {
+.plot_th_corr <- function(plotdf.ret, plotdf.res, plotdf.scatter, 
+                          df.labels, COLFACTORS, ROWFACTORS, OUTNAME) {
   # Select the column factors for plot this plot
-  plotdf.ret <- plotdf.ret[plotdf.ret$order == ROWFACTORS,]
-  plotdf.res <- plotdf.res[plotdf.res$order == ROWFACTORS,]
+  plotdf.ret <- plotdf.ret %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
+  plotdf.res <- plotdf.res %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
+  plotdf.scatter.ret <- plotdf.scatter.ret %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
+  plotdf.scatter.res <- plotdf.scatter.res %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
+  df.labels <- df.labels %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
   
-  df.labels <- df.labels %>% dplyr::filter(order %in% ROWFACTORS)
-  
-  # Then do plot
-  g <- ggplot(plotdf.ret, aes(x = qs, y = value)
-  ) +
-    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+  # Then do threshold plot
+  g <- ggplot() +
+    geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                data = plotdf.ret,
                 fill = 'grey10',
                 alpha = 0.1
     ) +
-    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+    geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
                 data = plotdf.res,
                 fill = 'grey10',
                 alpha = 0.1
     ) +
-    geom_line(aes(color = 'Return series')) +
+    geom_line(aes(x = qs, y = value, color = 'Return series'), data = plotdf.ret) +
     geom_line(aes(x = qs, y = value, color = 'Residual series'), data = plotdf.res) +
     theme_Publication() +
     scale_colour_Publication() +
     ylab('Correlation') +
     xlab('Quantiles') +
-    coord_cartesian(xlim = c(0,1), ylim = c(-0.5, 1)) + 
-    scale_x_continuous(labels = scales::percent) +
+    coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) + 
+    scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
     #annotate("rect", xmin = 0.375, xmax = 0.625, ymin = -0.50, ymax = -0.25, alpha = 0.8, fill = 'grey80')+
     geom_text(data = df.labels, aes(x = 0.50, y = -0.45, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
     facet_grid(order ~ order2)
     #ggtitle('Threshold correlations of weekly data (95% confidence bounds)') + 
     #theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
   
+  # Then do scatter plot(s)
+  g_scatter <- ggplot() +
+    # geom_point(mapping = aes(x = value1, y = value2, color = 'Returns'),
+    #             data = plotdf.scatter.ret
+    # ) +
+    geom_point(aes(x = value1, y = value2, color = 'Residuals'),
+               data = plotdf.scatter.res
+    ) +
+    theme_Publication() +
+    scale_colour_Publication() +
+    ylab('') +
+    xlab('') +
+    #coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) +
+    #scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
+    #annotate("rect", xmin = 0.375, xmax = 0.625, ymin = -0.50, ymax = -0.25, alpha = 0.8, fill = 'grey80')+
+    geom_text(data = df.labels, aes(x = 0.50, y = -0.45, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
+    facet_grid(order ~ order2)
+    #ggtitle('Threshold correlations of weekly data (95% confidence bounds)') +
+    #theme(axis.text = element_text(size = rel(0.6), colour = "grey30"))
+  
+  # Combine the two in grid
+  out.graph <- arrangeGrob(g, g_scatter, ncol = 2)
   # Save plot
   OUTPATH <- 'output/thresholdCorrelations/threshold_%s.png'
-  ggsave(sprintf(OUTPATH, OUTNAME), 
-    g, device = 'png', width = 14, height = 16, units = 'cm'
+  ggsave(sprintf(OUTPATH, OUTNAME),
+    out.graph, device = 'png', width = 14, height = 16, units = 'cm'
     )
 
 }
@@ -121,8 +184,9 @@ plotdf.res <- bind_rows(thCorrList.res$HML, thCorrList.res$RMW, thCorrList.res$C
 # Quick fix to append standard correlations to graphs
 df.labels <- .append_standard_corr(plotdf.ret, df.estim)
 
-.plot_th_corr(plotdf.ret, plotdf.res, df.labels, c('Mkt.RF', 'SMB','Mom'), sprintf('%s_Nonvalue', ID))
-.plot_th_corr(plotdf.ret, plotdf.res, df.labels, c('HML','RMW','CMA'), sprintf('%s_Value', ID))
+g <- .plot_th_corr(plotdf.ret, plotdf.res, plotdf.scatter.res, df.labels,
+              'HML', c('Mkt.RF', 'SMB','Mom'), sprintf('%s_Nonvalue', ID))
+#.plot_th_corr(plotdf.ret, plotdf.res, df.labels, 'HML', c('RMW','CMA'), sprintf('%s_Value', ID))
 
 # Threshold correlation fake data scatter for method ------------------------------
 
