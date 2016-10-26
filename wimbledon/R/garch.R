@@ -84,7 +84,8 @@ garch.fit2spec <- function(fits) {
       fit@model$modelinc['ar'],
       fit@model$modelinc['ma'],
       fixed.pars = fit@fit$coef,
-      vtarget = F # necessary to activate omega
+      vtarget = F, # necessary to activate omega
+      submodel = fit@model$modeldesc$vsubmodel
     )
   })
 }
