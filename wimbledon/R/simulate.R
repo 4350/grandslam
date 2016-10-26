@@ -183,7 +183,7 @@ shocks2stdresid <- function(shocks, uv, garch, cluster = NULL) {
 #' Simulate t+1 distribution for GARCH model i at time t
 #'
 #' @param i GARCH model number
-#' @param t Current time
+#' @param t Current time (simulates distribution t+1)
 #' @param garch List of GARCH models
 #' @param filtered List of filtered series (with series, sigma and residuals)
 #' @param stdresid mxN matrix of standardized residuals
