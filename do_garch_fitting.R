@@ -23,9 +23,7 @@ load('data/derived/weekly-estim.RData')
 #' @param dist either norm, std or ghst
 #' 
 #' @return saves the garch_fits objects in derived data
-do_garch_fit <- function(df.estim, submodel, dist){
-  # Set OOS to zero
-  nOOS <- 0
+do_garch_fit <- function(df.estim, submodel, dist, nOOS = 0) {
   
   # Estimate GARCH specifications ----
   speclist <- list(
@@ -69,7 +67,11 @@ do_garch_fit <- function(df.estim, submodel, dist){
   )
   stopCluster(cluster)
   rm(cluster)  
-  save(fits, file = sprintf('data/derived/garch_fits_%s_%s.RData', submodel, dist))
+  if(nOOS != 0) {
+    save(fits, file = sprintf('data/derived/oos_garch_fits_%s_%s.RData', submodel, dist))
+  } else {
+    save(fits, file = sprintf('data/derived/garch_fits_%s_%s.RData', submodel, dist))
+  }
 }
 
 do_garch_fit(df.estim, 'GJRGARCH', 'ghst')
@@ -79,3 +81,9 @@ do_garch_fit(df.estim, 'GJRGARCH', 'norm')
 do_garch_fit(df.estim, 'GARCH', 'ghst')
 do_garch_fit(df.estim, 'GARCH', 'std')
 do_garch_fit(df.estim, 'GARCH', 'norm')
+
+
+# Garch OOS ---------------------------------------------------------------
+
+do_garch_fit(df.estim, 'GJRGARCH', 'ghst', nOOS = 914) #first date is 1999-01-01, approx 1/3 of full sample
+do_garch_fit(df.estim, 'GARCH', 'ghst', nOOS = 914)

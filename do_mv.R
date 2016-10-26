@@ -10,7 +10,7 @@
 rm(list = ls())
 library(tictoc)
 library(Rsolnp)
-
+library(fBasics)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -462,7 +462,7 @@ g <- .density_plot(results_Sample, results_EW_6F, 'Sample All','Equal weighted A
         round(., digits = 4)
   names(table) <- stats_list
   
-  out <- as.data.frame(t(c(table, SR = (52*mean(ret)) / (sqrt(52) * sd(ret)), colMeans(results$weights))))
+  out <- as.data.frame(t(c(table, SR = (52*mean(ret)) / (sqrt(52)*sd(ret)), colMeans(results$weights))))
   
 }
 

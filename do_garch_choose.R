@@ -141,6 +141,7 @@ bestfits <-
 
 model.GARCH <- bestfits
 save(model.GARCH, file = 'data/derived/model.GARCH_chosen.RData')
+rm(model.GARCH.GJRGARCH, model.GARCH.GARCH)
 
 # Get and save residuals ----
 df.res <- data.frame(
@@ -170,16 +171,74 @@ df.u <- data.frame(
 )
 save(df.u, file = 'data/derived/garch_unires_model.RData')
 
-# Get and save uniform residuals, empirical CDF ----
-df.u.e <- data.frame(
+# Get and save standardized residuals ----
+df.stdres <- data.frame(
   Date = df.estim$Date,
-  
-  sapply(
-    bestfits,
-    function(factor) {
-      f = ecdf(factor@fit$residuals)
-      f(factor@fit$residuals)
-    }
+  as.data.frame(
+    lapply(bestfits,
+           function(factor) factor@fit$residuals/factor@fit$sigma)
   )
 )
-save(df.u.e, file = 'data/derived/garch_unires_empirical.RData')
+save(df.stdres, file = 'data/derived/garch_stdres.Rdata')
+
+# Below only for the chosen  OOS -----------------------------------------------
+rm(list = ls())
+load('data/derived/weekly-estim.RData')
+load('data/derived/oos_garch_fits_GARCH_ghst.RData')
+garch_fits_GARCH <- fits
+rm(fits)
+load('data/derived/oos_garch_fits_GJRGARCH_ghst.RData')
+garch_fits_GJRGARCH <- fits
+rm(fits)
+
+oos_bestfits <- 
+  list(
+    Mkt.RF = garch_fits_GJRGARCH$Mkt.RF$ARMA00,
+    HML = garch_fits_GARCH$HML$ARMA11,
+    SMB = garch_fits_GARCH$SMB$ARMA11,
+    Mom = garch_fits_GARCH$Mom$ARMA10,
+    RMW = garch_fits_GARCH$RMW$ARMA11,
+    CMA = garch_fits_GJRGARCH$CMA$ARMA11
+  )
+
+oos_model.GARCH <- oos_bestfits
+save(oos_model.GARCH, file = 'data/derived/oos_model.GARCH_chosen.RData')
+rm(garch_fits_GARCH, garch_fits_GJRGARCH)
+
+# Get and save residuals ----
+df.res <- data.frame(
+  Date = df.estim$Date,
+  as.data.frame(
+    lapply(oos_bestfits,
+           function(factor) factor@fit$residuals)
+  )
+)
+save(df.res, file = 'data/derived/oos_garch_res.RData')
+
+# Get and save uniform residuals ----
+df.u <- data.frame(
+  Date = df.estim$Date,
+  as.data.frame(
+    sapply(
+      oos_bestfits,
+      function(factor) {
+        rugarch:::psghst(
+          (factor@fit$residuals/factor@fit$sigma),
+          shape = factor@fit$coef[['shape']],
+          skew = factor@fit$coef[['skew']]
+        )
+      }
+    )
+  )
+)
+save(df.u, file = 'data/derived/oos_garch_unires_model.RData')
+
+# Get and save standardized residuals ----
+df.stdres <- data.frame(
+  Date = df.estim$Date,
+  as.data.frame(
+    lapply(oos_bestfits,
+           function(factor) factor@fit$residuals/factor@fit$sigma)
+  )
+)
+save(df.stdres, file = 'data/derived/_oosgarch_stdres.Rdata')
