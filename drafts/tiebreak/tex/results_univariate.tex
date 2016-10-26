@@ -1,0 +1,48 @@
+%!TEX root = ../main.tex
+
+\section{Modeling Factor Returns} % (fold)
+\label{sec:modeling_factor_returns}
+
+We proceed by estimating parsimonious models of each factor return series, trying to capture the established effects of serial correlation, volatility clustering, non-normality and leverage effects. By estimating appropriate models, we can characterize and filter these effects, while incorporating them in conditional forecasts. In this section, we describe the general case of our models, our systematic model selection approach and estimation results.
+
+\subsection{General univariate model: GJR-GARCH} % (fold)
+\label{sub:general_univariate_model_gjr_garch}
+
+ARMA-GARCH covers a broad class of models designed to capture the previously mentioned features of financial return series. We evaluate the GJR-GARCH model which is a parsimonious extension of the standard GARCH(1, 1) model designed to capture leverage effects~\autocite{glosten1993relation}. The GJR-GARCH model is evaluated with and without leverage effects ($\eta = 0$) and under different distributional assumptions (normal, Student's t and skewed Student's t), for each factor.
+
+We estimate conditional mean equations \emph{up to} ARMA(3, 3):
+\begin{align}
+  r_t &=
+    \mu +
+    \sum^p \phi_p r_{t - p} +
+    \sum^q \theta_q \epsilon_{t - q} + 
+    \epsilon_t
+\end{align}
+The conditional volatility evolves according to the GJR-GARCH specification:
+\begin{align}
+  \epsilon_t &= \sigma_t z_t \\\
+  \sigma_t^2 &=
+    \omega +
+    (\alpha + \eta I_{t - 1}) \epsilon_{t - 1}^2 +
+    \beta \sigma^2_{t - 1} \\
+  \intertext{where}
+  I_{t - 1} &=
+    \begin{cases}
+      1 & \text{if}\ \epsilon_{t - 1} \le 0 \\
+      0 & \text{if}\ \epsilon_{t - 1} \gt 0      
+    \end{cases}
+\end{align}
+A positive $\eta$ captures the typical leverage effect by increasing the current period's volatility if the previous period's residual $\epsilon$ was below zero. A significant $\eta$ thus introduces asymmetric volatility in the model. For the market factor, it can be expected that $\eta$ is positive, reflecting the leverage effect in the market itself. However, for the other factors, constructed as long-short positions in risky portfolios, the direction of $\eta$ is less obvious~\autocite{ChristoffersenLanglois2013}.
+
+The GJR-GARCH models are estimated on each series using maximum likelihood estimation given an assumed conditional distribution of $z_t$. We evaluate models where the standardized residuals $z_t$ are assumed to follow one of the following distributions: Standard normal, Student's t with $\nu$ degrees of freedom and skewed Student's t with $\nu$ degrees of freedom and skewness $\gamma$. Of these, Student's t allows greater kurtosis than possible with a normal distribution, while skewed Student's t \emph{also} allows for additional asymmetry in the model's behavior beyond that introduced by the leverage effect.
+
+% subsection general_univariate_model_gjr_garch (end)
+
+\subsection{Selection Process} % (fold)
+\label{sub:selection_process}
+
+Our selection process is as follows. For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1, 1) model). We then compute the Bayesian Information Criterion (BIC~\autocite{Schwarz1978}) for each specification and select the ARMA order with the lowest BIC as our primary candidate.
+
+% subsection selection_process (end)
+
+% section modeling_factor_returns (end)
