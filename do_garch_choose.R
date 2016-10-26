@@ -262,3 +262,19 @@ df.stdres <- data.frame(
   )
 )
 save(df.stdres, file = 'data/derived/garch/oos_model_GARCH_chosen_stdres.RData')
+
+# Get and save filtered data for full sample ----
+specs <- garch.fit2spec(model.GARCH)
+n.old <- length(model.GARCH$Mkt.RF@fit$z)
+
+df <- data.frame(df.estim)[, -1]
+
+filtered <- lapply(seq_along(specs), function(i) {
+  filtered <- ugarchfilter(specs[[i]], c(df[, i]), n.old = n.old)
+  
+  stopifnot(head(filtered@filter$z) == head(model.GARCH[[i]]@fit$z))
+  filtered
+})
+names(filtered) <- names(model.GARCH)
+
+save(filtered, file = 'data/derived/garch/oos_model_GARCH_chosen_filtered.RData')
