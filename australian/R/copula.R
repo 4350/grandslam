@@ -111,14 +111,36 @@ copula_simulate <- function(spec, n.sim, m.sim, Q_T = NULL, shocks_T = NULL, X =
 
   uv_distributions <- .copula_uv_distributions(spec)
 
-  foreach(i = 1:m.sim) %do% {
-    shocks <- .copula_simulate_shocks(spec, n.sim, Q_T, shocks_T, Upsilon)
-
-    # Compute the uniform residuals using the marginal distributions of
-    # the copula
-    sapply(seq_along(uv_distributions),
-           function(i) ghyp::pghyp(shocks[, i], uv_distributions[[i]]))
+  simulations <- foreach(i = 1:m.sim) %dopar% {
+    .copula_simulate_shocks(spec, n.sim, Q_T, shocks_T, Upsilon)
   }
+  
+  # Doing this inside each simulation run is insane, because pghyp needs
+  # to simulate up for each. Now, each element in shocks is a simulation
+  # run, but we want to run pghyp on each factor across simulations
+  #
+  # We will get a list with N elements, containing shocks from the first,
+  # second, third run... Each run is thus n.sim long, with total length
+  # n.sim x m.sim
+  uniforms <- lapply(seq_along(uv_distributions), function(i) {
+    # This is now a long vector of all the shocks from all the simulations
+    # distributed like you'd expect
+    i_distributed_shocks <- unlist(
+      lapply(simulations, function(simulation) simulation[, i])
+    )
+    
+    ghyp::pghyp(i_distributed_shocks, uv_distributions[[i]])
+  })
+  
+  # Now, reassemble this as a list of simulation runs. First m is 1 to n.sim,
+  # second is n.sim + 1 to 2 * n.sim, next (2 * n.sim + 1) to (3 * n.sim).
+  # Formula is therefore:
+  #   Start at  (m - 1) * n.sim + 1
+  #   Go to     m * n.sim
+  lapply(seq(m.sim), function(m) {
+    indices <- ((m - 1) * n.sim + 1):(m * n.sim)
+    sapply(seq(length(uv_distributions)), function(i) uniforms[[i]][indices])
+  })
 }
 
 #' @export
