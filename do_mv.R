@@ -28,7 +28,7 @@ library(stargazer)
 
 load_all('wimbledon')
 
-MODEL_NAME = 'dynamic_ghskt'
+MODEL_NAME = 'oos_constant_norm_100000'
 
 # Functions used in optimization  ---------------------------------------------------------------
 
@@ -59,7 +59,7 @@ do_optimize_mv <- function(model_name = NULL, mu = NULL, sigma = NULL, strategy,
   if(!is.null(model_name)) {
     based_on <- model_name
     # Load distribution simulated data and change to simple returns
-    load(sprintf('data/derived/distribution_%s.RData', model_name))
+    load(sprintf('data/derived/distributions/%s.RData', model_name))
     distribution_simple <- exp(distribution) - 1
     rm(distribution)
     # Subset the data using selectors
@@ -99,7 +99,7 @@ do_optimize_mv <- function(model_name = NULL, mu = NULL, sigma = NULL, strategy,
     strategy = strategy
   )
   # Give this a specific name
-  save(results, file = sprintf('data/derived/mv_results_%s_%s.Rdata', based_on, strategy))
+  save(results, file = sprintf('data/derived/mv/results_%s_%s.Rdata', based_on, strategy))
   return(results)
 }
 
@@ -287,12 +287,13 @@ do_fixed_weights_mv <- function(strategy, selectors, weights_fixed, T, df.realiz
     strategy = strategy
   )
   # Give this a specific name
-  save(results, file = sprintf('data/derived/mv_results_%s_%s.Rdata', based_on, strategy))
+  save(results, file = sprintf('data/derived/mv/results_%s_%s.Rdata', based_on, strategy))
   return(results)
 }
 
 # Get optimization results for different copula portfolios ------------------------------------
 
+load('data/derived/weekly-estim.RData')
 results_All <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'All', selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'), df.realized = df.estim)
 results_Four_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+HML', selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'), df.realized = df.estim)
 results_Four_CMA <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+CMA', selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'), df.realized = df.estim)
@@ -300,7 +301,7 @@ results_Four_CMA <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+CMA
 results_5F_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_INCL_HML', selectors = c('Mkt.RF','HML','SMB','RMW','CMA'), df.realized = df.estim)
 results_5F <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_EXCL_HML', selectors = c('Mkt.RF','SMB','RMW','CMA'), df.realized = df.estim)
 
-# And for EW portfolio
+# And for EW portfolio ----
 
 results_EW_6F <- do_fixed_weights_mv(strategy = 'EW_6F', T = 2765, 
                                   selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'), 
@@ -334,6 +335,22 @@ results_Sample_5F <- do_optimize_mv(mu = .sample_mu(df.estim[,c(-1,-5)], 2765), 
 # Load and use FF MV results ----------------------------------------------
 load('data/derived/mv_plot_data.RData')
 
+load_results <- function(name) {
+  load(sprintf('data/derived/mv/results_oos_%s.RData', name))
+  results
+}
+
+result_names <- list(
+  'indep_100000_All',
+  'constant_norm_10000_All',
+  'constant_std_10000_All',
+  'constant_ghst_10000_All',
+  'dynamic_norm_10000_All',
+  'dynamic_std_10000_All'
+)
+
+results <- lapply(names, load_results)
+names(results) <- result_names
 
 # Weights over time, smoothed and unsmoothed ------------------------------
 
@@ -455,8 +472,8 @@ g <- .density_plot(results_Sample, results_EW_6F, 'Sample All','Equal weighted A
 #  ------------------------------------------------------------------------
 # Table of summary stats, MDD of returns, realized SR, mean return, sd, mean weights etc
 
-.summary_stats <- function(results) {
-  ret <- results$portfolio_return
+.summary_stats <- function(result) {
+  ret <- result$portfolio_return
   # get the standard error on skewness, kurtosis?
   stats_list <- c('nobs','Maximum','Minimum','Mean','Median','Stdev','Skewness','Kurtosis')
   
@@ -467,20 +484,20 @@ g <- .density_plot(results_Sample, results_EW_6F, 'Sample All','Equal weighted A
   names(table) <- stats_list
   # add maximum drawdown
   # box plot, percentile ranges, oos
-  out <- as.data.frame(t(c(table, SR = (52*mean(ret)) / (sqrt(52)*sd(ret)), colMeans(results$weights))))
+  out <- as.data.frame(t(c(table, SR = (52*mean(ret)) / (sqrt(52)*sd(ret)), colMeans(result$weights))))
   
 }
 
-results_list = list(
-  results_EW_6F = results_EW_6F,
-  results_All = results_All,
-  results_Sample = results_Sample,
-  results_5F_HML = results_5F_HML,
-  results_Sample_5F = results_Sample_5F,
-  results_Four_CMA = results_Four_CMA,
-  results_Four_HML = results_Four_HML,
-  results_5F = results_5F
-)
+# results_list = list(
+#   results_EW_6F = results_EW_6F,
+#   results_All = results_All,
+#   results_Sample = results_Sample,
+#   results_5F_HML = results_5F_HML,
+#   results_Sample_5F = results_Sample_5F,
+#   results_Four_CMA = results_Four_CMA,
+#   results_Four_HML = results_Four_HML,
+#   results_5F = results_5F
+# )
 
-summary_table <- bind_rows(sapply(results_list, .summary_stats), .id = 'id')
+summary_table <- bind_rows(lapply(results, .summary_stats), .id = 'id')
 stargazer(summary_table, type = 'text', summary = FALSE)
