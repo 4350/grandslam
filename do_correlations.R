@@ -93,10 +93,11 @@ do_scatter_df <- function(df) {
             out.df <- data.frame(
               value1 = as.vector(df[,other_factor]),
               value2 = as.vector(df[,value]),
-              order = other_factor,
-              order2 = value
+              order = factor(other_factor, levels = factors_all),
+              order2 = factor(value, levels = factors_all),
+              uniq = paste0(other_factor, value)
             )
-            colnames(out.df) <- c('value1','value2','order','order2')
+            colnames(out.df) <- c('value1','value2','order','order2', 'uniq')
             return(out.df)
           },
           df = df
@@ -105,76 +106,114 @@ do_scatter_df <- function(df) {
     }, 
     df = df
   )
-  bind_rows(out_list)
+  out_df <- bind_rows(out_list)
+  # Get breakpoints for x y quantiles
+  out_df <- out_df %>% 
+    group_by(uniq) %>%
+    mutate(
+      px10 = quantile(value1, probs = .10),
+      py10 = quantile(value2, probs = .10),
+      px49 = quantile(value1, probs = .49),
+      py49 = quantile(value2, probs = .49),
+      px51 = quantile(value1, probs = .51),
+      py51 = quantile(value2, probs = .51),
+      px90 = quantile(value1, probs = .90),
+      py90 = quantile(value2, probs = .90)
+    ) %>% ungroup()
 }
 
 plotdf.scatter.ret <- do_scatter_df(df.estim)
 plotdf.scatter.res <- do_scatter_df(df.stdres)
 
-
 # Do threshold plot and save ----------------------------------------------
 
-.plot_th_corr <- function(plotdf.ret, plotdf.res, plotdf.scatter, 
-                          df.labels, COLFACTORS, ROWFACTORS, OUTNAME) {
+.plot_th_corr <- function(plotdf, plotdf.scatter,
+                          df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
+                          width, height) {
   # Select the column factors for plot this plot
-  plotdf.ret <- plotdf.ret %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
-  plotdf.res <- plotdf.res %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
-  plotdf.scatter.ret <- plotdf.scatter.ret %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
-  plotdf.scatter.res <- plotdf.scatter.res %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
+  plotdf <- plotdf %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
+  plotdf.scatter <- plotdf.scatter %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
   df.labels <- df.labels %>% filter(order %in% ROWFACTORS, order2 %in% COLFACTORS)
   
+  # Create the text df, to not print 1000 values, looks bad
+  plotdf.scatter.text <- plotdf.scatter %>% select(-value1, -value2) %>% distinct()
+  
   # Then do threshold plot
-  g <- ggplot() +
+  g <- ggplot(data = plotdf) +
     geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-                data = plotdf.ret,
                 fill = 'grey10',
                 alpha = 0.1
     ) +
-    geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-                data = plotdf.res,
-                fill = 'grey10',
-                alpha = 0.1
-    ) +
-    geom_line(aes(x = qs, y = value, color = 'Return series'), data = plotdf.ret) +
-    geom_line(aes(x = qs, y = value, color = 'Residual series'), data = plotdf.res) +
+    geom_line(aes(x = qs, y = value, color = 'Threshold correlation')) +
+    geom_abline(aes(slope = 0, intercept = standard_corr,
+                    color = 'Correlation'), linetype = 2, data = df.labels)+
     theme_Publication() +
     scale_colour_Publication() +
     ylab('Correlation') +
     xlab('Quantiles') +
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) + 
+    theme(legend.position = 'none')+
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
-    #annotate("rect", xmin = 0.375, xmax = 0.625, ymin = -0.50, ymax = -0.25, alpha = 0.8, fill = 'grey80')+
-    geom_text(data = df.labels, aes(x = 0.50, y = -0.45, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
     facet_grid(order ~ order2)
-    #ggtitle('Threshold correlations of weekly data (95% confidence bounds)') + 
-    #theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
   
   # Then do scatter plot(s)
-  g_scatter <- ggplot() +
-    # geom_point(mapping = aes(x = value1, y = value2, color = 'Returns'),
-    #             data = plotdf.scatter.ret
-    # ) +
-    geom_point(aes(x = value1, y = value2, color = 'Residuals'),
-               data = plotdf.scatter.res
-    ) +
+  g_scatter <- ggplot(data = plotdf.scatter) +
+    geom_bin2d(
+      aes(
+        x = value1, y = value2, color = 'GARCH residuals'
+        ),
+      binwidth = c(0.20, 0.20)
+    )+
+    
+    # Boxes
+    # 10%
+    geom_rect(
+      aes(
+        xmin = -5, xmax = px10, ymin = -5, ymax = py10
+      ), fill = NA, color = 'black', linetype = 4, size = 0.25
+    )+
+    geom_text(data = plotdf.scatter.text, 
+              aes(x = -4.5, y = py10-0.3, label = '10%'), family = 'Minion Pro', size = 2, parse = F)+
+    # 49%
+    geom_rect(
+      aes(
+        xmin = -5, xmax = px49, ymin = -5, ymax = py49
+      ), fill = NA, color = 'black', linetype = 3, size = 0.25
+    )+
+    geom_text(data = plotdf.scatter.text, 
+              aes(x = -4.5, y = py49-0.3, label = '49%'), family = 'Minion Pro', size = 2, parse = F)+
+    # 51%
+    geom_rect(
+      aes(
+        xmin = px51, xmax = 5, ymin = py51, ymax = 5
+      ), fill = NA, color = 'black', linetype = 3, size = 0.25
+    )+
+    geom_text(data = plotdf.scatter.text, 
+              aes(x = 4.5, y = py51+0.3, label = '51%'), family = 'Minion Pro', size = 2, parse = F)+
+    # 90%
+    geom_rect(
+      aes(
+        xmin = px90, xmax = 5, ymin = py90, ymax = 5
+      ), fill = NA, color = 'black', linetype = 4, size = 0.25
+    )+
+    geom_text(data = plotdf.scatter.text, 
+              aes(x = 4.5, y = py90+0.3, label = paste('90%')), family = 'Minion Pro', size = 2, parse = F)+
+    
     theme_Publication() +
-    scale_colour_Publication() +
-    ylab('') +
-    xlab('') +
-    #coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) +
-    #scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
-    #annotate("rect", xmin = 0.375, xmax = 0.625, ymin = -0.50, ymax = -0.25, alpha = 0.8, fill = 'grey80')+
-    geom_text(data = df.labels, aes(x = 0.50, y = -0.45, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
+    scale_colour_Publication()+
+    theme(legend.position = 'none')+
+    ylab('Standardized residuals (column factor)') +
+    xlab('Standardized residuals (row factor)') +
+    coord_cartesian(xlim = c(-5,5), ylim = c(-5, 5)) +
+    geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
     facet_grid(order ~ order2)
-    #ggtitle('Threshold correlations of weekly data (95% confidence bounds)') +
-    #theme(axis.text = element_text(size = rel(0.6), colour = "grey30"))
   
   # Combine the two in grid
-  out.graph <- arrangeGrob(g, g_scatter, ncol = 2)
+  out.graph <- arrangeGrob(g_scatter, g, ncol = 2)
   # Save plot
   OUTPATH <- 'output/thresholdCorrelations/threshold_%s.png'
   ggsave(sprintf(OUTPATH, OUTNAME),
-    out.graph, device = 'png', width = 14, height = 16, units = 'cm'
+    out.graph, device = 'png', width = width, height = height, units = 'cm'
     )
 
 }
@@ -184,9 +223,13 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
 # Quick fix to append standard correlations to graphs
 df.labels <- .append_standard_corr(plotdf.ret, df.estim)
 
-g <- .plot_th_corr(plotdf.ret, plotdf.res, plotdf.scatter.res, df.labels,
-              'HML', c('Mkt.RF', 'SMB','Mom'), sprintf('%s_Nonvalue', ID))
-#.plot_th_corr(plotdf.ret, plotdf.res, df.labels, 'HML', c('RMW','CMA'), sprintf('%s_Value', ID))
+.plot_th_corr(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+              COLFACTORS = 'HML', ROWFACTORS = c('Mkt.RF', 'SMB','Mom'), sprintf('%s_Nonvalue', ID),
+              14, 16)
+.plot_th_corr(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+              COLFACTORS = 'HML', ROWFACTORS = c('RMW', 'CMA'), sprintf('%s_Value', ID),
+              14, 10)
+
 
 # Threshold correlation fake data scatter for method ------------------------------
 
