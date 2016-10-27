@@ -19,8 +19,6 @@ library(memoise)
 load_all('australian')
 load_all('wimbledon')
 
-registerDoParallel(cores = 7)
-
 rm(list = ls())
 
 N_RANDOM <- 1e4          # Number of simulation paths per t
@@ -115,6 +113,9 @@ do_simulate <- function(name, copula) {
 
 # Run Simulations --------------------------------------------------------
 
+cl <- makeCluster()
+registerDoParallel(cl)
+
 load('data/derived/copula/oos_constant_filtered.RData')
 do_simulate('constant_norm', constant_copula_filtered$norm)
 do_simulate('constant_std',  constant_copula_filtered$std)
@@ -125,4 +126,4 @@ do_simulate('dynamic_norm', dynamic_copula_filtered$norm)
 do_simulate('dynamic_std',  dynamic_copula_filtered$std)
 do_simulate('dynamic_ghst', dynamic_copula_filtered$ghst)
 
-load_all('australian')
+stopCluster(cl)
