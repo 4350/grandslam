@@ -111,6 +111,23 @@ copula_simulate <- function(spec, n.sim, m.sim, Q_T = NULL, shocks_T = NULL, X =
 
   uv_distributions <- .copula_uv_distributions(spec)
 
+  # Special case for n.sim = 1
+  if (n.sim == 1) {
+    # Just get a big ol' matrix of shocks for n.sim == 1, and compute
+    # uniforms for each column (as usual!)
+    shocks <- .copula_simulate_shocks_tp1(spec, m.sim, Q_T, shocks_T, Upsilon[,, 1])
+    uniforms <- sapply(seq_along(uv_distributions), function(i) {
+      ghyp::pghyp(shocks[, i], uv_distributions[[i]])
+    })
+    
+    # Sanity check
+    stopifnot(m.sim == nrow(uniforms))
+    
+    # Returns this as a list of simulations runs to be consistent
+    return(lapply(seq(m.sim), function(r) uniforms[r, ]))
+  }
+  
+  # General case (n.sim > 1); requires updating the Q for the future separately
   simulations <- foreach(i = 1:m.sim) %dopar% {
     .copula_simulate_shocks(spec, n.sim, Q_T, shocks_T, Upsilon)
   }
@@ -408,6 +425,14 @@ copula_Upsilon <- function(theta, X) {
   }
 
   rbind(shocks[-1, ])
+}
+
+.copula_simulate_shocks_tp1 <- function(spec, m.sim, Q_t, shocks_t, Upsilon_tp1) {
+  N <- ncol(Q_t)
+  Q_tp1 <- .copula_Q_tp1(spec, Q_t, shocks_t, Upsilon_tp1)
+  Correlation <- .copula_Correlation(array(Q_tp1, c(N, N, 1)))
+  
+  .copula_rghyp(m.sim, spec, Correlation[,, 1])
 }
 
 # Log Likelihoods --------------------------------------------------------

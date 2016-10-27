@@ -79,13 +79,8 @@ garch_path_t <- function(t, filtered_copula) {
 
 # Do the actual simulation
 .do_simulate_stdresid_t <- function(t, filtered_copula) {
-  tic('simulate_t')
   u <- .copula_simulate_t(t, filtered_copula)
-  toc()
-  tic('uniform2stdresid')
-  x <- garch_uniform2stdresid(model.GARCH, u)
-  toc()
-  x
+  garch_uniform2stdresid(model.GARCH, u)
 }
 
 # Memoised version for constant 
@@ -129,3 +124,5 @@ load('data/derived/copula/oos_dynamic_filtered.RData')
 do_simulate('dynamic_norm', dynamic_copula_filtered$norm)
 do_simulate('dynamic_std',  dynamic_copula_filtered$std)
 do_simulate('dynamic_ghst', dynamic_copula_filtered$ghst)
+
+load_all('australian')
