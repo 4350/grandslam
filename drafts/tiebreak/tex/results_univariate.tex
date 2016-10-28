@@ -41,7 +41,20 @@ The GJR-GARCH models are estimated on each series using maximum likelihood estim
 \subsection{Selection Process} % (fold)
 \label{sub:selection_process}
 
-Our selection process is as follows. For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1, 1) model). We then compute the Bayesian Information Criterion (BIC~\autocite{Schwarz1978}) for each specification and select the ARMA order with the lowest BIC as our primary candidate.
+Our selection process is as follows. For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1, 1) model). We then compute the Bayesian Information Criterion (BIC~\autocite{Schwarz1978}) for each specification and select the ARMA order with the lowest BIC as our primary candidates.
+
+The candidate models are checked for remaining serial correlation and ARCH effects in the residuals, by using the weighted portmanteau tests of~\autocite{FisherGallagher2012}. We also compute the sign bias statistic in order to choose between GARCH and GJR-GARCH specifications -- if the statistic is insignificant, this suggests that there is no significant leverage effect present in the series. GARCH diagnostics results can be seen in~\autoref{table:garch_diagnostics}. In a well-specified model, we expect there to be no significant serial correlation, ARCH effects or sign bias in the residuals. Furthermore, the QQ-plots of the standardized residuals should show that their empirical distribution is comparable to the theoretical distribution (be distributed around the 45 degree line).
+
+% TODO Sign bias statistic???
+% TODO Say more interesting stuff about GARCH diagnostics
+
+The result of our selection procedure is to model each of the six factor series up to a maximum of ARMA(1, 1) with an asymmetric Student's t distribution. The significant sign bias statistics in the GARCH specifications, lead us to preferring GJR-GARCH specifications for the Market and CMA series, while GARCH is selected for the remaining four.
+
+The candidate specifications under normal or Student's t distributed innovations all display misbehaved QQ-plots, see~\autoref{fig:qq_norm,fig:qq_std}. Rather than falling ``around'' the 45 degree line, the empirical distributions deviate, especially in the more extreme quantiles. This is indicative of asymmetry in the residual series (even after accounting for leverage effects). By comparision (see~\autoref{fig:qq_ghst}), the empirical distributions of residuals in the chosen models seem to largely agree with the theoretical asymmetric Student's t distribution.
+
+The lack of significant sign bias in the GARCH specifications for all models except Market and CMA (at 10\% level) is notable, but in line with the previous argument that any leverage effects can ``cancel out'' in a risky long-short portfolio; the Market-RF being short in the risk-free asset therefore shows the significant leverage effect of the market itself. For the Market series, the GJR-GARCH specification appears to remove this sign bias.
+
+We additionally note that the Market model selects order ARMA(0, 0), suggesting that predicting the 1-step return on a market portfolio is hard to do based on serial correlation.
 
 % subsection selection_process (end)
 
