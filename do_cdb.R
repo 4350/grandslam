@@ -16,7 +16,6 @@ library(foreach)
 load_all('wimbledon')
 rm(list = ls())
 
-MODEL_NAME <- 'dynamic_ghskt'
 
 # Functions 
 
@@ -110,7 +109,7 @@ best_cdb <- function(distribution) {
 }
 
 do_best_cdb <- function(model_name, strategy, selectors) {
-  load(sprintf('data/derived/distribution_%s.RData', model_name))
+  load(sprintf('data/derived/distributions/%s.RData', model_name))
   distribution_simple <- exp(distribution) - 1
   rm(distribution)
   
@@ -122,16 +121,18 @@ do_best_cdb <- function(model_name, strategy, selectors) {
   rm(distribution_simple)
   
   save(cdb_results,
-       file = sprintf('data/derived/cdb_%s_%s.RData', strategy, model_name))
+       file = sprintf('data/derived/cdb/%s_%s.RData', strategy, model_name))
 }
 
 # CDB Optimization -------------------------------------------------------
 
+MODEL_NAME <- 'full_dynamic_ghst_10000'
+
 do_best_cdb(MODEL_NAME, 'all',
             c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'))
 
-do_best_cdb(MODEL_NAME, 'modern',
-            c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'))
+# do_best_cdb(MODEL_NAME, 'modern',
+#             c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'))
 
 do_best_cdb(MODEL_NAME, 'HML', c('Mkt.RF', 'HML', 'SMB', 'Mom'))
 do_best_cdb(MODEL_NAME, 'RMW', c('Mkt.RF', 'SMB', 'Mom', 'RMW'))

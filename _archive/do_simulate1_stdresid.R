@@ -1,3 +1,5 @@
+#' ARCHIVED BECAUSE OLD COPULA MODELS. 
+#' 
 #' Simulate 1-step residuals from copula
 
 

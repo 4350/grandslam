@@ -1,3 +1,5 @@
+#' ARCHIVED BECAUSE OLD COPULA INTERFACE AND GARCH
+#' 
 #' Estimate copulas with constant correlation matrices
 #'
 #' These estimations use the dynamic code, but with parameter restrictions
