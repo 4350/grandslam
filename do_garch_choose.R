@@ -229,7 +229,7 @@ oos_bestfits <-
     SMB = garch_fits_GARCH$SMB$ARMA11,
     Mom = garch_fits_GARCH$Mom$ARMA10,
     RMW = garch_fits_GARCH$RMW$ARMA11,
-    CMA = garch_fits_GJRGARCH$CMA$ARMA11
+    CMA = garch_fits_GARCH$CMA$ARMA10
   )
 
 model.GARCH <- oos_bestfits
