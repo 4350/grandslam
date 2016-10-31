@@ -7,16 +7,17 @@ data/ff-weekly.RData
 data/derived
 output
 *.aux
-drafts/gameball/out/Thesis Draft (22107 and 22584).bbl
+*.bbl
 *.bcf
-drafts/gameball/out/Thesis Draft (22107 and 22584).fdb_latexmk
+*.fdb_latexmk
 *.fls
-drafts/gameball/out/Thesis Draft (22107 and 22584).out
+*.out
 *.pdf
-drafts/gameball/out/Thesis Draft (22107 and 22584).run.xml
+*.run.xml
 *.ini
-drafts/gameball/out/Thesis Draft (22107 and 22584).thm
+*.thm
 *.blg
-drafts/gameball/out/Thesis Draft (22107 and 22584).log
+*.log
 *.gz
 data/derived/model_GARCH.RData
+
