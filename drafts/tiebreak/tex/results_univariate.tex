@@ -3,12 +3,12 @@
 \section{Modeling Factor Returns} % (fold)
 \label{sec:modeling_factor_returns}
 
-We proceed by estimating parsimonious models of each factor return series, trying to capture the established effects of serial correlation, volatility clustering, non-normality and leverage effects. By estimating appropriate models, we can characterize and filter these effects, while incorporating them in conditional forecasts. In this section, we describe the general case of our models, our systematic model selection approach and estimation results.
+We proceed by estimating models of each factor's return series, trying to capture the established effects of serial correlation, volatility clustering, non-normality and leverage effects in financial returns. By estimating appropriate models, we can characterize and filter these effects, while incorporating them in conditional forecasts. In this section, we describe the general structure of our models, our systematic model selection approach and estimation results.
 
 \subsection{General univariate model: GJR-GARCH} % (fold)
 \label{sub:general_univariate_model_gjr_garch}
 
-ARMA-GARCH covers a broad class of models designed to capture the previously mentioned features of financial return series. We evaluate the GJR-GARCH model which is a parsimonious extension of the standard GARCH(1, 1) model designed to capture leverage effects~\autocite{glosten1993relation}. The GJR-GARCH model is evaluated with and without leverage effects ($\eta = 0$) and under different distributional assumptions (normal, Student's t and skewed Student's t), for each factor.
+The ARMA-GARCH is a broad model family designed to eliminate predictable components of financial return series. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). ARCH effects are also referred to as volatility clustering, due to the persistence in magnitude of return shocks. Shocks in financial return series are often not homoskedastic, and the hetreoskedasticy tends to exhibit serial correlation. We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1) model of~\autocite{Bollerslev1986}. The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when negative and positive return shocks have different impact on future volatility~\autocite{Black1976}.
 
 We estimate conditional mean equations \emph{up to} ARMA(3, 3):
 \begin{align}
@@ -18,43 +18,63 @@ We estimate conditional mean equations \emph{up to} ARMA(3, 3):
     \sum^q \theta_q \epsilon_{t - q} + 
     \epsilon_t
 \end{align}
-The conditional volatility evolves according to the GJR-GARCH specification:
+where $r_t$ are log returns. The conditional volatility evolves according to the GJR-GARCH specification:
 \begin{align}
-  \epsilon_t &= \sigma_t z_t \\\
+  \epsilon_t &= \sigma_t z_t \\
   \sigma_t^2 &=
     \omega +
-    (\alpha + \eta I_{t - 1}) \epsilon_{t - 1}^2 +
-    \beta \sigma^2_{t - 1} \\
-  \intertext{where}
-  I_{t - 1} &=
-    \begin{cases}
-      1 & \text{if}\ \epsilon_{t - 1} \le 0 \\
-      0 & \text{if}\ \epsilon_{t - 1} \gt 0      
-    \end{cases}
+    (\alpha + \eta I_{\epsilon_{t-1} \leq 0}) \epsilon_{t - 1}^2 +
+    \beta \sigma^2_{t - 1}
 \end{align}
-A positive $\eta$ captures the typical leverage effect by increasing the current period's volatility if the previous period's residual $\epsilon$ was below zero. A significant $\eta$ thus introduces asymmetric volatility in the model. For the market factor, it can be expected that $\eta$ is positive, reflecting the leverage effect in the market itself. However, for the other factors, constructed as long-short positions in risky portfolios, the direction of $\eta$ is less obvious~\autocite{ChristoffersenLanglois2013}.
+where $I$ is an indicator function that is equal to one when $\epsilon_{t-1} \leq 0$. A positive $\eta$ captures the leverage effect by increasing the current period's volatility if the previous period's residual $\epsilon$ was below zero. A significant $\eta$ thus introduces asymmetric volatility in the model. For the market factor, it is expected that $\eta$ is positive, reflecting the leverage effect in the market itself and no impact from the short risk-free component. However, for the other factors, which are constructed as all-equity zero-cost long-short portfolios, the direction of $\eta$ is less obvious~\autocite{ChristoffersenLanglois2013}. If there are leverage effects for stocks in general, negative shocks will lead to more volatility than positive shocks in a portfolio of stocks. But in a zero-cost portfolio, the leverage effects of the long positions in stocks could be eliminated by the short positions in other firms. The level of the leverage effect in a zero-cost portfolio therefore depends on the relative strength of leverage effects in the long and short components.
 
-The GJR-GARCH models are estimated on each series using maximum likelihood estimation given an assumed conditional distribution of $z_t$. We evaluate models where the standardized residuals $z_t$ are assumed to follow one of the following distributions: Standard normal, Student's t with $\nu$ degrees of freedom and skewed Student's t with $\nu$ degrees of freedom and skewness $\gamma$. Of these, Student's t allows greater kurtosis than possible with a normal distribution, while skewed Student's t \emph{also} allows for additional asymmetry in the model's behavior beyond that introduced by the leverage effect.
+The GJR-GARCH models are estimated on each series using maximum likelihood estimation, taking an assumed conditional distribution of standardized returns $\{z_t\}$ as given. We evaluate models where the standardized residuals series $\{z_t\}$ are assumed to follow one of the following distributions: Standard normal, Student's \textit{t} with $\nu$ degrees of freedom and skewed Student's \textit{t} with $\nu$ degrees of freedom and skewness $\gamma$. The Student's t distribution allows for greater kurtosis (fatter tails) than the standard normal distribution, while skewed Student's \textit{t} also allows for additional asymmetry in the model's behavior beyond that introduced by the leverage effect.
 
 % subsection general_univariate_model_gjr_garch (end)
 
 \subsection{Selection Process} % (fold)
 \label{sub:selection_process}
 
-Our selection process is as follows. For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1, 1) model). We then compute the Bayesian Information Criterion (BIC~\autocite{Schwarz1978}) for each specification and select the ARMA order with the lowest BIC as our primary candidates.
+Our estimation process is as follows: For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1, 1) model). We then compute the Bayesian Information Criterion (BIC~\autocite{Schwarz1978}) for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
 
-The candidate models are checked for remaining serial correlation and ARCH effects in the residuals, by using the weighted portmanteau tests of~\autocite{FisherGallagher2012}. We also compute the sign bias statistic in order to choose between GARCH and GJR-GARCH specifications -- if the statistic is insignificant, this suggests that there is no significant leverage effect present in the series. GARCH diagnostics results can be seen in~\autoref{table:garch_diagnostics}. In a well-specified model, we expect there to be no significant serial correlation, ARCH effects or sign bias in the residuals. Furthermore, the QQ-plots of the standardized residuals should show that their empirical distribution is comparable to the theoretical distribution (be distributed around the 45 degree line).
+First, the candidate models are checked for remaining serial correlation and ARCH effects. Second, we examine whether there are significant leverage effects that warrant the use of a GJR-GARCH instead of a standard GARCH. Third, we use QQ-plots to control for misspecification in the residual process, and to find a suitable distribution for the standardized residuals $z_t$.
 
-% TODO Sign bias statistic???
-% TODO Say more interesting stuff about GARCH diagnostics
+In a well-specified model, we expect there to be no significant serial correlation, ARCH effects or sign bias in the residuals. Furthermore, the QQ-plots of the standardized residuals should show that their empirical distribution is comparable to the theoretical distribution (be distributed around the 45 degree line).
 
-The result of our selection procedure is to model each of the six factor series up to a maximum of ARMA(1, 1) with an asymmetric Student's t distribution. The significant sign bias statistics in the GARCH specifications, lead us to preferring GJR-GARCH specifications for the Market and CMA series, while GARCH is selected for the remaining four.
+% subsection selection_process (end)
 
-The candidate specifications under normal or Student's t distributed innovations all display misbehaved QQ-plots, see~\autoref{fig:qq_norm,fig:qq_std}. Rather than falling ``around'' the 45 degree line, the empirical distributions deviate, especially in the more extreme quantiles. This is indicative of asymmetry in the residual series (even after accounting for leverage effects). By comparision (see~\autoref{fig:qq_ghst}), the empirical distributions of residuals in the chosen models seem to largely agree with the theoretical asymmetric Student's t distribution.
+\subsection{Diagnostic test procedures}
+\label{sub:diagnostic_test_procedures}
+The serial correlation test is a weighted Ljung-Box test, following~\textcite{FisherGallagher2012} and~\textcite{LjungBox1978}. Under the null of a correctly specified model with no serial correlation, the weighted Ljung-Box test has been shown to generate results closer to its asymptotic distribution than the standard Ljung-Box test. The test statistic is given by
+\begin{align}
+	Q_W = T (T+2) \sum\limits^m_{k = 1} \frac{m-k+1}{m} \frac{\hat{r}_k^2 (\hat{\epsilon}^2_t / \hat{\sigma}_t)}{T-k}
+\end{align}
+where $T$ is the number of observations, $\hat{r}^2_{k} ( \hat{\epsilon}^_{t} / \hat{\sigma}_{t} )$ is the squared sample autocorrelation of standardized residuals with lag order $k$ and max lag order $m$. Under the null, the test statistic is asymptotically distributed $\sum\limits^m_{k = 1} \chi^2_k \gamma_k$, where $\{\chi^2_k\}$ are independent chi-squared random variables with one degree of freedom and $\{\gamma_k\}$ are eigenvalues of a weighting matrix. We consider two maximum lag orders, 5 and 10 weeks. The maximum lag length was chosen by visual inspection of the autocorrelation functions for standardized residuals.
 
-The lack of significant sign bias in the GARCH specifications for all models except Market and CMA (at 10\% level) is notable, but in line with the previous argument that any leverage effects can ``cancel out'' in a risky long-short portfolio; the Market-RF being short in the risk-free asset therefore shows the significant leverage effect of the market itself. For the Market series, the GJR-GARCH specification appears to remove this sign bias.
+For ARCH effects, we use the weighted LM test, following~\textcite{FisherGallagher2012} and~\textcite{LiMak1994}. The test has the null of no autocorrelation in standardized squared residuals from the model, and the test statistic is given by:
+\begin{align}
+	LM_W = T \sum\limits_{k = b + 1}^{m} \frac{m - k + (b+1)}{m} \hat{r}^2_k (\hat{\epsilon}^2_t / \hat{\sigma}_t)
+\end{align}
+where $T$ is the number of observations, $b$ the number of autoregressive lags in the GARCH ($b=1$), $\hat{r}^2_k (\hat{\epsilon}^2_t / \hat{\sigma}_t)$ is the squared sample autocorrelation of standardized squared residuals with lag order $k$ and max lag order $m$. Under the null, the test statistic is asymptotically distributed $\sum\limits^m_{k = 1} \chi^2_k w_k$, where $\{\chi^2_k\}$ are independent chi-squared random variables with one degree of freedom and $\{w_k\}$ are the weighting parameters ($w = (m - k + (b+1))/m$). The maximum lag length was chosen by visual inspection of the autocorrelation functions for standardized squared residuals.
 
-We additionally note that the Market model selects order ARMA(0, 0), suggesting that predicting the 1-step return on a market portfolio is hard to do based on serial correlation.
+We use the sign bias test of~\textcite{EngleNg1993} to determine whether there are significant leverage effects in the factor returns. Run the regression
+\begin{align}
+	\hat{z}_t^2 = c_0 + c_1 I_{\hat{\epsilon}_{t-1} < 0} + c_2 I_{\hat{\epsilon}_{t-1} < 0} \cdot \hat{\epsilon}_{t-1} + c_3 I_{\hat{\epsilon}_{t-1} \geq 0} \cdot \hat{\epsilon}_{t-1} + u_t
+\end{align}
+where $\hat{z}_t^2$ are the standardized squared residuals of the ARMA-GARCH model, $I_\cdot$ are indicator functions that are equal to one when the subscript conditions are true, and $\hat{\epsilon}_{t-1}$ are the lagged ARMA-GARCH residuals. For the test of negative sign bias (i.e. leverage effect), the null hypothesis is $H_0: c_2 = 0$, and for the test of positive sign bias (i.e. reverse leverage effect), the null hypothesis is $H_0: c_3 = 3$. The Wald test statistics are asymptotically distributed $\chi^2$ with one degree of freedom.
+
+% subsection diagnostic_test_procedures (end)
+
+\subsection{Selection and estimation results}
+\label{sub:selection_results}
+
+The result of our selection and estimation procedure are presented in~\autoref{table:garch_diagnostics}. The Market factor is the only model that requires a GJR-GARCH $\eta$, while the remaining models are all standard GARCH (1, 1). The minimization of BIC leads to ARMA(0, 0) for Market, ARMA(1, 0) for Mom and ARMA(1, 1) for the remaining factors HML, SMB, RMW, CMA. 
+
+Based on these ARMA-GARCH specifications, the Ljung-Box and LM tests indicate no remaining serial correlation or ARCH effects, as all p-values are greater than our 5\% cut-off point. However, some p-values are quite close to the limit, including the Market factor's Ljung-Box tests and the longer Ljung-Box tests of RMW and CMA. We also note that the Market-RF model selects order ARMA(0, 0), suggesting that it is hard to predict the 1-week-ahead return on the Market based on serial correlation alone.
+
+The lack of significant sign bias in the GARCH specifications for all models except Market is interesting, but in line with the argument that any leverage effects could cancel out in a zero-cost long-short equity portfolio; the Market-RF is the only factor that is net-long equities and also exhibited the expected negative sign bias as a GARCH model. In \autoref{table:garch_diagnostics}, we note that the sign bias has been eliminated in the GJR-GARCH model. 
+
+The candidate specifications under normal and Student's \textit{t} distributed innovations all display misaligned QQ-plots, see~\autoref{fig:qq_norm,fig:qq_std}. The empirical distributions deviate from the 45 degree theoretical lines, especially in the more extreme quantiles. This indicates asymmetry in the residual series. In unreported results, we have controlled that the misspecification of normal and Student's \textit{t} residuals is persistent even if GJR-GARCH models are fitted for all factors. By comparision (see~\autoref{fig:qq_ghst}), the QQ-plot with skewed Student's \textit{t} innovations seems to fit the data well. We proceed with skewed Student's \textit{t} residual distributions.
 
 % subsection selection_process (end)
 

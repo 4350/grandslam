@@ -154,7 +154,7 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) + 
     theme(legend.position = 'none')+
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
-    facet_grid(order ~ order2)
+    facet_grid(order ~ order2, switch = 'y')
   
   # Then do scatter plot(s)
   g_scatter <- ggplot(data = plotdf.scatter) +
@@ -206,7 +206,7 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
     xlab('Standardized residuals (row factor)') +
     coord_cartesian(xlim = c(-5,5), ylim = c(-5, 5)) +
     geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
-    facet_grid(order ~ order2)
+    facet_grid(order ~ order2, switch = 'y')
   
   # Combine the two in grid
   out.graph <- arrangeGrob(g_scatter, g, ncol = 2)
@@ -224,11 +224,20 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
 df.labels <- .append_standard_corr(plotdf.ret, df.estim)
 
 .plot_th_corr(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
-              COLFACTORS = 'HML', ROWFACTORS = c('Mkt.RF', 'SMB','Mom'), sprintf('%s_Nonvalue', ID),
+              COLFACTORS = 'HML', ROWFACTORS = c('Mkt.RF', 'SMB','Mom'), sprintf('%s_HML_Nonvalue', ID),
               14, 16)
 .plot_th_corr(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
-              COLFACTORS = 'HML', ROWFACTORS = c('RMW', 'CMA'), sprintf('%s_Value', ID),
+              COLFACTORS = 'RMW', ROWFACTORS = c('Mkt.RF', 'SMB','Mom'), sprintf('%s_RMW_Nonvalue', ID),
+              14, 16)
+.plot_th_corr(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+              COLFACTORS = 'CMA', ROWFACTORS = c('Mkt.RF', 'SMB','Mom'), sprintf('%s_CMA_Nonvalue', ID),
+              14, 16)
+.plot_th_corr(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+              COLFACTORS = 'HML', ROWFACTORS = c('RMW', 'CMA'), sprintf('%s_HML_Value', ID),
               14, 10)
+.plot_th_corr(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+              COLFACTORS = 'CMA', ROWFACTORS = c('RMW'), sprintf('%s_CMA_RMW', ID),
+              14, 6)
 
 
 # Threshold correlation fake data scatter for method ------------------------------
