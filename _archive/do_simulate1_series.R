@@ -1,3 +1,5 @@
+#' ARCHIVED BECAUSE OLD COPULA MODELS
+
 #' One-step ahead distributions
 #' 
 #' Given information available at time t, we can simulate the distribution of

@@ -1,3 +1,5 @@
+#' ARCHIVED BECAUSE OLD COPULA MDOELS
+
 #' Use simulated distributions of returns to get VaR estimates
 #' 
 

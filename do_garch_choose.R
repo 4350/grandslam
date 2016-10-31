@@ -196,6 +196,20 @@ df.stdres <- data.frame(
 )
 save(df.stdres, file = 'data/derived/garch/model_GARCH_chosen_stdres.RData')
 
+# Filter ----
+specs <- garch.fit2spec(model.GARCH)
+
+df <- data.frame(df.estim)[, -1]
+
+filtered <- lapply(seq_along(specs), function(i) {
+  filtered <- ugarchfilter(specs[[i]], c(df[, i]))
+  
+  stopifnot(head(filtered@filter$z) == head(model.GARCH[[i]]@fit$z))
+  filtered
+})
+names(filtered) <- names(model.GARCH)
+
+save(filtered, file = 'data/derived/garch/model_GARCH_chosen_filtered.RData')
 
 
 # Below only for the chosen  OOS -----------------------------------------------

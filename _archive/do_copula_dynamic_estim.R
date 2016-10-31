@@ -1,3 +1,5 @@
+#' ARCHIVED BECAUSE OLD GARCH MODELS
+#' 
 #' Estimate copulas with dynamic correlations
 
 # Workspace Setup --------------------------------------------------------

@@ -1,3 +1,6 @@
+#' ARCHIVED BECAUSE THIS GARCH MODEL IS NOT CURRENT NOR IS THE
+#' COPULA INTERFACE CURRENT
+
 #' Filter models
 #' 
 #' Give me estimated models and I will give you their filtered output against
