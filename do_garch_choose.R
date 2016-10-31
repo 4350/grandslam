@@ -150,7 +150,7 @@ bestfits <-
     SMB = model.GARCH.GARCH$SMB,
     Mom = model.GARCH.GARCH$Mom,
     RMW = model.GARCH.GARCH$RMW,
-    CMA = model.GARCH.GJRGARCH$CMA
+    CMA = model.GARCH.GARCH$CMA
   )
 
 model.GARCH <- bestfits
