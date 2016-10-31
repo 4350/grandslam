@@ -45,6 +45,7 @@ In a well-specified model, we expect there to be no significant serial correlati
 
 \subsection{Diagnostic test procedures}
 \label{sub:diagnostic_test_procedures}
+
 The serial correlation test is a weighted Ljung-Box test, following~\textcite{FisherGallagher2012} and~\textcite{LjungBox1978}. Under the null of a correctly specified model with no serial correlation, the weighted Ljung-Box test has been shown to generate results closer to its asymptotic distribution than the standard Ljung-Box test. The test statistic is given by
 \begin{align}
 	Q_W = T (T+2) \sum\limits^m_{k = 1} \frac{m-k+1}{m} \frac{\hat{r}_k^2 (\hat{\epsilon}^2_t / \hat{\sigma}_t)}{T-k}
@@ -75,6 +76,8 @@ Based on these ARMA-GARCH specifications, the Ljung-Box and LM tests indicate no
 The lack of significant sign bias in the GARCH specifications for all models except Market is interesting, but in line with the argument that any leverage effects could cancel out in a zero-cost long-short equity portfolio; the Market-RF is the only factor that is net-long equities and also exhibited the expected negative sign bias as a GARCH model. In \autoref{table:garch_diagnostics}, we note that the sign bias has been eliminated in the GJR-GARCH model. 
 
 The candidate specifications under normal and Student's \textit{t} distributed innovations all display misaligned QQ-plots, see~\autoref{fig:qq_norm,fig:qq_std}. The empirical distributions deviate from the 45 degree theoretical lines, especially in the more extreme quantiles. This indicates asymmetry in the residual series. In unreported results, we have controlled that the misspecification of normal and Student's \textit{t} residuals is persistent even if GJR-GARCH models are fitted for all factors. By comparision (see~\autoref{fig:qq_ghst}), the QQ-plot with skewed Student's \textit{t} innovations seems to fit the data well. We proceed with skewed Student's \textit{t} residual distributions.
+
+% Here comment on all the parameter estimates, significance, persistence etc etc 
 
 % subsection selection_process (end)
 
