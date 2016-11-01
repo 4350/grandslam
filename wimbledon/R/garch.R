@@ -15,7 +15,7 @@
 #'
 #' @return uGARCHspec object
 #' @export
-garch.specgen <- function(p, q = 0, r = 1, s = 1, model = 'fGARCH', submodel = 'GJRGARCH',
+garch.specgen <- function(p, q = 0, r = 1, s = 1, model,
                     vtarget = T, dist = 'ghst', fixed.pars = list()) {
   spec <- rugarch::ugarchspec(
     mean.model = list(
@@ -24,7 +24,6 @@ garch.specgen <- function(p, q = 0, r = 1, s = 1, model = 'fGARCH', submodel = '
     distribution.model = dist,
     variance.model = list(
       model = model,
-      submodel = submodel,
       variance.targeting = vtarget
     ),
     fixed.pars = fixed.pars
@@ -85,7 +84,7 @@ garch.fit2spec <- function(fits) {
       fit@model$modelinc['ma'],
       fixed.pars = fit@fit$coef,
       vtarget = F, # necessary to activate omega
-      submodel = fit@model$modeldesc$vsubmodel
+      model = fit@model$modeldesc$vmodel
     )
   })
 }
