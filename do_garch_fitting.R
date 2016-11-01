@@ -74,16 +74,16 @@ do_garch_fit <- function(df.estim, model, dist, nOOS = 0) {
   }
 }
 
-do_garch_fit(df.estim, 'GJRGARCH', 'ghst')
-do_garch_fit(df.estim, 'GJRGARCH', 'std')
-do_garch_fit(df.estim, 'GJRGARCH', 'norm')
+do_garch_fit(df.estim, 'gjrGARCH', 'ghst')
+do_garch_fit(df.estim, 'gjrGARCH', 'std')
+do_garch_fit(df.estim, 'gjrGARCH', 'norm')
 
-do_garch_fit(df.estim, 'GARCH', 'ghst')
-do_garch_fit(df.estim, 'GARCH', 'std')
-do_garch_fit(df.estim, 'GARCH', 'norm')
+do_garch_fit(df.estim, 'sGARCH', 'ghst')
+do_garch_fit(df.estim, 'sGARCH', 'std')
+do_garch_fit(df.estim, 'sGARCH', 'norm')
 
 
 # Garch OOS ---------------------------------------------------------------
 
-do_garch_fit(df.estim, 'GJRGARCH', 'ghst', nOOS = 914) #first date is 1999-01-01, approx 1/3 of full sample
-do_garch_fit(df.estim, 'GARCH', 'ghst', nOOS = 914)
+do_garch_fit(df.estim, 'gjrGARCH', 'ghst', nOOS = 914) #first date is 1999-01-01, approx 1/3 of full sample
+do_garch_fit(df.estim, 'sGARCH', 'ghst', nOOS = 914)
