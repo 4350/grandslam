@@ -9,11 +9,13 @@ rm(list = ls())
 
 # Gustaf: Create a cluster and pass instead. Remember to stopCluster() after
 # i.e.
-# cl <- makeCluster()
-# registerDoParallel(cl = cl)
+cl <- makeCluster(spec = detectCores() - 1)
+clusterEvalQ(cl, library(devtools))
+clusterEvalQ(cl, load_all('australian'))
+registerDoParallel(cl)
 #
 # It should work!
-registerDoParallel(cores = 7)
+#registerDoParallel(cores = 7)
 
 # Copula Estimation (Full Sample) ----------------------------------------
 load('data/derived/garch/model_GARCH_chosen_u.RData')
