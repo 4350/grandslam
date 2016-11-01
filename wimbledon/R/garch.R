@@ -207,10 +207,11 @@ garch.qq = function(x, ...)
 # End table GARCH diagnostics ---------------------------------------------
 
 do_garch_end_table <- function(object) {
-  # Count obs and get LLH and BIC
+  # Count obs and get LLH and BIC, persistence
   obs = length(object@fit$residuals)
   LLH = object@fit$LLH
   BIC = tryCatch(infocriteria(object)['Bayes',], error = function(err) NA)
+  Var_persistence = object@fit$persistence
   # Get standardized residuals and dof
   stdresid = object@fit$residuals/object@fit$sigma
   modelinc = object@model$modelinc
@@ -230,6 +231,7 @@ do_garch_end_table <- function(object) {
     obs = obs,
     LLH = LLH,
     BIC = BIC,
+    Var_persistence = Var_persistence,
     LB_5 = LB_5,
     LB_10 = LB_10,
     LM_5 = LM_5,
