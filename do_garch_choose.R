@@ -26,20 +26,18 @@ load('data/derived/weekly-estim.RData')
 
 # BIC bestfits and save out stuff -----------------------------------------
 
-
-
-do_garch_BIC_bestfits <- function(df.estim, submodel, dist, nIS = 0) {
+do_garch_BIC_bestfits <- function(df.estim, model, dist, nIS = 0) {
   prefix = ""
   if(nIS != 0) {
     prefix = "oos_"
     df.estim <- head(df.estim, nIS)
   }
   # Load data
-  load(sprintf('data/derived/garch/%sgarch_fits_%s_%s.RData', prefix, submodel, dist))
+  load(sprintf('data/derived/garch/%sgarch_fits_%s_%s.RData', prefix, model, dist))
   
   # Create folders for output
   SAVEPATH = 'output/garch_diagnostics'
-  save.directory <- file.path(SAVEPATH, submodel, dist)
+  save.directory <- file.path(SAVEPATH, model, dist)
   dir.create(save.directory, showWarnings = FALSE, recursive = TRUE)
   
   # Calculate BIC
@@ -53,9 +51,9 @@ do_garch_BIC_bestfits <- function(df.estim, submodel, dist, nIS = 0) {
   rankBIC <- apply(as.data.frame(BIC), 2, min_rank)
   write.table(rankBIC, 
               file = sprintf('%s/%sbic_table_%s_%s.csv',
-                                      file.path(SAVEPATH, submodel, dist),
+                                      file.path(SAVEPATH, model, dist),
                              prefix,         
-                             submodel,
+                             model,
                              dist),
               sep = ','
               )
@@ -76,21 +74,21 @@ do_garch_BIC_bestfits <- function(df.estim, submodel, dist, nIS = 0) {
   # Save GARCH parameters of best fits to csv files
   lapply(
     colnames(df.estim[,-1]),
-    function(vars, SAVEPATH, prefix, submodel, dist) {
+    function(vars, SAVEPATH, prefix, model, dist) {
       write.table(
         model.GARCH[[vars]]@fit$robust.matcoef,
         file = sprintf('%s/%sgarch_params_%s_%s_%s.csv',
-                       file.path(SAVEPATH, submodel, dist),
+                       file.path(SAVEPATH, model, dist),
                        prefix,
                        vars,
-                       submodel,
+                       model,
                        dist),
         sep = ','
       )
     },
     SAVEPATH = SAVEPATH,
     prefix = prefix,
-    submodel = submodel,
+    model = model,
     dist = dist
   )
   
@@ -102,12 +100,12 @@ do_garch_BIC_bestfits <- function(df.estim, submodel, dist, nIS = 0) {
              function(factor) factor@fit$residuals/factor@fit$sigma)
     )
   )
-  save(df.stdres, file = sprintf('data/derived/garch/%sgarch_stdres_%s_%s.Rdata', prefix, submodel, dist))
+  save(df.stdres, file = sprintf('data/derived/garch/%sgarch_stdres_%s_%s.Rdata', prefix, model, dist))
   
   # Do the QQ plots
   
   g_qq <- do_qq_plot(do_qq_data(model.GARCH))
-  ggsave(file = sprintf('output/garch_diagnostics/%s/%s/%sqqplot_%s_%s.png', submodel, dist, prefix, submodel, dist),
+  ggsave(file = sprintf('output/garch_diagnostics/%s/%s/%sqqplot_%s_%s.png', model, dist, prefix, model, dist),
          g_qq, width = 14.0, height = 10, units = 'cm', limitsize = F
          ) 
   
@@ -115,48 +113,50 @@ do_garch_BIC_bestfits <- function(df.estim, submodel, dist, nIS = 0) {
   # Save end table of test results etc
   test.table <- sapply(model.GARCH, do_garch_end_table)
   write.table(test.table, file = sprintf('output/garch_diagnostics/%s/%s/%send_table_%s_%s.csv',
-                                         submodel, dist, prefix, submodel, dist), sep = ',')
+                                         model, dist, prefix, model, dist), sep = ',')
   
   # Save model.GARCH to file
-  save(model.GARCH, file = sprintf('data/derived/garch/%smodel_GARCH_%s_%s.Rdata', prefix, submodel, dist))
+  save(model.GARCH, file = sprintf('data/derived/garch/%smodel_GARCH_%s_%s.Rdata', prefix, model, dist))
 }
 
 # Total
-do_garch_BIC_bestfits(df.estim, 'GJRGARCH', 'ghst')
-do_garch_BIC_bestfits(df.estim, 'GJRGARCH', 'std')
-do_garch_BIC_bestfits(df.estim, 'GJRGARCH', 'norm')
+do_garch_BIC_bestfits(df.estim, 'gjrGARCH', 'ghst')
+do_garch_BIC_bestfits(df.estim, 'gjrGARCH', 'std')
+do_garch_BIC_bestfits(df.estim, 'gjrGARCH', 'norm')
 
-do_garch_BIC_bestfits(df.estim, 'GARCH', 'ghst')
-do_garch_BIC_bestfits(df.estim, 'GARCH', 'std')
-do_garch_BIC_bestfits(df.estim, 'GARCH', 'norm')
+do_garch_BIC_bestfits(df.estim, 'sGARCH', 'ghst')
+do_garch_BIC_bestfits(df.estim, 'sGARCH', 'std')
+do_garch_BIC_bestfits(df.estim, 'sGARCH', 'norm')
 
 # OOS
-do_garch_BIC_bestfits(df.estim, 'GJRGARCH', 'ghst', 1852)
-do_garch_BIC_bestfits(df.estim, 'GARCH', 'ghst', 1852)
+do_garch_BIC_bestfits(df.estim, 'gjrGARCH', 'ghst', 1852)
+do_garch_BIC_bestfits(df.estim, 'sGARCH', 'ghst', 1852)
 
 
 # Below only for the chosen -----------------------------------------------
-load('data/derived/garch/model_GARCH_GARCH_ghst.Rdata')
-model.GARCH.GARCH <- model.GARCH
+rm(list = ls())
+load('data/derived/weekly-estim.RData')
+load('data/derived/garch/model_GARCH_sGARCH_ghst.Rdata')
+model.GARCH.sGARCH <- model.GARCH
 rm(model.GARCH)
-load('data/derived/garch/model_GARCH_GJRGARCH_ghst.Rdata')
-model.GARCH.GJRGARCH <- model.GARCH
+load('data/derived/garch/model_GARCH_gjrGARCH_ghst.Rdata')
+model.GARCH.gjrGARCH <- model.GARCH
 rm(model.GARCH)
 
 bestfits <- 
   list(
-    Mkt.RF = model.GARCH.GJRGARCH$Mkt.RF,
-    HML = model.GARCH.GARCH$HML,
-    SMB = model.GARCH.GARCH$SMB,
-    Mom = model.GARCH.GARCH$Mom,
-    RMW = model.GARCH.GARCH$RMW,
-    CMA = model.GARCH.GARCH$CMA
+    Mkt.RF = model.GARCH.gjrGARCH$Mkt.RF,
+    HML = model.GARCH.sGARCH$HML,
+    SMB = model.GARCH.sGARCH$SMB,
+    Mom = model.GARCH.sGARCH$Mom,
+    RMW = model.GARCH.sGARCH$RMW,
+    CMA = model.GARCH.sGARCH$CMA
   )
 
 model.GARCH <- bestfits
 rm(bestfits)
 save(model.GARCH, file = 'data/derived/garch/model_GARCH_chosen.RData')
-rm(model.GARCH.GJRGARCH, model.GARCH.GARCH)
+rm(model.GARCH.sGARCH, model.GARCH.gjrGARCH)
 
 # Get and save residuals ----
 df.res <- data.frame(
@@ -211,31 +211,32 @@ names(filtered) <- names(model.GARCH)
 
 save(filtered, file = 'data/derived/garch/model_GARCH_chosen_filtered.RData')
 
-
-# Below only for the chosen  OOS -----------------------------------------------
+# Below only for the chosen (hyperparameters from full sample) OOS -----------------------------------------------
 rm(list = ls())
 load('data/derived/weekly-estim.RData')
-load('data/derived/garch/oos_garch_fits_GARCH_ghst.RData')
-garch_fits_GARCH <- fits
+load('data/derived/garch/oos_garch_fits_sGARCH_ghst.RData')
+oos.sGARCH.fits <- fits
 rm(fits)
-load('data/derived/garch/oos_garch_fits_GJRGARCH_ghst.RData')
-garch_fits_GJRGARCH <- fits
+load('data/derived/garch/oos_garch_fits_gjrGARCH_ghst.RData')
+oos.gjrGARCH.fits <- fits
 rm(fits)
 
+# NOTE HARDCODED IMPORTANT TO CHANGE IF SPECS CHANGE
+####################################################
 oos_bestfits <- 
   list(
-    Mkt.RF = garch_fits_GJRGARCH$Mkt.RF$ARMA00,
-    HML = garch_fits_GARCH$HML$ARMA11,
-    SMB = garch_fits_GARCH$SMB$ARMA11,
-    Mom = garch_fits_GARCH$Mom$ARMA10,
-    RMW = garch_fits_GARCH$RMW$ARMA11,
-    CMA = garch_fits_GARCH$CMA$ARMA10
+    Mkt.RF = oos.gjrGARCH.fits$Mkt.RF$ARMA00,
+    HML = oos.sGARCH.fits$HML$ARMA11,
+    SMB = oos.sGARCH.fits$SMB$ARMA11,
+    Mom = oos.sGARCH.fits$Mom$ARMA10,
+    RMW = oos.sGARCH.fits$RMW$ARMA11,
+    CMA = oos.sGARCH.fits$CMA$ARMA10
   )
 
 model.GARCH <- oos_bestfits
 rm(oos_bestfits)
 save(model.GARCH, file = 'data/derived/garch/oos_model_GARCH_chosen.RData')
-rm(garch_fits_GARCH, garch_fits_GJRGARCH)
+rm(oos.sGARCH.fits, oos.gjrGARCH.fits)
 
 nIS <- length(model.GARCH$Mkt.RF@fit$residuals)
 
