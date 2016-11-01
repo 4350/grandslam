@@ -3,7 +3,7 @@
 \subsection{Factor return series}
 Factor return series are downloaded from Ken French's data library.\footnote{\url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html}} We download the daily Fama-French five-factor data set and merge this with the daily momentum data set. Both are available since 1963-07-01, making 1963-07-05 the first week of data. We convert each of the return series into weekly log returns for further use. 
 
-The Mkt.RF factor is long the value-weighted return of CRSP firms on NYSE, AMEX or NASDAQ with CRSP share codes 10 or 11 and short the one-month Treasury bill rate. The remaining return series are based on zero-cost portfolios that are long certain equities and short other equities, according to a 2 x 3 sort: First, firms are sorted into one of two size groups, small and big, depending on whether the market cap is above or below the median. For each the small and big firm groups, each factor then sorts into one of three groups depending on whether the variable of interest falls below the 30\textsuperscript{th} percentile, between the 30\textsuperscript{th} and the 70\textsuperscript{th} or above the 70\textsuperscript{th}. For the five-factor data set, the factors are:
+The Mkt-RF factor is long the value-weighted return of CRSP firms on NYSE, AMEX or NASDAQ with CRSP share codes 10 or 11 and short the one-month Treasury bill rate. The remaining return series are based on zero-cost portfolios that are long certain equities and short other equities, according to a 2 x 3 sort: First, firms are sorted into one of two size groups, small and big, depending on whether the market cap is above or below the median. For each the small and big firm groups, each factor then sorts into one of three groups depending on whether the variable of interest falls below the 30\textsuperscript{th} percentile, between the 30\textsuperscript{th} and the 70\textsuperscript{th} or above the 70\textsuperscript{th}. For the five-factor data set, the factors are:
 \begin{itemize}
   \item High-minus-low, is long firms above the 70\textsuperscript{th} percentile B/M (high) and short stocks below the 30\textsuperscript{th} percentile, in the small and big firm group respectively. \\
   $HML = 1/2 \cdot (Small\,value + Big\,value) - 1/2 \cdot (Small\,growth + Big\,growth)$
@@ -33,7 +33,7 @@ French's financial statement data originates from Compustat, stock return data f
 \begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X r r r r r r} 
   \\[-1.8ex]\midrule
   \\[-1.8ex] 
- & Mkt.RF & HML & SMB & Mom & RMW & CMA \\ 
+ & Mkt-RF & HML & SMB & Mom & RMW & CMA \\ 
 \hline \\[-1.8ex] 
 Observations & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ \\ 
 Maximum & $0.126$ & $0.117$ & $0.060$ & $0.120$ & $0.094$ & $0.054$ \\ 
@@ -46,7 +46,7 @@ Excess kurtosis & $6.191$ & $7.318$ & $4.997$ & $11.987$ & $13.005$ & $3.149$ \\
 %\bottomrule \\[-1.8ex] 
 \end{tabularx} 
 \end{table}
-For all series, there are 2,766 consecutive data points and no missing data. Mkt.RF is the most volatile and extreme of the series, with weekly returns as large as 12.6\% and a standard deviation of 2.2\%. Among the value strategies, RMW and CMA seem to be less extreme than HML, with less negative minimums and smaller standard deviations. In comparison to stylized facts on return series, the factor strategies exhibit the typical excess kurtosis, which is even higher than that for the market for HML, Mom and RMW. However, the value strategies HML, RMW and CMA instead exhibit positive skewness. 
+For all series, there are 2,766 consecutive data points and no missing data. Mkt-RF is the most volatile and extreme of the series, with weekly returns as large as 12.6\% and a standard deviation of 2.2\%. Among the value strategies, RMW and CMA seem to be less extreme than HML, with less negative minimums and smaller standard deviations. In comparison to stylized facts on return series, the factor strategies exhibit the typical excess kurtosis, which is even higher than that for the market for HML, Mom and RMW. However, the value strategies HML, RMW and CMA instead exhibit positive skewness. 
 \begin{figure}[H]
   \caption{Cumulative returns to factor strategies}
   \label{diag:cumret}
