@@ -28,7 +28,7 @@ where $r_t$ are log returns. The conditional volatility evolves according to the
 \end{align}
 where $I$ is an indicator function that is equal to one when $\epsilon_{t-1} \leq 0$. A positive $\eta$ captures the leverage effect by increasing the current period's volatility if the previous period's residual $\epsilon$ was below zero. A significant $\eta$ thus introduces asymmetric volatility in the model. For the market factor, it is expected that $\eta$ is positive, reflecting the leverage effect in the market itself and no impact from the short risk-free component. However, for the other factors, which are constructed as all-equity zero-cost long-short portfolios, the direction of $\eta$ is less obvious~\autocite{ChristoffersenLanglois2013}. If there are leverage effects for stocks in general, negative shocks will lead to more volatility than positive shocks in a portfolio of stocks. But in a zero-cost portfolio, the leverage effects of the long positions in stocks could be eliminated by the short positions in other firms. The level of the leverage effect in a zero-cost portfolio therefore depends on the relative strength of leverage effects in the long and short components.
 
-The ARMA-GARCH models are estimated on each series using maximum likelihood estimation, taking an assumed conditional distribution of standardized returns $\{z_t\}$ as given. We evaluate models where the standardized residuals series $\{z_t\}$ are assumed to follow one of the following distributions: Standard normal, Student's \textit{t} with $\nu$ degrees of freedom and skewed Student's \textit{t} with $\nu$ degrees of freedom and skewness $\gamma$. The Student's t distribution allows for greater kurtosis (fatter tails) than the standard normal distribution, while skewed Student's \textit{t} also allows for additional asymmetry in the model's behavior beyond that introduced by the leverage effect.
+The ARMA-GARCH models are estimated on each series using maximum likelihood estimation, taking an assumed conditional distribution of standardized returns $\{z_t\}$ as given. We evaluate models where the standardized residuals series $\{z_t\}$ are assumed to follow one of the following distributions: Standard normal, Student's \textit{t} with $\nu$ degrees of freedom and skewed Student's \textit{t} with $\nu$ degrees of freedom and skewness $\gamma$. The Student's t distribution allows for greater kurtosis (fatter tails) than the standard normal distribution, while skewed Student's \textit{t} also allows for additional asymmetry in the model's behavior beyond that introduced by the leverage effect. In the estimation, we also use variance targeting as proposed by~\textcite{EngleMezrich1995}, which is shown makes optimization faster and sometimes more certain to reach the global maximum. This means that $\omega$ is not estimated in the maximum likelihood setting, but instead set to 1 minus the persistence of the process times the sample mean of squared residuals, where the persistence is $\alpha + \beta$ for the GARCH.\footnote{Note that in the case of the GJR-GARCH for the Mkt-RF factor, the persistence is $\alpha + \beta + \eta \kappa$ where $\kappa$ is the probability that standardized residuals $z_t$ are below zero.}
 
 % subsection general_univariate_model_gjr_garch (end)
 
@@ -84,21 +84,15 @@ The candidate specifications under normal and Student's \textit{t} distributed i
 
 The estimation results of the chosen ARMA-GJR-GARCH models are found in~\autoref{tab:garch_value} and~\autoref{tab:garch_nonvalue}. 
 
-First, we discuss the value-related factors HML, RMW and CMA in \autoref{tab:garch_value}. We find significant intercepts in the mean equation for all three strategies. In terms of return autoregression, the HML factor stands out with a high 0.722 estimate, while CMA is substantially lower at 0.112. This lower estimate can in part be explained by the fact that CMA is estimated without a moving average component $\theta$ that in the presence of a return shock counteracts the autoregressive part, as $\theta$ are estimated with a negative sign for both HML and RMW. 
+First, we comment on the value-related factors HML, RMW and CMA in \autoref{tab:garch_value}. We find significant intercepts in the mean equation for all three strategies. In terms of return autoregression, the HML factor stands out with a high 0.722 estimate, while CMA is substantially lower at 0.112. This lower estimate can in part be explained by the fact that CMA is estimated without a moving average component $\theta$ that in the presence of a return shock counteracts the autoregressive part, as $\theta$ are estimated with a negative sign for both HML and RMW. 
 
-In the variance equation, all three factors exhibit high variance persistence, between 0.98 and 0.99. Generally, variance persistence, which is related to volatility clustering, tends to be high in financial return series. We note that our zero-cost equity portfolios are no exception. The HML factor has a higher $\alpha$ estimate, indicating that shocks of equal size translate to slightly stronger volatility for HML than for RMW and CMA. RMW, on the other hand, has both the lowest $\alpha$ estimate and the highest $\beta$ estimate, indicating higher persistence and lower sensitivity of volatility to shocks. HML also has a $\omega$ estimate of 0.003, compared to 0.001 for RMW and CMA, indicating that the mean level of variance is substantially higher.
+In the variance equation, all three factors exhibit high variance persistence, between 0.98 and 0.99. Generally, variance persistence, which is related to volatility clustering, tends to be high in financial return series. We note that the zero-cost factor portfolios are no exception. The HML factor has a higher $\alpha$ estimate, indicating that shocks of equal size translate into slightly stronger volatility for HML than for RMW and CMA. RMW, on the other hand, has both the lowest $\alpha$ estimate and the highest $\beta$ estimate, indicating higher persistence and lower sensitivity of volatility to shocks.
 
-Second, we discuss the non-value related factors in~\autoref{tab:garch_nonvalue}. The level of the intercept in the mean equation is considerably higher for Mkt-RF and Mom than for any of the other factor strategies, with 0.126\% and 0.128\% respectively. The SMB factor instead has the lowest mean estimate that is not significantly different from zero. These estimtaes are in line with our expectations from a visual inspection of the cumulative return graphs in the data section~\autoref{fig:cumretplot}. We note that the Mkt-RF factor is, according to our model selection procedure, best fitted by a ARMA(0, 0) mean equation, indicating no predictive power of 1-week lagged returns. SMB is an ARMA(1, 1) with parameter estimates similar to HML and Mom is an ARMA(1, 0) with parameter estimates similar to CMA.
+Second, we comment on the non-value related factors in~\autoref{tab:garch_nonvalue}. The level of the intercept in the mean equation is considerably higher for Mkt-RF and Mom than for the other factor strategies, with 0.096\% and 0.128\% respectively. The SMB factor instead has the lowest mean estimate that is not significantly different from zero. These estimtaes are in line with our expectations from a visual inspection of the cumulative return graphs in the data section~\autoref{fig:cumretplot}. We note that the Mkt-RF factor is, according to our model selection procedure, best fitted by a ARMA(0, 0) mean equation, indicating no predictive power of 1-week lagged returns. 
 
-In the variance equation, we note that the variance persistence is in a slightly lower range than for the value factors, with values between 0.94 and 0.98. The Mom factor stands out with a much higher estimate of $\alpha$ (0.186) than any of the other series (all around 0.10) and a lower $\beta$ (0.793). This means that volatility in the momentum factor is considerably more sensitive to return shocks and less predictable by the 1-week lagged volatility.
+In the variance equation, we note that the Mkt-RF is estimated with GJR dynamics, and the relatively low $\alpha = 0.037$ sensitivity to shocks is increased considerably by $\eta = 0.181$ in the case of a \emph{negative} shock. Furthermore, the Mom factor stands out with a much higher estimate of $\alpha$ (0.186) than any of the other series (all around 0.10) and a lower $\beta$ (0.793). This means that volatility in the momentum factor is more sensitive than other factor strategies to return shocks and less predictable by past volatility alone. We also note that the Mkt-RF and Mom factors exhibit relatively higher unconditional volatilities (of 0.022 and 0.018) than do other factors (around 0.010).
 
-
-% Here comment on all the parameter estimates, significance, persistence etc etc 
-
-
-% subsection estimation_results (end)
-
-
+For both the value-related and non-value related factors, many of the estimates of $\gamma$, the skewness of the skewed Student's \textit{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates for SMB and Mom. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots (\autoref{fig:qq_norm,fig:qq_std}) indicate misspecification for models with both the normal and Student's \textit{t} innovations.
 
 % TABLES NEED TO BE MODIFIED IN THE FOLLOWING WAYS
 % 1) Change {tabular} to {tabularx}{\textwidth} and make leftmost column an X column
@@ -133,7 +127,7 @@ In the variance equation, we note that the variance persistence is in a slightly
 \begin{tabularx}{\textwidth}{X}
 \\[-1.8ex]\toprule
 \\[-1.8ex] 
-\footnotesize Parameter estimates from ARMA-GARCH models. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. All data 1963-07-05 - 2016-07-01. Mean equation: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and variance equation: $\epsilon_t = \sigma_t z_t$ and $\sigma_t^2 = \omega + (\alpha + \eta I_{\epsilon_{t-1} \leq 0}) \epsilon_{t - 1}^2 + \beta \sigma^2_{t - 1}$. $\gamma$ and $\nu$ are the skewness and degree of freedom parameters of the skewed Student's \textit{t} innovations. $\eta$ is fixed at zero, as the sign bias test showed no significant misspecification of the GARCH for the HML, RMW and CMA factors. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993}.
+\footnotesize Parameter estimates from ARMA-GARCH models on weekly returns 1963-2016. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. Mean equation: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and variance equation: $\epsilon_t = \sigma_t z_t$ and $\sigma_t^2 = \omega + (\alpha + \eta I_{\epsilon_{t-1} \leq 0}) \epsilon_{t - 1}^2 + \beta \sigma^2_{t - 1}$. $\gamma$ and $\nu$ are the skewness and degree of freedom parameters of the skewed Student's \textit{t} innovations. $\eta$ is fixed at zero, as the sign bias test showed no significant misspecification of the GARCH for the HML, RMW and CMA factors. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993}.
 \end{tabularx}
 \begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
 \\[-1.8ex]\midrule
@@ -143,34 +137,35 @@ In the variance equation, we note that the variance persistence is in a slightly
 \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
 \\[-1.8ex] & \multicolumn{1}{c}{HML} & \multicolumn{1}{c}{RMW} & \multicolumn{1}{c}{CMA}\\ 
 \hline \\[-1.8ex] 
- $\mu\,\,(percent)$ & 0.058^{**} & 0.052^{***} & 0.037^{**} \\ 
-  & (0.025) & (0.016) & (0.017) \\ 
+ $\mu\,\,(percent)$ & 0.058^{***} & 0.052^{***} & 0.037^{***} \\ 
+  & (0.019) & (0.015) & (0.012) \\ 
   & & & \\ 
  $\phi_1$ & 0.722^{***} & 0.583^{***} & 0.112^{***} \\ 
-  & (0.079) & (0.190) & (0.019) \\ 
+  & (0.077) & (0.183) & (0.019) \\ 
   & & & \\ 
  $\theta_1$ & -0.608^{***} & -0.460^{**} &  \\ 
-  & (0.088) & (0.209)  &  \\ 
+  & (0.085) & (0.201)  &  \\ 
   & & & \\ 
  $\alpha$ & 0.109^{***} & 0.076^{***} & 0.088^{***} \\ 
-  & (0.002) & (0.001) & (0.002) \\ 
+  & (0.004) & (0.002) & (0.002) \\ 
   & & & \\ 
  $\beta$ & 0.873^{***} & 0.915^{***} & 0.899^{***} \\ 
-  & (0.002) & (0.001) & (0.000) \\ 
+  & (0.004) & (0.001) & (0.001) \\ 
   & & & \\ 
  $\eta$ & 0.000 & 0.000 & 0.000 \\ 
   & & &  \\ 
   & & & \\ 
- $\gamma$ & 0.491 & 0.132 & 0.370 \\ 
-  & (0.379) & (0.366) & (0.448) \\ 
+ $\gamma$ & 0.491 & 0.132 & 0.368 \\ 
+  & (0.377) & (0.355) & (0.453) \\ 
   & & & \\ 
- $\nu$ & 10.349^{***} & 11.079^{*} & 11.222^{***} \\ 
-  & (2.978) & (5.736) & (3.673) \\ 
+ $\nu$ & 10.349^{***} & 11.079^{**} & 11.223^{***} \\ 
+  & (2.900) & (5.531) & (3.618) \\ 
   & & & \\ 
  $\omega\,\,(per\,mil)$ & 0.003 & 0.001 & 0.001 \\ 
 \hline \\[-1.8ex] 
 Observations & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} \\ 
 LLH & \multicolumn{1}{c}{8,790} & \multicolumn{1}{c}{9,874} & \multicolumn{1}{c}{9,577} \\
+Unconditional volatility & \multicolumn{1}{c}{0.010} & \multicolumn{1}{c}{0.010} & \multicolumn{1}{c}{0.010} \\
 Variance persistence & \multicolumn{1}{c}{0.982} & \multicolumn{1}{c}{0.992} & \multicolumn{1}{c}{0.987} \\
 Ljung-Box [5] p-value & \multicolumn{1}{c}{1.000} & \multicolumn{1}{c}{1.000} & \multicolumn{1}{c}{0.209} \\ 
 Ljung-Box [10] p-value & \multicolumn{1}{c}{0.978} & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.084} \\ 
@@ -188,7 +183,7 @@ Sign bias (+) p-value & \multicolumn{1}{c}{0.357} & \multicolumn{1}{c}{0.664} & 
 \begin{tabularx}{\textwidth}{X}
 \\[-1.8ex]\toprule
 \\[-1.8ex] 
-\footnotesize Parameter estimates from ARMA-GARCH models. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. All data 1963-07-05 - 2016-07-01. Mean equation: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and variance equation: $\epsilon_t = \sigma_t z_t$ and $\sigma_t^2 = \omega + (\alpha + \eta I_{\epsilon_{t-1} \leq 0}) \epsilon_{t - 1}^2 + \beta \sigma^2_{t - 1}$. $\gamma$ and $\nu$ are the skewness and degree of freedom parameters of the skewed Student's \textit{t} innovations. $\eta$ is fixed at zero for SMB and Mom, as the sign bias test showed no significant misspecification of the GARCH. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993}.
+\footnotesize Parameter estimates from ARMA-GARCH models on weekly returns 1963-2016. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. Mean equation: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and variance equation: $\epsilon_t = \sigma_t z_t$ and $\sigma_t^2 = \omega + (\alpha + \eta I_{\epsilon_{t-1} \leq 0}) \epsilon_{t - 1}^2 + \beta \sigma^2_{t - 1}$. $\gamma$ and $\nu$ are the skewness and degree of freedom parameters of the skewed Student's \textit{t} innovations. $\eta$ is fixed at zero for SMB and Mom, as the sign bias test showed no significant misspecification of the GARCH. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993}.
 \end{tabularx}
 \begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
 \\[-1.8ex]\midrule
@@ -198,41 +193,42 @@ Sign bias (+) p-value & \multicolumn{1}{c}{0.357} & \multicolumn{1}{c}{0.664} & 
 \\[-1.8ex] & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
 \\[-1.8ex] & \multicolumn{1}{c}{Mkt-RF} & \multicolumn{1}{c}{SMB} & \multicolumn{1}{c}{Mom}\\ 
 \hline \\[-1.8ex] 
- $\mu\,\,(percent)$ & 0.126^{***} & 0.026 & 0.128^{***} \\ 
-  & (0.030) & (0.033) & (0.027) \\ 
+ $\mu\,\,(percent)$ & 0.096^{***} & 0.026 & 0.128^{***} \\ 
+  & (0.032) & (0.033) & (0.032) \\ 
   & & & \\ 
  $\phi_1$ &  & 0.772^{***} & 0.129^{***} \\ 
-  &  & (0.046) & (0.022) \\ 
+  &  & (0.046) & (0.027) \\ 
   & & & \\ 
  $\theta_1$ &  & -0.652^{***} &  \\ 
   &  & (0.056) & \\ 
   & & & \\ 
- $\alpha$ & 0.088^{***} & 0.115^{***} & 0.186^{***} \\ 
-  & (0.012) & (0.024) & (0.002) \\ 
+ $\alpha$ & 0.037^{**} & 0.115^{***} & 0.186^{***} \\ 
+  & (0.015) & (0.023) & (0.003) \\ 
   & & & \\ 
- $\beta$ & 0.851^{***} & 0.841^{***} & 0.793^{***} \\ 
-  & (0.004) & (0.036) & (0.003) \\ 
+ $\beta$ & 0.844^{***} & 0.841^{***} & 0.793^{***} \\ 
+  & (0.006) & (0.035) & (0.004) \\ 
   & & & \\ 
- $\eta$ & 0.450^{***} & 0.000 & 0.000 \\ 
-  & (0.112) &  &  \\ 
+ $\eta$ & 0.181^{***} & 0.000 & 0.000 \\ 
+  & (0.023) &  &  \\ 
   & & & \\ 
- $\gamma$ & -2.631^{**} & -0.864 & -2.546 \\ 
-  & (1.086) & (1.755) & (4.625) \\ 
+ $\gamma$ & -2.482^{**} & -0.864 & -2.547 \\ 
+  & (1.020) & (1.755) & (4.985) \\ 
   & & & \\ 
- $\nu$ & 13.305^{***} & 11.801 & 13.821 \\ 
-  & (3.081) & (15.784) & (16.335) \\ 
+ $\nu$ & 12.170^{***} & 11.801 & 13.822 \\ 
+  & (3.072) & (15.791) & (17.436) \\ 
   & & & \\ 
  $\omega\,\,(per\,mil)$ & 0.016 & 0.006 & 0.007 \\ 
 \hline \\[-1.8ex] 
 Observations & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} \\ 
-LLH & \multicolumn{1}{c}{7,052} & \multicolumn{1}{c}{8,568} & \multicolumn{1}{c}{7,941} \\ 
-Variance persistence & \multicolumn{1}{c}{0.966} & \multicolumn{1}{c}{0.956} & \multicolumn{1}{c}{0.979} \\
-Ljung-Box [5] p-value & \multicolumn{1}{c}{0.111} & \multicolumn{1}{c}{0.307} & \multicolumn{1}{c}{0.830} \\ 
-Ljung-Box [10] p-value & \multicolumn{1}{c}{0.079} & \multicolumn{1}{c}{0.734} & \multicolumn{1}{c}{0.712} \\ 
-ARCH-LM [5] p-value & \multicolumn{1}{c}{0.904} & \multicolumn{1}{c}{0.650} & \multicolumn{1}{c}{0.060} \\  
-ARCH-LM [10] p-value & \multicolumn{1}{c}{0.968} & \multicolumn{1}{c}{0.892} & \multicolumn{1}{c}{0.172} \\  
-Sign bias (-) p-value & \multicolumn{1}{c}{0.575} & \multicolumn{1}{c}{0.443} & \multicolumn{1}{c}{0.717} \\  
-Sign bias (+) p-value & \multicolumn{1}{c}{0.248} & \multicolumn{1}{c}{0.106} & \multicolumn{1}{c}{0.224} \\  
+LLH & \multicolumn{1}{c}{7,051} & \multicolumn{1}{c}{8,568} & \multicolumn{1}{c}{7,941} \\ 
+Unconditional volatility & \multicolumn{1}{c}{0.022} & \multicolumn{1}{c}{0.010} & \multicolumn{1}{c}{0.017} \\
+Variance persistence & \multicolumn{1}{c}{0.966} & \multicolumn{1}{c}{0.957} & \multicolumn{1}{c}{0.979} \\
+Ljung-Box [5] p-value & \multicolumn{1}{c}{0.108} & \multicolumn{1}{c}{0.307} & \multicolumn{1}{c}{0.830} \\ 
+Ljung-Box [10] p-value & \multicolumn{1}{c}{0.080} & \multicolumn{1}{c}{0.734} & \multicolumn{1}{c}{0.712} \\ 
+ARCH-LM [5] p-value & \multicolumn{1}{c}{0.804} & \multicolumn{1}{c}{0.650} & \multicolumn{1}{c}{0.060} \\  
+ARCH-LM [10] p-value & \multicolumn{1}{c}{0.897} & \multicolumn{1}{c}{0.892} & \multicolumn{1}{c}{0.172} \\  
+Sign bias (-) p-value & \multicolumn{1}{c}{0.899} & \multicolumn{1}{c}{0.443} & \multicolumn{1}{c}{0.717} \\  
+Sign bias (+) p-value & \multicolumn{1}{c}{0.182} & \multicolumn{1}{c}{0.106} & \multicolumn{1}{c}{0.224} \\  
 \bottomrule \\[-1.8ex] 
 \textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
 \end{tabularx} 
