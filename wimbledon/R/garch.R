@@ -211,7 +211,8 @@ do_garch_end_table <- function(object) {
   obs = length(object@fit$residuals)
   LLH = object@fit$LLH
   BIC = tryCatch(infocriteria(object)['Bayes',], error = function(err) NA)
-  Var_persistence = object@fit$persistence
+  unc_var = uncvariance(object)
+  var_persistence = object@fit$persistence
   # Get standardized residuals and dof
   stdresid = object@fit$residuals/object@fit$sigma
   modelinc = object@model$modelinc
@@ -231,7 +232,8 @@ do_garch_end_table <- function(object) {
     obs = obs,
     LLH = LLH,
     BIC = BIC,
-    Var_persistence = Var_persistence,
+    unc_var = unc_var,
+    var_persistence = var_persistence,
     LB_5 = LB_5,
     LB_10 = LB_10,
     LM_5 = LM_5,
