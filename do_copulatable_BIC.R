@@ -3,53 +3,48 @@
 rm(list = ls())
 library(devtools)
 load_all('wimbledon')
-
+load_all('australian')
 
 # Constant copulas --------------------------------------------------------
 
 # List of data frames
-load('data/derived/model_copula_constant_gauss.RData')
-load('data/derived/model_copula_constant_ght.RData')
-load('data/derived/model_copula_constant_ghskt.RData')
-load('data/derived/model_copula_dynamic_gauss.RData')
-load('data/derived/model_copula_dynamic_ght.RData')
-load('data/derived/model_copula_dynamic_ghskt.RData')
+load('data/derived/copula/full_constant.RData')
+load('data/derived/copula/full_dynamic.RData')
 
-
-model_list <- list(constant_gauss = model.copula.constant.gauss, 
-                   constant_ght = model.copula.constant.ght, 
-                   constant_ghskt = model.copula.constant.ghskt,
-                   dynamic_gauss = model.copula.dynamic.gauss,
-                   dynamic_ght = model.copula.dynamic.ght,
-                   dynamic_ghskt = model.copula.dynamic.ghskt
-)
-
-out.data <- lapply(model_list, function(model) {
-  N = ncol(model$shocks)
-  T = nrow(model$shocks)
-  
-  Parameters = model$params
-  Observations = T
-  ll = model$ll
-  nParams = length(unlist(model$params)) - (model$params$alpha == 0) - (model$params$beta == 0) + (N * (N-1) / 2)
-  BIC = -2 * ll + nParams * log(T)
-  Persistence = model$params$alpha + model$params$beta
-  
+copulatable <- function(copula_list) {
+  out.data <- lapply(copula_list, function(model) {
+    N = ncol(model$fit@dynamics@Omega)
     
-  out.data <- data.frame(value =
-    unlist(
-      list(
-        Parameters,
-        Observations = Observations,
-        ll = ll,
-        nParams = nParams,
-        BIC = BIC,
-        Persistence = Persistence
-      )
+    # NOTE HARDCODED
+    ################
+    T = 2766
+    
+    Parameters = model$optimized$par
+    Observations = T
+    ll = model$ll
+    nParams = length(Parameters) + (N * (N-1) / 2)
+    BIC = -2 * ll + nParams * log(T)
+    Persistence = tryCatch(model$optimized$par['alphabeta.alpha'], error = function(err) NA) + 
+      tryCatch(model$optimized$par['alphabeta.beta'], error = function(err) NA)
+    
+    out.data <- data.frame(value =
+                             unlist(
+                               list(
+                                 Parameters,
+                                 Observations = Observations,
+                                 ll = ll,
+                                 nParams = nParams,
+                                 BIC = BIC,
+                                 Persistence = Persistence
+                               )
+                             )
     )
-  )
+    
+    out.data <- round(out.data, digits = 3)
+  })
   
-  out.data <- round(out.data, digits = 3)
-})
+  print(out.data, digits = 3)  
+}
 
-print(out.data, digits = 3)
+copulatable(constant_copula_fit)
+copulatable(dynamic_copula_fit)
