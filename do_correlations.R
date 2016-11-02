@@ -127,16 +127,12 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
 
 # Do threshold plot and save ----------------------------------------------
 
-.plot_th_corr <- function(plotdf, plotdf.scatter,
+.plot_th_corr <- function(plotdf,
                           df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
                           width, height) {
   # Select the column factors for plot this plot
   plotdf <- plotdf %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
-  plotdf.scatter <- plotdf.scatter %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
   df.labels <- df.labels %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
-  
-  # Create the text df, to not print 1000 values, looks bad
-  plotdf.scatter.text <- plotdf.scatter %>% select(-value1, -value2) %>% distinct()
   
   # Then do threshold plot
   g <- ggplot(data = plotdf) +
@@ -168,10 +164,10 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
 # Quick fix to append standard correlations to graphs
 df.labels <- .append_standard_corr(plotdf.ret, df.estim)
 
-.plot_th_corr(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+.plot_th_corr(plotdf = plotdf.res, df.labels,
               COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
               14, 16)
-.plot_th_corr(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+.plot_th_corr(plotdf = plotdf.res, df.labels,
               COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
               14, 12)
 
@@ -274,7 +270,7 @@ df.labels <- .append_standard_corr(plotdf.ret, df.estim)
     xlab('Standardized residuals (row factor)') +
     coord_cartesian(xlim = c(-5,5), ylim = c(-5, 5)) +
     # Correlation coefficient
-    geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
+    #geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
     # Facet
     facet_grid(order2 ~ order, switch = 'y')
 
@@ -290,7 +286,7 @@ df.labels <- .append_standard_corr(plotdf.ret, df.estim)
 }
 
 # Do graph
-a <- .plot_th_corr_scatter(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+.plot_th_corr_scatter(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
               COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
               14, 7)
 
@@ -330,7 +326,68 @@ g <- ggplot(rand_data, aes(x = y1, y = y2)
 # Save plot
 ggsave('output/thresholdCorrelations/threshold_explain.png', g, device = 'png', width = 14, height = 12, units = 'cm')
               
-              
+
+# Threshold correlations simulated ----------------------------------------
+
+# Function for plot
+
+
+.plot_th_corr_simulated <- function(plotdf, ribbondf
+                          COLFACTORS, ROWFACTORS, OUTNAME,
+                          width, height) {
+  # Select the column factors for plot this plot
+  plotdf <- plotdf %>% filter(factor1 %in% COLFACTORS, factor2 %in% ROWFACTORS)
+  ribbondf <- ribbondf %>% filter(factor1 %in% COLFACTORS, factor2 %in% ROWFACTORS)
+  
+  # Then do threshold plot
+  g <- ggplot(data = plotdf) +
+    geom_ribbon(data = ribbondf,
+                mapping = aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = 'grey10',
+                alpha = 0.1
+    ) +
+    geom_line(aes(x = qs, y = coef, color = model)) +
+    theme_Publication() +
+    scale_colour_Publication() +
+    ylab('Correlation') +
+    xlab('Quantiles') +
+    coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) + 
+    theme(legend.position = 'none')+
+    scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
+    facet_grid(factor2 ~ factor1, switch = 'y')
+  
+  OUTPATH <- 'output/thresholdCorrelations/threshold_simulated_%s.png'
+  ggsave(sprintf(OUTPATH, OUTNAME),
+         g, device = 'png', width = width, height = height, units = 'cm'
+  )
+  
+}
+
+# Consolidate simulated and empirical data
+
+load('data/derived/correlations_threshold_copula.RData')
+models_simulated <- models
+models_empirical <- plotdf.res %>% 
+  select(factor1 = order,
+         factor2 = order2,
+         qs = qs,
+         coef = value,
+         lb = lb,
+         ub = ub
+         ) %>%
+  mutate(model = 'empirical')
+models <- bind_rows(models, models_empirical) %>% select(-ub, -lb)
+
+
+# Plot
+
+.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical,
+              COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
+              14, 16)
+.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical,
+              COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
+              14, 12)
+
 
 # Rolling correlations ----------------------------------------------------
 
