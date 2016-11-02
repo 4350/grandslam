@@ -1,174 +1,103 @@
-#' Bootstrap standard errors for our models
-#'
-#' This is done sequentially for each bootstrap, however, it is suitable
-#' to run this process on multiple computers and later join the results.
-#'
-#' The script is written to output its results progressively, so you can cancel
-#' it and the bootstrapped parameters so far will be available in an output
-#' file.
+#' Run `do_bootstrap_index` first!
 
-# BOOTSTRAP PARAMETERS ---------------------------------------------------
-
-library(devtools)
-load_all('wimbledon')
+# Setup ------------------------------------------------------------------
 
 rm(list = ls())
 
-# RNG seed used for Bootstrap. Change this to run a parallel universe bootstrap
-kRandomSeed <- 403
+library(devtools)
+library(doParallel)
+library(tictoc)
+load_all('australian')
 
-# Number of bootstrap repetitions to perform. Set this to a large number
-kBSRepetitions <- 1000
+load('data/derived/weekly-full.RData')
+load('data/derived/garch/model_GARCH_chosen.RData')
+load('data/derived/copula/full_dynamic.RData')
+load('data/derived/bootstrap/bs_index.RData')
 
-# Bootstrap iteration to start at (<=kBootstrapRepetitions)
-kBSIteration <- 4
+# Select relevant models. NULL out Omega in the fitted copula
+MODEL_NAME <- 'ghst'
+MODEL_COPULA <- dynamic_copula_fit$ghst
+MODEL_COPULA_FIT_ARGS <- list(distribution = MODEL_NAME, constant = F)
 
-# Average block length for stationary bootstrap
-# See optim_block_length for choosing this number
-kBSBlockLength <- 45
+# Change this to start bootstrap at a new index (for massively parallel
+# operations)
+START_INDEX <- 1
 
-# Best models, as determined before
-kGARCHModels <- list(
-  Mkt.RF = garch.specgen(0, 0),
-  HML = garch.specgen(1, 1),
-  SMB = garch.specgen(1, 1),
-  Mom = garch.specgen(1, 0),
-  RMW = garch.specgen(1, 1),
-  CMA = garch.specgen(1, 1)
-)
+# Configure parallel
+cl <- makePSOCKcluster(7)
+clusterEvalQ(cl, library(devtools))
+clusterEvalQ(cl, load_all('australian'))
+registerDoParallel(cl)
 
-# Output path
-kBSOutputPath <- 'data/derived/bootstrap/ghskt'
+# Use getspec so we DON'T set fixed pars, just extract the spec
+MODEL_GARCH <- lapply(model.GARCH, getspec)
 
-# From previous runs, values around here are found to optimize the LL
-load('data/derived/model_copula_dynamic_ghskt.RData')
-kCopulaParams <- c(
-  model.copula.dynamic.ghskt$params$dist.params$df,
-  model.copula.dynamic.ghskt$params$dist.params$skew,
-  model.copula.dynamic.ghskt$params$alpha,
-  model.copula.dynamic.ghskt$params$beta
-)
+# NULL out Omega for fitting!
+MODEL_COPULA$fit@dynamics@Omega <- NULL
 
-# c(
-#   11.804937402,
-#   -0.019263030,
-#   0.064795233,
-#   -0.161745377,
-#   -0.148752424,
-#   0.081236747,
-#   0.004100415,
-#   0.068927164,
-#   0.912195831
-# )
+# Do Bootstrap -----------------------------------------------------------
 
-cz <- rep(0, 6)
-kCopulaUi <- rbind(
-  # Degrees of freedom bounds
-  c( 1, cz, 0, 0),
-  c(-1, cz, 0, 0),
+# All this code should be moved to a separate file
 
-  # Skewness Bounds
-  cbind(cz, diag( 1, 6), cz, cz),
-  cbind(cz, diag(-1, 6), cz, cz),
-
-  # Alpha/Beta Bounds
-  c(0, cz,  1,  0),
-  c(0, cz,  0,  1),
-  c(0, cz, -1, -1)
-)
-rm(cz)
-
-kCopulaCi <- cbind(
-  c(
-      6.0000,       # min df
-    -20.0000,       # max df (negative)
-    rep(-0.25, 6),  # min skew
-    rep(-0.25, 6),  # max skew (negative)
-      0.0000,       # min alpha
-      0.0000,       # min beta
-     -0.9999        # max alpha + beta (negative)
-  )
-)
-
-# Functions Unique to Each Copula Model ----
-
-#' Function to optimize for GHSKT copula
-#'
-#' Unique because parameters are special for this copula
-optimize <- function(params, u, cluster) {
-  df <- params[1]
-  skew <- params[2:(ncol(u) + 1)]
-  alpha <- tail(params, 2)[1]
-  beta <- tail(params, 1)[1]
-
-  -wimbledon::dc.ll.total(
-    u,
-    list(
-      df = df,
-      skew = skew
-    ),
-    alpha = alpha,
-    beta = beta,
-    cluster
-  )
-}
-
-#' Estimate GHSKT copula
-#'
-#' Unique because constraints need to be set specifically, and correct
-#' optimized function must be called
-estimate.copula <- function(u) {
-  cluster <- makeCluster(detectCores() - 1)
-  clusterEvalQ(cluster, library(ghyp))
-  clusterEvalQ(cluster, library(devtools))
-  clusterEvalQ(cluster, load_all('wimbledon'))
-
-  param <- constrOptim(
-    theta = kCopulaParams,
-    f = optimize,
-    grad = NULL,
-    u = u,
-    cluster = cluster,
-
-    # Optimization constraints and control
-    ui = kCopulaUi,
-    ci = kCopulaCi,
-
-    control = list(
-      trace = 0,
-      maxit = 1000
+#' Fit best GARCH models to original data, returning ugarchfit objects
+fit_garch <- function(garch_models, data) {
+  N <- length(garch_models)
+  
+  lapply(seq(N), function(i) {
+    ugarchfit(
+      garch_models[[i]],
+      data[, i],
+      solver = "hybrid"
     )
-  )
-
-  stopCluster(cluster)
-  param
+  })
 }
 
-#' Build bootstrap output for GHSKT copula
-#'
-#' Unique because names of parameters are hardcoded
-build.bootstrap.output.copula <- function(b.copula) {
-  b.out.copula <- c(
-    b.copula$par,
-    -b.copula$value,
-    b.copula$convergence
-  )
-  names(b.out.copula) <- paste0('copula.', c(
-    # Parameters
-    'par.df',
-    paste0('par.skew', seq(1, 6)),
-    'par.alpha',
-    'par.beta',
+#' Extract uniforms from GARCH fits
+get_uniforms <- function(garch_fits) {
+  sapply(garch_fits, function(fit) {
+    rugarch:::psghst(
+      fit@fit$z,
+      shape = fit@fit$coef[['shape']],
+      skew = fit@fit$coef[['skew']]
+    )
+  })
+}
 
-    # Diagnostics
-    'll',
-    'convergence'
+dir.create(sprintf('data/derived/bootstrap/%s', MODEL_NAME), showWarnings = F)
+
+for (b in seq(START_INDEX, ncol(BS_INDEX))) {
+  tic(sprintf('Model "%s". Bootstrap %d', MODEL_NAME, b))
+  
+  # Need to make a data frame; something about tibbles messes up
+  data <- data.frame(df[BS_INDEX[, b], -1])
+  
+  tic('GARCH fitting')
+    fits <- fit_garch(MODEL_GARCH, data)
+  toc()
+  
+  tic('Extract uniform residuals')
+    uniforms <- get_uniforms(fits)
+  toc()
+  
+  tic('Fit Copula')
+  fitted_copula <- do.call(copula_fit, c(
+    list(
+      spec = MODEL_COPULA$fit,
+      u = uniforms
+    ),
+    MODEL_COPULA_FIT_ARGS
   ))
-
-  b.out.copula
+  toc()
+  
+  results <- list(
+    garch = fits,
+    copula = fitted_copula$fit
+  )
+  
+  save(
+    results,
+    file = sprintf('data/derived/bootstrap/%s/%d.RData', MODEL_NAME, b)
+  )
+  
+  toc()
 }
-
-
-# Bootstrap --------------------------------------------------------------
-source('source/dynamic_bootstrap.R')
-
