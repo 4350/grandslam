@@ -1,0 +1,59 @@
+%!TEX root = ../main.tex
+
+\section{Multivariate dependence in univariate residuals} % (fold)
+%\label
+% explain the logic in what we are doing, that there might still be dependence in what looks like white noise residuals
+
+\subsection{Threshold correlations}
+%\label
+% method, plots, [diff between series/residuals], talk
+
+\subsection{Rolling correlation}
+%\label
+% method, plots, talk
+
+\section{Modeling multivariate dependence: Copula} % (fold)
+%\label
+
+
+\subsection{Multivariate model selection}
+%\label
+% why copula?
+% explain logic and intuition: this is a parsimonious way, and solves the two issues with asymmetry and time-variation to some extent
+% other models BEKK, etc have issues with dimensionality or can't capture the features of threshold and rolling
+
+\subsection{Copula}
+%\label
+% method of model
+% estimation of model
+
+\subsection{Copula results with constant correlations}
+%\label
+% diagnostics of fit
+% include threshold correlations, look better for skewed t, gaussian bad
+
+\subsection{Copula results with dynamic correlations}
+%\label
+% still haven't captured dynamic, lets do this now
+% diagnostics of fit
+% why we prefer symmetric t
+% correlation patterns over time in-sample graph looks very much like the data rolling
+
+% potentially subsection exogenous regressors
+%
+
+\section{Putting the model to work}
+%\label
+% now, lets see what this model can say about a few things
+
+\subsection{Mean-variance investing}
+%\label
+% fama french regressions, what actually happens to MV weights, do they go to zero?
+% explain method for out-of-sample distributions, simulation based
+% show that weights don't go to zero, not for sample and not for advanced super copula model
+% what is the out-of-sample investment performance of relying on the best copula model?
+% it looks pretty good but not drastically better than relying on sample average - OOS is hard
+
+\subsection{Conditional diversification benefits}
+%\label
+% what are the theoretical diversificaiton benefits of including hml? is HML or CMA riskier if one can only choose either or? CDB analysis
