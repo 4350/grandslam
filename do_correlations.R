@@ -332,7 +332,7 @@ ggsave('output/thresholdCorrelations/threshold_explain.png', g, device = 'png', 
 # Function for plot
 
 
-.plot_th_corr_simulated <- function(plotdf, ribbondf
+.plot_th_corr_simulated <- function(plotdf, ribbondf,
                           COLFACTORS, ROWFACTORS, OUTNAME,
                           width, height) {
   # Select the column factors for plot this plot
