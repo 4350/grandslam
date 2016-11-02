@@ -142,12 +142,12 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
     ) +
     geom_line(aes(x = qs, y = value, color = 'Threshold correlation')) +
     geom_abline(aes(slope = 0, intercept = standard_corr,
-                    color = 'Correlation'), linetype = 2, data = df.labels)+
+                    color = 'Correlation'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels)+
     theme_Publication() +
     scale_colour_Publication() +
     ylab('Correlation') +
     xlab('Quantiles') +
-    coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) + 
+    coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.50, .75)) + 
     theme(legend.position = 'none')+
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
     facet_grid(order2 ~ order, switch = 'y')
@@ -163,6 +163,9 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
 
 # Quick fix to append standard correlations to graphs
 df.labels <- .append_standard_corr(plotdf.ret, df.estim)
+# Reorder variables
+plotdf.res$order <- factor(plotdf.res$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+plotdf.res$order2 <- factor(plotdf.res$order2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
 .plot_th_corr(plotdf = plotdf.res, df.labels,
               COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
@@ -195,7 +198,7 @@ df.labels <- .append_standard_corr(plotdf.ret, df.estim)
     ) +
     geom_line(aes(x = qs, y = value, color = 'Threshold correlation')) +
     geom_abline(aes(slope = 0, intercept = standard_corr,
-                    color = 'Correlation'), linetype = 2, data = df.labels)+
+                    color = 'Correlation'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels)+
     theme_Publication() +
     scale_colour_Publication() +
     ylab('Correlation') +
@@ -331,27 +334,31 @@ ggsave('output/thresholdCorrelations/threshold_explain.png', g, device = 'png', 
 
 # Function for plot
 
-
-.plot_th_corr_simulated <- function(plotdf, ribbondf,
+.plot_th_corr_simulated <- function(plotdf, ribbondf, df.labels,
                           COLFACTORS, ROWFACTORS, OUTNAME,
                           width, height) {
   # Select the column factors for plot this plot
   plotdf <- plotdf %>% filter(factor1 %in% COLFACTORS, factor2 %in% ROWFACTORS)
   ribbondf <- ribbondf %>% filter(factor1 %in% COLFACTORS, factor2 %in% ROWFACTORS)
+  df.labels$factor1 <- df.labels$order
+  df.labels$factor2 <- df.labels$order2
+  df.labels <- df.labels %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
   
   # Then do threshold plot
   g <- ggplot(data = plotdf) +
+    geom_line(aes(x = qs, y = coef, color = model)) +
     geom_ribbon(data = ribbondf,
                 mapping = aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
                 fill = 'grey10',
                 alpha = 0.1
     ) +
-    geom_line(aes(x = qs, y = coef, color = model)) +
+    # geom_abline(aes(slope = 0, intercept = standard_corr,
+    #                 color = 'Correlation'), colour = 'grey20', linetype = 2, size = 0.25, data = df.labels)+
     theme_Publication() +
     scale_colour_Publication() +
     ylab('Correlation') +
     xlab('Quantiles') +
-    coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) + 
+    coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.20, .60)) + 
     theme(legend.position = 'none')+
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
     facet_grid(factor2 ~ factor1, switch = 'y')
@@ -376,15 +383,18 @@ models_empirical <- plotdf.res %>%
          ub = ub
          ) %>%
   mutate(model = 'empirical')
+
 models <- bind_rows(models, models_empirical) %>% select(-ub, -lb)
+models$factor1 <- factor(models$factor1, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+models$factor2 <- factor(models$factor2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
 
 # Plot
 
-.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical,
+.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels,
               COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
               14, 16)
-.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical,
+.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels,
               COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
               14, 12)
 
@@ -394,7 +404,7 @@ models <- bind_rows(models, models_empirical) %>% select(-ub, -lb)
 # Create list to hold correlation sets
 rollCorrList.ret = roll_corr(df = df.estim %>% select(-Date), 
                                    df.date = df.estim %>% select(Date), 
-                                   window = 45
+                                   window = 52
                                    )
 
 
@@ -403,6 +413,10 @@ plotdf.ret <- bind_rows(rollCorrList.ret$HML, rollCorrList.ret$RMW, rollCorrList
 
 # Quick fix to append standard correlations to graphs
 df.labels <- .append_standard_corr(plotdf.ret, df.estim)
+
+# Order the variables
+plotdf.ret$order <- factor(plotdf.ret$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
 # Do roll plot and save ----------------------------------------------
 g <- ggplot(plotdf.ret, aes(x = Date, y = value)
@@ -418,15 +432,10 @@ g <- ggplot(plotdf.ret, aes(x = Date, y = value)
   xlab('Year') +
   scale_x_date(date_labels = "%y") +
   coord_cartesian(ylim = c(-1, 1), xlim = c(df.estim$Date[1], df.estim$Date[length(df.estim$Date)])) +
-  #annotate("rect", xmin = as.Date('1986-01-01'), xmax = as.Date('1994-01-01'), ymin = -0.95, ymax = -0.5, alpha = 0.8, fill = 'grey80')+
-  #geom_text(data = df.labels, aes(x = as.Date('1990-01-01'), y = -0.725, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
   geom_text(data = df.labels, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
-  facet_grid(order ~ order2)
-  #ggtitle('Rolling 45-week correlations (95% confidence bounds)')#+
-  #theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
+  facet_grid(order ~ order2, switch = 'y')
 
-ggsave('output/rollingCorrelations/rolling45.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
-
+ggsave('output/rollingCorrelations/rolling52.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
 
 # Do roll plot with NBER dummy --------------------------------------------
 load('data/derived/usrec-weekly.RData')
@@ -452,11 +461,7 @@ g <- ggplot(plotdf.ret) +
   xlab('Year') +
   scale_x_date(date_labels = "%y") +
   coord_cartesian(ylim = c(-1, 1), xlim = c(df.estim$Date[1], df.estim$Date[length(df.estim$Date)])) +
-  #annotate("rect", xmin = as.Date('1986-01-01'), xmax = as.Date('1994-01-01'), ymin = -0.95, ymax = -0.5, alpha = 0.8, fill = 'grey80')+
-  #geom_text(data = df.labels, aes(x = as.Date('1990-01-01'), y = -0.725, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
   geom_text(data = df.labels, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
   facet_grid(order ~ order2)
-#ggtitle('Rolling 45-week correlations (95% confidence bounds)')#+
-#theme(axis.text = element_text(size = rel(0.6), colour = "grey30")) 
 
-ggsave('output/rollingCorrelations/rolling45NBER.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
+ggsave('output/rollingCorrelations/rolling52NBER.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
