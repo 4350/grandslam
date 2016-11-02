@@ -7,6 +7,8 @@ rm(list = ls())
 library(devtools)
 library(doParallel)
 library(tictoc)
+library(rugarch)
+
 load_all('australian')
 
 load('data/derived/weekly-full.RData')
