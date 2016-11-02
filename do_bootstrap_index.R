@@ -7,6 +7,9 @@
 
 rm(list = ls())
 
+library(devtools)
+load_all('wimbledon')
+
 set.seed(403)
 
 BLOCK_LENGTH <- 104
