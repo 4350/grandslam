@@ -15,8 +15,8 @@ load('data/derived/copula/full_dynamic.RData')
 load('data/derived/bootstrap/bs_index.RData')
 
 # Select relevant models. NULL out Omega in the fitted copula
-MODEL_NAME <- 'ghst'
-MODEL_COPULA <- dynamic_copula_fit$ghst
+MODEL_NAME <- 'norm'
+MODEL_COPULA <- dynamic_copula_fit[[MODEL_NAME]]
 MODEL_COPULA_FIT_ARGS <- list(distribution = MODEL_NAME, constant = F)
 
 # Change this to start bootstrap at a new index (for massively parallel
@@ -90,7 +90,7 @@ for (b in seq(START_INDEX, ncol(BS_INDEX))) {
   toc()
   
   results <- list(
-    garch = fits,
+    garch_coef = lapply(fits, function(fit) fit@fit$coef),
     copula = fitted_copula$fit
   )
   
