@@ -154,65 +154,7 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) + 
     theme(legend.position = 'none')+
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
-    facet_grid(order2 ~ order, switch = 'y', drop = TRUE)
-  
-  # DEACTIVATED USE OF SCATTER PLOTS
-  ###################################
-  # # Then do scatter plot(s)
-  # g_scatter <- ggplot(data = plotdf.scatter) +
-  #   geom_bin2d(
-  #     aes(
-  #       x = value1, y = value2, color = 'GARCH residuals'
-  #       ),
-  #     binwidth = c(0.20, 0.20)
-  #   )+
-  #   
-  #   # Boxes
-  #   # 10%
-  #   geom_rect(
-  #     aes(
-  #       xmin = -5, xmax = px10, ymin = -5, ymax = py10
-  #     ), fill = NA, color = 'black', linetype = 4, size = 0.25
-  #   )+
-  #   geom_text(data = plotdf.scatter.text, 
-  #             aes(x = -4.5, y = py10-0.3, label = '10%'), family = 'Minion Pro', size = 2, parse = F)+
-  #   # 49%
-  #   geom_rect(
-  #     aes(
-  #       xmin = -5, xmax = px49, ymin = -5, ymax = py49
-  #     ), fill = NA, color = 'black', linetype = 3, size = 0.25
-  #   )+
-  #   geom_text(data = plotdf.scatter.text, 
-  #             aes(x = -4.5, y = py49-0.3, label = '49%'), family = 'Minion Pro', size = 2, parse = F)+
-  #   # 51%
-  #   geom_rect(
-  #     aes(
-  #       xmin = px51, xmax = 5, ymin = py51, ymax = 5
-  #     ), fill = NA, color = 'black', linetype = 3, size = 0.25
-  #   )+
-  #   geom_text(data = plotdf.scatter.text, 
-  #             aes(x = 4.5, y = py51+0.3, label = '51%'), family = 'Minion Pro', size = 2, parse = F)+
-  #   # 90%
-  #   geom_rect(
-  #     aes(
-  #       xmin = px90, xmax = 5, ymin = py90, ymax = 5
-  #     ), fill = NA, color = 'black', linetype = 4, size = 0.25
-  #   )+
-  #   geom_text(data = plotdf.scatter.text, 
-  #             aes(x = 4.5, y = py90+0.3, label = paste('90%')), family = 'Minion Pro', size = 2, parse = F)+
-  #   
-  #   theme_Publication() +
-  #   scale_colour_Publication()+
-  #   theme(legend.position = 'none')+
-  #   ylab('Standardized residuals (column factor)') +
-  #   xlab('Standardized residuals (row factor)') +
-  #   coord_cartesian(xlim = c(-5,5), ylim = c(-5, 5)) +
-  #   geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
-  #   facet_grid(order2 ~ order, switch = 'y')
-  
-  # Combine the two in grid
-  # out.graph <- arrangeGrob(g_scatter, g, ncol = 2)
-  # Save plot
+    facet_grid(order2 ~ order, switch = 'y')
   
   OUTPATH <- 'output/thresholdCorrelations/threshold_%s.png'
   ggsave(sprintf(OUTPATH, OUTNAME),
@@ -234,14 +176,133 @@ df.labels <- .append_standard_corr(plotdf.ret, df.estim)
               14, 12)
 
 
+# Threshold correlation explain before results, for MKT-HML pair ------------------------------
+
+# Function for graph
+
+.plot_th_corr_scatter <- function(plotdf, plotdf.scatter,
+                          df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
+                          width, height) {
+  # Select the column factors for plot this plot
+  plotdf <- plotdf %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  plotdf.scatter <- plotdf.scatter %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  df.labels <- df.labels %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  
+  # Create the text df, to not print 1000 values, looks bad
+  plotdf.scatter.text <- plotdf.scatter %>% select(-value1, -value2) %>% distinct()
+  
+  # Then do threshold plot
+  g <- ggplot(data = plotdf) +
+    geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = 'grey10',
+                alpha = 0.1
+    ) +
+    geom_line(aes(x = qs, y = value, color = 'Threshold correlation')) +
+    geom_abline(aes(slope = 0, intercept = standard_corr,
+                    color = 'Correlation'), linetype = 2, data = df.labels)+
+    theme_Publication() +
+    scale_colour_Publication() +
+    ylab('Correlation') +
+    xlab('Quantiles') +
+    coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) +
+    theme(legend.position = 'none')+
+    scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
+    facet_grid(order2 ~ order, switch = 'y')
+   
+  # Then do scatter plot(s)
+  g_scatter <- ggplot() +
+    geom_bin2d(
+      data = plotdf.scatter,
+      mapping = aes(
+        x = value1, y = value2, color = 'GARCH residuals'
+        ),
+      binwidth = c(0.10, 0.10)
+    )+
+    # Boxes
+    # 10%
+    geom_rect(
+      data = plotdf.scatter.text,
+      mapping = aes(
+        xmin = -5, xmax = px10, ymin = -5, ymax = py10
+      ),
+      fill = 'grey80', alpha = 0.4, linetype = 1, colour = 'black', size = 0.25
+    ) +
+    # 49%
+    geom_rect(
+      data = plotdf.scatter.text,
+      mapping = aes(
+        xmin = -5, xmax = px49, ymin = -5, ymax = py49
+      ),
+      fill = 'grey80', alpha = 0.5, linetype = 2, colour = 'black', size = 0.25
+    )+
+    # 51%
+    geom_rect(
+      data = plotdf.scatter.text,
+      mapping = aes(
+        xmin = px51, xmax = 5, ymin = py51, ymax = 5
+      ),
+      fill = 'grey80', alpha = 0.5, linetype = 2, colour = 'black', size = 0.25
+    )+
+    # 90%
+    geom_rect(
+      data = plotdf.scatter.text,
+      mapping = aes(
+        xmin = px90, xmax = 5, ymin = py90, ymax = 5
+      ),
+      fill = 'grey80', alpha = 0.4, linetype = 1, colour = 'black', size = 0.25
+    )+
+    # Text
+    # 10 %
+    geom_text(data = plotdf.scatter.text,
+              aes(x = -3.75, y = py10-0.3, label = 'ThCorr 10%'), family = 'Minion Pro', size = 2, parse = F)+
+    # 49%
+    geom_text(data = plotdf.scatter.text,
+              aes(x = -3.75, y = py49-0.3, label = 'ThCorr 49%'), family = 'Minion Pro', size = 2, parse = F)+
+    # 51%
+    geom_text(data = plotdf.scatter.text,
+              aes(x = 3.75, y = py51+0.3, label = 'ThCorr 51%'), family = 'Minion Pro', size = 2, parse = F)+
+    # 90%
+    geom_text(data = plotdf.scatter.text,
+              aes(x = 3.75, y = py90+0.3, label = paste('ThCorr 90%')), family = 'Minion Pro', size = 2, parse = F)+
+        
+    # Theme options
+    theme_Publication() +
+    scale_colour_Publication()+
+    theme(legend.position = 'none')+
+    # Axes
+    ylab('Standardized residuals (column factor)') +
+    xlab('Standardized residuals (row factor)') +
+    coord_cartesian(xlim = c(-5,5), ylim = c(-5, 5)) +
+    # Correlation coefficient
+    geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
+    # Facet
+    facet_grid(order2 ~ order, switch = 'y')
+
+  # Combine the two in grid
+  out.graph <- arrangeGrob(g_scatter, g, ncol = 2)
+  # Save plot
+
+  OUTPATH <- 'output/thresholdCorrelations/threshold_scatter_%s.png'
+  ggsave(sprintf(OUTPATH, OUTNAME),
+         out.graph, device = 'png', width = width, height = height, units = 'cm'
+  )
+  
+}
+
+# Do graph
+a <- .plot_th_corr_scatter(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+              COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
+              14, 7)
+
+
 # Threshold correlation fake data scatter for method ------------------------------
 
 # Generate data
 sigma = diag(2)
-sigma[1,2] = 0.5
-sigma[2,1] = 0.5
+sigma[1,2] = -0.25
+sigma[2,1] = -0.25
 rand_data <- data.frame(rmvnorm(n = 1000, mean = c(0,0), sigma = sigma))
-rand_data$cor = 0.5
+rand_data$cor = -0.25
 colnames(rand_data) = c('y1','y2')
 
 # Plot data
