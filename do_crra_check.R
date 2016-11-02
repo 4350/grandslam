@@ -6,9 +6,11 @@ get_realized <- function(name) {
 }
 
 realized <- list(
-  constant_std = get_realized('simple_5_full_constant_std'),
-  dynamic_ghst = get_realized('simple_5_full_dynamic_ghst'),
-  indep = get_realized('simple_5_full_indep')
+  constant_norm = get_realized('simple_5_oos_constant_norm'),
+  constant_std = get_realized('simple_5_oos_constant_std'),
+  dynamic_norm = get_realized('simple_5_oos_dynamic_norm'),
+  dynamic_std = get_realized('simple_5_oos_dynamic_std'),
+  dynamic_ghst = get_realized('simple_5_oos_dynamic_ghst')
 )
 
 lapply(realized, mean)

@@ -2,7 +2,7 @@ library(foreach)
 library(tictoc)
 
 rm(list = ls())
-NAME <- 'full_indep'
+NAME <- 'oos_constant_norm'
 gamma = 5
 
 load(sprintf('data/derived/distributions/%s_10000.RData', NAME))
