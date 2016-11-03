@@ -137,7 +137,7 @@ copula_fit_pars <- function(spec, distribution = 'norm', constant = T, upsilon =
   ci <- list()
 
   # Distribution parameters to optimize over
-  if (distribution == 't') {
+  if (distribution == 't' || distribution == 'std') {
     pars$distribution <- c(INITIAL_NU)
     names(pars$distribution) <- c('nu')
 
@@ -190,7 +190,7 @@ copula_fit_pars <- function(spec, distribution = 'norm', constant = T, upsilon =
 copula_fit_build_spec <- function(pars, spec, distribution, constant, upsilon) {
   N <- length(spec@distribution@gamma)
 
-  if (distribution == 't') {
+  if (distribution == 't' || distribution == 'std') {
     spec@distribution@nu <- pars[1]
     pars <- pars[-1]
   }
