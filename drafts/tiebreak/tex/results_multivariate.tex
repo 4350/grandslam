@@ -85,7 +85,22 @@ For modeling of multivariate dependence, we expect that good candidate models wi
 \subsection{Copula results with constant correlations}
 %\label
 % diagnostics of fit
-% include threshold correlations, look better for skewed t, gaussian bad
+% theory
+A key purpose of the copula is to better capture tail dependence between factor series. Tail dependence was demonstrated in the threshold correlation analysis, and we may now compare the empirical threshold correlations to simulated threshold correlations from the constant copula model. 
+
+By simulating a 250,000 weeks of shocks in the copula, and then transforming these shocks into standardized residuals for each of the factors, we can test copula's ability to generate the tail dependence in the data. The results are given in~\autoref{fig:threshold_copula1, threshold_copula2}.
+
+% plot
+
+% talk
+In each plot, we present the empirical threshold correlation with its associated 95\% confidence bound, along with three copula models: the standard normal copula, the Student's \textit{t} copula and the skewed Student's \textit{t}.
+
+First, we note that for most factors, the normal copula is the farthest away from generating threshold correlations that correspond to the empirical distribution around the median. More specifically, it seems to underestimate the threshold correlation, i.e. not generate sufficient tail dependence. The Student's \textit{t} and skewed Student's \textit{t} copulae better capture the threshold correlations, as the fatter tails of the Student's \textit{t} distribution allows for tail dependence. For example, note how the normal copula generates negative threshold correlations for both the Mom - HML and RMW - HML asset pairs, while the Student's \textit{t} based copulae are much closer to the higher values in the data. On the other hand, the Student's \textit{t} based copulae sometimes seem to overshoot the empirical threshold correlation, as in the Mkt-RF - RMW asset pair.
+
+Second, we find that although the skewed Student's \textit{t} does generate some asymmetry around the mean, which can be seen most clearly for the Mom - RMW and RMW - HML asset pairs, the asymmetry is far too weak to be an accurate description of the data. 
+
+In conclusion, threshold correlation comparison between empirical and simulated data shows the limitations of our copula approach. Although the copulae are flexible and can express tail dependence, which is a clear improvement to no tail dependence at all, it does not overlap very well with the data. For example, the Student's \textit{t} copula only has one degree of freedom parameter that controls the fatness of tails, and the skewed Student's \textit{t} copula only has one skewness parameter for each series. This imposes limits on how strongly the model can express fat tails or asymmetries between factors A and B and simultaneously express other fat tails or asymmetries (or lack thereof) between factors A and C. For a collection of six factors with heterogenous dependence, this is even harder. This is a clear limitation of the quite parsimonious copula approach, and will be discussed further in the concluding section. Although imperfect, the copula modeling of tail dependence could constitute a significant improvement to alternatives, especially in the field of risk management, where understanding of tail events is paramount.
+
 \subsection{Copula results}
 % TABLES NEED TO BE MODIFIED IN THE FOLLOWING WAYS
 % 1) Change {tabular} to {tabularx}{\textwidth} and make leftmost column an X column
