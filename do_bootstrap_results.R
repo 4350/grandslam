@@ -6,8 +6,8 @@ library(stargazer)
 
 # XXX Bootstrap should be named dynamic_norm or something
 load('data/derived/copula/full_dynamic.RData')
-PATH <- 'data/derived/bootstrap/ghst'
-estimate <- dynamic_copula_fit$ghst
+PATH <- 'data/derived/bootstrap/norm'
+estimate <- dynamic_copula_fit$norm
 
 results <- lapply(list.files(PATH), function(data) {
   load(file.path(PATH, data))
@@ -32,6 +32,9 @@ fit_results <- bind_rows(
     param_estimate <- param_fn(estimate$fit)
     names(param_estimate) <- NULL
     
+    param_estimate[param_se == 0] <- NaN
+    param_se[param_se == 0] <- NaN
+    
     data.frame(
       estimate = param_estimate,
       se = param_se
@@ -50,3 +53,4 @@ stargazer(
   digits = 4,
   digits.extra = 0
 )
+cat(sprintf('N: %d', length(results)))
