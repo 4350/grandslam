@@ -585,7 +585,9 @@ g <- ggplot(plotdf.res, aes(x = Date, y = value)
               fill = 'grey10',
               alpha = 0.1
   ) +
-  geom_line(aes(color = 'Residual series')) +
+  geom_line(aes(color = 'Rolling correlation')) +
+  geom_abline(aes(slope = 0, intercept = standard_corr,
+                  color = 'Unconditional correlation'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels.res)+
   theme_Publication() +
   scale_colour_Publication() +
   ylab('Correlation') +
@@ -610,10 +612,15 @@ g <- ggplot(plotdf.res, aes(x = Date, y = value)
               alpha = 0.1,
               data = plotdf.ret
   ) +
-  geom_line(aes(color = 'Residuals')) +
-  geom_line(aes(color = 'Returns'),
+  geom_line(aes(color = 'Rolling correlation residuals')) +
+  geom_line(aes(color = 'Rolling correlations returns'),
             data = plotdf.ret) +
+  geom_abline(aes(slope = 0, intercept = standard_corr,
+                  color = 'Unconditional correlation residuals'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels.res)+
+  geom_abline(aes(slope = 0, intercept = standard_corr,
+                  color = 'Unconditional correlation returns'), colour = 'grey20', size = 0.25, linetype = 3, data = df.labels.ret)+
   theme_Publication() +
+  theme(legend.position = 'none')+
   scale_colour_Publication() +
   ylab('Correlation') +
   xlab('Year') +
