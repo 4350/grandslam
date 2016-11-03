@@ -3,14 +3,47 @@
 \section{Multivariate dependence in univariate residuals} % (fold)
 %\label
 % explain the logic in what we are doing, that there might still be dependence in what looks like white noise residuals
+After the univariate modeling of returns in ARMA-GARCH models, we find that the ARMA-GARCH residuals look like white noise, with no serial correlation or ARCH effects. However, when considered jointly, we find that there is substantial dependence remaining in the residual series -- as will be shown in this section, correlation is non-zero and time-varying, and there is tail dependence between the residual series. 
+
+Therefore, we do not use returns directly in the multivariate analysis, as significant parts of the dependence can be removed by univariate models alone. Instead, we use the residuals from the ARMA-GARCH models. The intuition behind this is that we do not want to confuse multivariate dependency in returns with what are in fact just predictable effects that can be understood on the univariate level alone.
+
+Our philosophy, which is in line with the copula methodology, is to try to sanitize the data as far as possible on the univariate level. Then, any dependence left in the residuals can be attributed to multivariate dependence.
 
 \subsection{Threshold correlations}
 %\label
-% method, plots, [diff between series/residuals], talk
+% method
+Threshold (or exceedance) correlations have previously been used to highlight the asymmetric dependence structure of i.a. country equity indices~\autocite{LonginSolnik2001}, portfolios by industry, size, value and momentum~\autocite{AngChen2002} and factor strategies~\autocite{ChristoffersenLanglois2013}. The following analysis is still new as it adds the factors investment (CMA) and profitability (RMW). We follow~\textcite{ChristoffersenLanglois2013} definition of threshold correlation
+\begin{align}
+    ThCorr(r_i, r_j) = 
+    \begin{cases} 
+        Corr\Big(r_i, r_j \,|\, r_i < F_i^{-1}(p), r_j < F_j^{-1}(p)\Big)  & \text{for } p < 0.5 \\
+        Corr\Big(r_i, r_j \,|\, r_i \geq F_i^{-1}(p), r_j \geq F_j^{-1}(p)\Big)  & \text{for } p \geq 0.5
+    \end{cases}
+\end{align}
+where $F_i^{-1}(p)$ the empirical quantile of $r_i$ at percentile $p$. 
+
+Graphically, threshold correlation are understood as the standard correlation estimate in more and more distant parts of the first and third quadrant as $p$ approaches either zero or unity. This subsetting of data is illustrated in \autoref{fig:illustrate_threshold}. 
+
+On the left hand plot, we see the scatter of returns on Mkt-RF and HML, and how $p$, found on the x axis of the right hand plot, determines the subset of data that is included in the correlation calculation. Note that the further away from the median we get, the more uncertain the point estimate of the correlation coefficient becomes, as fewer observations are available. For the 49\% and 51\% points, estimates are much more precise as essentially half the data set is available. We also note that the standard correlation, given by the dashed line in the right hand plot, is clearly negative, while threshold correlations in the first and third quadrants are significantly more positive, which shows the usefulness of this analysis; not taking threshold correlations into account provides a vaguer picture of the dependence structure.
+
+Although threshold correlations are nothing but linear correlation coefficients for a subset of the data, they do provide an intuitive measure of tail dependence -- how correlated are returns in bad times? And does this differ from the correlation in good times? Ceteris paribus, assets pairs with weaker or negative threshold correlation as $p \rightarrow 0$ are better diversified, as they have less tendency to coincide in extreme negative realizations.
+
+% plots [possibly add diff series/residuals]
+As previously noted, we use residuals from the ARMA-GARCH models in the threshold correlation analysis instead of returns directly. The plots for the standardized residuals are presented in~\autoref{fig:threshold_corr1, threshold_corr2} The patterns of returns and residuals are highly similar, with returns exhibiting more extreme patterns (see \autoref{app:threshold_returns1, app:threshold_return2} for a comparison).
+
+% talk
+
 
 \subsection{Rolling correlation}
 %\label
-% method, plots, talk
+%method
+We compute rolling correlation estimates in order to investigate whether the factor equity strategies exhibit constant correlation over time. 
+\begin{align}
+    RCorr(r_{i, t}, r_{j, t})_t^{w} = \frac{\sum^{t}_{t-w+1}(r_{i, t} - \bar{r}_i)(r_{j,t} - \bar{r}_j)}{\sqrt{\sum^{t}_{t-w+1} (r_{i,t} - \bar{r}_i)^2} \sqrt{\sum^{t}_{t-w+1} (r_{j,t} - \bar{r}_j)^2}}
+\end{align}
+where $r_i$, $r_j$ are the $N \cdot (N-1) / 2$ different pairs of the factor strategies' log returns and $w$ is the rolling window of data. We use one year of data with $w = 52$ on weekly data.
+%plots, talk
+
 
 \section{Modeling multivariate dependence: Copula} % (fold)
 %\label
