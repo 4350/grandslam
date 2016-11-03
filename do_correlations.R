@@ -125,7 +125,7 @@ do_scatter_df <- function(df) {
 plotdf.scatter.ret <- do_scatter_df(df.estim)
 plotdf.scatter.res <- do_scatter_df(df.stdres)
 
-# Do threshold plot and save ----------------------------------------------
+# Do threshold plot and save for main text ----------------------------------------------
 
 .plot_th_corr <- function(plotdf,
                           df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
@@ -159,6 +159,9 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
 
 }
 
+
+# Threshold plot including returns ----------------------------------------
+
 .plot_th_corr_incl_ret <- function(plotdf, plotdf.ret,
                           df.labels, df.labels.ret,
                           COLFACTORS, ROWFACTORS, OUTNAME,
@@ -186,7 +189,7 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
     geom_abline(aes(slope = 0, intercept = standard_corr,
                     color = 'Correlation (residuals)'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels)+
     geom_abline(aes(slope = 0, intercept = standard_corr,
-                    color = 'Correlation (returns)'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels.ret)+
+                    color = 'Correlation (returns)'), colour = 'grey20', size = 0.25, linetype = 3, data = df.labels.ret)+
     theme_Publication() +
     scale_colour_Publication() +
     ylab('Correlation') +
@@ -203,11 +206,11 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
   
 }
 
-# Do the plots ------------------------------------------------------------
+# Do the threshold plots for threshold part ------------------------------------------------------------
 
 # Quick fix to append standard correlations to graphs
 df.labels.ret <- .append_standard_corr(plotdf.ret, df.estim)
-df.labels.res <- .append_standard_corr(plotdf.res, df.estim)
+df.labels.res <- .append_standard_corr(plotdf.res, df.stdres)
 
 # Reorder variables
 plotdf.res$order <- factor(plotdf.res$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
@@ -233,7 +236,8 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
               14, 12)
 
 
-# Threshold correlation explain before results, for MKT-HML pair ------------------------------
+# Threshold correlation with scatter to  explain before main results, for MKT-HML pair ------------------------------
+# One function for scatter with residuals and one for scatter with returns, axes differ etc...
 
 # Function for graph
 
@@ -456,7 +460,7 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
   
 }
 
-# Do graph
+# Do graph with residuals and returns
 .plot_th_corr_scatter(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels.res,
               COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
               14, 7)
@@ -465,43 +469,7 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
                       COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
                       14, 7)
 
-# Threshold correlation fake data scatter for method ------------------------------
-
-# Generate data
-sigma = diag(2)
-sigma[1,2] = -0.25
-sigma[2,1] = -0.25
-rand_data <- data.frame(rmvnorm(n = 1000, mean = c(0,0), sigma = sigma))
-rand_data$cor = -0.25
-colnames(rand_data) = c('y1','y2')
-
-# Plot data
-g <- ggplot(rand_data, aes(x = y1, y = y2)
-) +
-  geom_point() +
-  theme_Publication() +
-  scale_colour_Publication() +
-  ylab('Factor 1 return') +
-  xlab('Factor 2 return') +
-  coord_cartesian(xlim = c(-4,4), ylim = c(-4, 4)) + 
-  annotate("rect", xmin = -4, xmax = 0, ymin = -4, ymax = 0, alpha = 0.4, fill = 'grey80', linetype = 1, color = 'black')+
-  annotate("text", x = -3.85, y = -0.2, label = 'A', family = 'Minion Pro')+
-  annotate("rect", xmin = -4, xmax = -1, ymin = -4, ymax = -1, alpha = 0.5, fill = 'grey80', linetype = 2, color = 'black')+
-  annotate("text", x = -3.85, y = -1.2, label = 'B', family = 'Minion Pro')+
-  annotate("rect", xmin = -4, xmax = -2, ymin = -4, ymax = -2, alpha = 0.6, fill = 'grey80', linetype = 3, color = 'black')+
-  annotate("text", x = -3.85, y = -2.2, label = 'C', family = 'Minion Pro')+
-  annotate("rect", xmin = 0, xmax = 4, ymin = 0, ymax = 4, alpha = 0.4, fill = 'grey80', linetype = 1, color = 'black')+
-  annotate("text", x = 3.85, y = 0.2, label = 'D', family = 'Minion Pro')+
-  annotate("rect", xmin = 1, xmax = 4, ymin = 1, ymax = 4, alpha = 0.5, fill = 'grey80', linetype = 2, color = 'black')+
-  annotate("text", x = 3.85, y = 1.2, label = 'E', family = 'Minion Pro')+
-  annotate("rect", xmin = 2, xmax = 4, ymin = 2, ymax = 4, alpha = 0.6, fill = 'grey80', linetype = 3, color = 'black')+
-  annotate("text", x = 3.85, y = 2.2, label = 'F', family = 'Minion Pro')
-
-# Save plot
-ggsave('output/thresholdCorrelations/threshold_explain.png', g, device = 'png', width = 14, height = 12, units = 'cm')
-              
-
-# Threshold correlations simulated ----------------------------------------
+# Threshold correlations simulated - for comparing compula performance to real world ----------------------------------------
 
 # Function for plot
 
@@ -560,7 +528,7 @@ models$factor1 <- factor(models$factor1, levels = c('Mkt.RF','SMB','Mom','HML','
 models$factor2 <- factor(models$factor2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
 
-# Plot
+# Plot simulated graphs
 
 .plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels.res,
               COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
@@ -568,6 +536,17 @@ models$factor2 <- factor(models$factor2, levels = c('Mkt.RF','SMB','Mom','HML','
 .plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels.res,
               COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
               14, 12)
+
+
+#  ------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 
 
 # Rolling correlations ----------------------------------------------------
@@ -578,61 +557,70 @@ rollCorrList.ret = roll_corr(df = df.estim %>% select(-Date),
                                    window = 52
                                    )
 
+rollCorrList.res = roll_corr(df = df.stdres %>% select(-Date), 
+                             df.date = df.stdres %>% select(Date), 
+                             window = 52
+)
+
+
 
 # Bind to one df for plot
 plotdf.ret <- bind_rows(rollCorrList.ret$HML, rollCorrList.ret$RMW, rollCorrList.ret$CMA)
+plotdf.res <- bind_rows(rollCorrList.res$HML, rollCorrList.res$RMW, rollCorrList.res$CMA)
 
 # Quick fix to append standard correlations to graphs
 df.labels.ret <- .append_standard_corr(plotdf.ret, df.estim)
+df.labels.res <- .append_standard_corr(plotdf.res, df.stdres)
 
 # Order the variables
 plotdf.ret$order <- factor(plotdf.ret$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+plotdf.res$order <- factor(plotdf.res$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+plotdf.res$order2 <- factor(plotdf.res$order2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
-# Do roll plot and save ----------------------------------------------
-g <- ggplot(plotdf.ret, aes(x = Date, y = value)
+# Do roll plot only residuals and save ----------------------------------------------
+g <- ggplot(plotdf.res, aes(x = Date, y = value)
 ) +
   geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
               fill = 'grey10',
               alpha = 0.1
   ) +
-  geom_line(aes(color = 'Return series')) +
+  geom_line(aes(color = 'Residual series')) +
   theme_Publication() +
   scale_colour_Publication() +
   ylab('Correlation') +
   xlab('Year') +
   scale_x_date(date_labels = "%y") +
-  coord_cartesian(ylim = c(-1, 1), xlim = c(df.estim$Date[1], df.estim$Date[length(df.estim$Date)])) +
-  geom_text(data = df.labels.ret, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
+  theme(legend.position = 'none')+
+  coord_cartesian(ylim = c(-1, 1), xlim = c(df.stdres$Date[1], df.stdres$Date[length(df.stdres$Date)])) +
+  #geom_text(data = df.labels.res, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
   facet_grid(order ~ order2, switch = 'y')
 
 ggsave('output/rollingCorrelations/rolling52.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
 
-# Do roll plot with NBER dummy --------------------------------------------
-load('data/derived/usrec-weekly.RData')
-
-g <- ggplot(plotdf.ret) +
-  geom_ribbon(aes(x = Date, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+# Do roll plot both returns and residuals and save ----------------------------------------------
+g <- ggplot(plotdf.res, aes(x = Date, y = value)
+) +
+  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
               fill = 'grey10',
               alpha = 0.1
   ) +
-  geom_line(aes(x = Date, y = value, color = 'Return series')) +
-  geom_ribbon(data = usrec, 
-              mapping = aes(x = Date, ymin = -1, 
-                              ymax = -1 + 2 * recdummy, 
-                              linetype = NA, 
-                              fill = 'sienna2'
-                            ),
-              fill = 'sienna2',
-              alpha = 0.3
+  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+              fill = 'grey10',
+              alpha = 0.1,
+              data = plotdf.ret
   ) +
+  geom_line(aes(color = 'Residuals')) +
+  geom_line(aes(color = 'Returns'),
+            data = plotdf.ret) +
   theme_Publication() +
   scale_colour_Publication() +
   ylab('Correlation') +
   xlab('Year') +
   scale_x_date(date_labels = "%y") +
-  coord_cartesian(ylim = c(-1, 1), xlim = c(df.estim$Date[1], df.estim$Date[length(df.estim$Date)])) +
-  geom_text(data = df.labels.ret, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
-  facet_grid(order ~ order2)
+  coord_cartesian(ylim = c(-1, 1), xlim = c(df.stdres$Date[1], df.stdres$Date[length(df.stdres$Date)])) +
+  #geom_text(data = df.labels.res, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
+  #geom_text(data = df.labels.ret, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
+  facet_grid(order ~ order2, switch = 'y')
 
-ggsave('output/rollingCorrelations/rolling52NBER.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
+ggsave('output/rollingCorrelations/rolling_both52.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
