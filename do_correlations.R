@@ -159,18 +159,76 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
 
 }
 
+.plot_th_corr_incl_ret <- function(plotdf, plotdf.ret,
+                          df.labels, df.labels.ret,
+                          COLFACTORS, ROWFACTORS, OUTNAME,
+                          width, height) {
+  # Select the column factors for plot this plot
+  plotdf <- plotdf %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  plotdf.ret <- plotdf.ret %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  df.labels <- df.labels %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  df.labels.ret <- df.labels.ret %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  
+  # Then do threshold plot
+  g <- ggplot(data = plotdf) +
+    geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = 'grey10',
+                alpha = 0.1
+    ) +
+    geom_line(aes(x = qs, y = value, color = 'Threshold correlation (residuals)')) +
+    geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = 'grey10',
+                alpha = 0.1,
+                data = plotdf.ret
+    ) +
+    geom_line(aes(x = qs, y = value, color = 'Threshold correlation (returns)'),
+              data = plotdf.ret) +
+    geom_abline(aes(slope = 0, intercept = standard_corr,
+                    color = 'Correlation (residuals)'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels)+
+    geom_abline(aes(slope = 0, intercept = standard_corr,
+                    color = 'Correlation (returns)'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels.ret)+
+    theme_Publication() +
+    scale_colour_Publication() +
+    ylab('Correlation') +
+    xlab('Quantiles') +
+    coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.50, .75)) + 
+    theme(legend.position = 'none')+
+    scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
+    facet_grid(order2 ~ order, switch = 'y')
+  
+  OUTPATH <- 'output/thresholdCorrelations/threshold_incl_ret%s.png'
+  ggsave(sprintf(OUTPATH, OUTNAME),
+         g, device = 'png', width = width, height = height, units = 'cm'
+  )
+  
+}
+
 # Do the plots ------------------------------------------------------------
 
 # Quick fix to append standard correlations to graphs
-df.labels <- .append_standard_corr(plotdf.ret, df.estim)
+df.labels.ret <- .append_standard_corr(plotdf.ret, df.estim)
+df.labels.res <- .append_standard_corr(plotdf.res, df.estim)
+
 # Reorder variables
 plotdf.res$order <- factor(plotdf.res$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 plotdf.res$order2 <- factor(plotdf.res$order2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+plotdf.ret$order <- factor(plotdf.ret$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
-.plot_th_corr(plotdf = plotdf.res, df.labels,
+
+.plot_th_corr(plotdf = plotdf.res, df.labels.res,
               COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
               14, 16)
-.plot_th_corr(plotdf = plotdf.res, df.labels,
+.plot_th_corr(plotdf = plotdf.res, df.labels.res,
+              COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
+              14, 12)
+
+.plot_th_corr_incl_ret(plotdf.res, plotdf.ret,
+                       df.labels.res, df.labels.ret,
+              COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
+              14, 16)
+.plot_th_corr_incl_ret(plotdf.res, plotdf.ret,
+                       df.labels.res, df.labels.ret,
               COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
               14, 12)
 
@@ -269,8 +327,8 @@ plotdf.res$order2 <- factor(plotdf.res$order2, levels = c('Mkt.RF','SMB','Mom','
     scale_colour_Publication()+
     theme(legend.position = 'none')+
     # Axes
-    ylab('Standardized residuals (column factor)') +
-    xlab('Standardized residuals (row factor)') +
+    ylab('Standardized residuals (HML)') +
+    xlab('Standardized residuals (Mkt.RF)') +
     coord_cartesian(xlim = c(-5,5), ylim = c(-5, 5)) +
     # Correlation coefficient
     #geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
@@ -288,11 +346,124 @@ plotdf.res$order2 <- factor(plotdf.res$order2, levels = c('Mkt.RF','SMB','Mom','
   
 }
 
+.plot_th_corr_scatter_ret <- function(plotdf, plotdf.scatter,
+                                  df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
+                                  width, height) {
+  # Select the column factors for plot this plot
+  plotdf <- plotdf %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  plotdf.scatter <- plotdf.scatter %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  df.labels <- df.labels %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  
+  # Create the text df, to not print 1000 values, looks bad
+  plotdf.scatter.text <- plotdf.scatter %>% select(-value1, -value2) %>% distinct()
+  
+  # Then do threshold plot
+  g <- ggplot(data = plotdf) +
+    geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = 'grey10',
+                alpha = 0.1
+    ) +
+    geom_line(aes(x = qs, y = value, color = 'Threshold correlation')) +
+    geom_abline(aes(slope = 0, intercept = standard_corr,
+                    color = 'Correlation'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels)+
+    theme_Publication() +
+    scale_colour_Publication() +
+    ylab('Correlation') +
+    xlab('Quantiles') +
+    coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) +
+    theme(legend.position = 'none')+
+    scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
+    facet_grid(order2 ~ order, switch = 'y')
+  
+  # Then do scatter plot(s)
+  g_scatter <- ggplot() +
+    geom_bin2d(
+      data = plotdf.scatter,
+      mapping = aes(
+        x = value1, y = value2, color = 'GARCH residuals'
+      ),
+      binwidth = c(0.002, 0.002)
+    )+
+    # Boxes
+    # 10%
+    geom_rect(
+      data = plotdf.scatter.text,
+      mapping = aes(
+        xmin = -.1, xmax = px10, ymin = -.1, ymax = py10
+      ),
+      fill = 'grey80', alpha = 0.4, linetype = 1, colour = 'black', size = 0.25
+    ) +
+    # 49%
+    geom_rect(
+      data = plotdf.scatter.text,
+      mapping = aes(
+        xmin = -.1, xmax = px49, ymin = -.1, ymax = py49
+      ),
+      fill = 'grey80', alpha = 0.5, linetype = 2, colour = 'black', size = 0.25
+    )+
+    # 51%
+    geom_rect(
+      data = plotdf.scatter.text,
+      mapping = aes(
+        xmin = px51, xmax = .1, ymin = py51, ymax = .1
+      ),
+      fill = 'grey80', alpha = 0.5, linetype = 2, colour = 'black', size = 0.25
+    )+
+    # 90%
+    geom_rect(
+      data = plotdf.scatter.text,
+      mapping = aes(
+        xmin = px90, xmax = .1, ymin = py90, ymax = .1
+      ),
+      fill = 'grey80', alpha = 0.4, linetype = 1, colour = 'black', size = 0.25
+    )+
+    # Text
+    # 10 %
+    geom_text(data = plotdf.scatter.text,
+              aes(x = -.075, y = py10-0.006, label = 'ThCorr 10%'), family = 'Minion Pro', size = 2, parse = F)+
+    # 49%
+    geom_text(data = plotdf.scatter.text,
+              aes(x = -.075, y = py49-0.006, label = 'ThCorr 49%'), family = 'Minion Pro', size = 2, parse = F)+
+    # 51%
+    geom_text(data = plotdf.scatter.text,
+              aes(x = .075, y = py51+0.006, label = 'ThCorr 51%'), family = 'Minion Pro', size = 2, parse = F)+
+    # 90%
+    geom_text(data = plotdf.scatter.text,
+              aes(x = .075, y = py90+0.006, label = paste('ThCorr 90%')), family = 'Minion Pro', size = 2, parse = F)+
+    
+    # Theme options
+    theme_Publication() +
+    scale_colour_Publication()+
+    scale_y_continuous(labels = scales::percent, breaks = c(-.10, -.05, 0, .05, .10)) +
+    theme(legend.position = 'none')+
+    # Axes
+    ylab('Log return (HML)') +
+    xlab('Log return (Mkt.RF)') +
+    coord_cartesian(xlim = c(-.1,.1), ylim = c(-.1, .1)) +
+    # Correlation coefficient
+    #geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
+    # Facet
+    facet_grid(order2 ~ order, switch = 'y')
+  
+  # Combine the two in grid
+  out.graph <- arrangeGrob(g_scatter, g, ncol = 2)
+  # Save plot
+  
+  OUTPATH <- 'output/thresholdCorrelations/threshold_scatter_ret_%s.png'
+  ggsave(sprintf(OUTPATH, OUTNAME),
+         out.graph, device = 'png', width = width, height = height, units = 'cm'
+  )
+  
+}
+
 # Do graph
-.plot_th_corr_scatter(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels,
+.plot_th_corr_scatter(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels.res,
               COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
               14, 7)
 
+.plot_th_corr_scatter_ret(plotdf = plotdf.ret, plotdf.scatter = plotdf.scatter.ret, df.labels.ret,
+                      COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
+                      14, 7)
 
 # Threshold correlation fake data scatter for method ------------------------------
 
@@ -391,10 +562,10 @@ models$factor2 <- factor(models$factor2, levels = c('Mkt.RF','SMB','Mom','HML','
 
 # Plot
 
-.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels,
+.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels.res,
               COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
               14, 16)
-.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels,
+.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels.res,
               COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
               14, 12)
 
@@ -412,7 +583,7 @@ rollCorrList.ret = roll_corr(df = df.estim %>% select(-Date),
 plotdf.ret <- bind_rows(rollCorrList.ret$HML, rollCorrList.ret$RMW, rollCorrList.ret$CMA)
 
 # Quick fix to append standard correlations to graphs
-df.labels <- .append_standard_corr(plotdf.ret, df.estim)
+df.labels.ret <- .append_standard_corr(plotdf.ret, df.estim)
 
 # Order the variables
 plotdf.ret$order <- factor(plotdf.ret$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
@@ -432,7 +603,7 @@ g <- ggplot(plotdf.ret, aes(x = Date, y = value)
   xlab('Year') +
   scale_x_date(date_labels = "%y") +
   coord_cartesian(ylim = c(-1, 1), xlim = c(df.estim$Date[1], df.estim$Date[length(df.estim$Date)])) +
-  geom_text(data = df.labels, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
+  geom_text(data = df.labels.ret, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
   facet_grid(order ~ order2, switch = 'y')
 
 ggsave('output/rollingCorrelations/rolling52.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
@@ -461,7 +632,7 @@ g <- ggplot(plotdf.ret) +
   xlab('Year') +
   scale_x_date(date_labels = "%y") +
   coord_cartesian(ylim = c(-1, 1), xlim = c(df.estim$Date[1], df.estim$Date[length(df.estim$Date)])) +
-  geom_text(data = df.labels, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
+  geom_text(data = df.labels.ret, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
   facet_grid(order ~ order2)
 
 ggsave('output/rollingCorrelations/rolling52NBER.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
