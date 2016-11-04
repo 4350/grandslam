@@ -5,7 +5,8 @@
 #' 
 
 
-# Libraries ---------------------------------------------------------------
+
+# Setup -------------------------------------------------------------------
 
 library(dplyr)
 library(tidyr)
@@ -27,9 +28,6 @@ load(sprintf('data/derived/garch/%s', ID))
 
 # Load functions
 load_all('wimbledon')
-
-
-# Function ----------------------------------------------------------------
 
 # Quick fix to add standard correlations to a graph data frame
 
@@ -631,3 +629,8 @@ g <- ggplot(plotdf.res, aes(x = Date, y = value)
   facet_grid(order ~ order2, switch = 'y')
 
 ggsave('output/rollingCorrelations/rolling_both52.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
+
+
+# Rolling from simulations ------------------------------------------------
+# Lets think about it.
+
