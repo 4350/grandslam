@@ -10,7 +10,7 @@
 Accurate modeling of the joint dynamics of returns is an important and well-studied problem in finance. Unfortunately, straightforward extension of univariate GARCH models to multiple dimensions has proven difficult. Unrestricted multivariate GARCH (MGARCH) models, modeling the conditional covariance matrix directly, become impossible to estimate as the number of covariances grows exponentially with the number of series~\autocite{WhyMGARCHSucks}. It thus becomes necessary to restrict the parameter space, where the BEKK model is a common example~\autocite{BEKKModel}.
 
 % Separate modeling of variance and correlation
-A parsimonious solution is to separate the modeling of return and variance dynamics (modeled using ARMA-GARCH) from that of the conditional correlation dynamics. One such approach is encapsulated by the \emph{dynamic conditional correlation} (DCC) model originally proposed by~\autocite{Engle2002} (and its correction \emph{c}DCC by~\autocite{Aielli2013}). Here, ARMA-GARCH models are estimated on each return series to model the univariate dynamics (as we do), and then an autoregressive process for the dynamic correlation matrix is fitted to the standardized residuals $z_t$ of those models.
+A parsimonious solution is to separate the modeling of return and variance dynamics (modeled using ARMA-GARCH) from that of the conditional correlation dynamics. One such approach is encapsulated by the \emph{dynamic conditional correlation} (DCC) model originally proposed by~\autocite{Engle2002} (and its correction \emph{c}DCC by~\autocite{Aielli2013}). The separation allows for consistent (albeit inefficient) two-step estimation. First, univariate GARCH models are estimated on each series (as we do). Second, an autoregressive process for the correlation matrix is fitted to the standardized residuals $\varepsilon_t$ of those models. The separation makes large-scale estimation feasible.
 
 % Asymmetric cDCC
 DCC is a useful and tractable model for estimating time-varying correlations between return series. However, as it is a model of correlations only, it cannot capture the asymmetric tail dependency seen in the threshold correlations of residuals. Introducing indicator variables for the strength of correlation, similar to how the leverage effect is captured by GJR-GARCH, is a potential solution (as in the AGDCC model by~\autocite{Cappiello2006}).
@@ -49,14 +49,14 @@ The copula is made dynamic by evolving the correlation matrix $\Psi_t$ according
   \intertext{where $Q_t$ is normalized to the correlation matrix}
   \Psi_t &= Q_t^{-1/2} Q_t Q_t^{-1/2}
 \end{align}
-The $Q_t$ process is comprised of three components that are weighted according to $\alpha, \beta$: (1) a time-invariant component $Q$, (2) an innovation component from copula shocks $z_{t-1} z_{t-1}^\top$ and (3) an autoregressive component of order one $Q_{t-1}$. In order for the the correlation matrix $\Psi_t$ to be positive definite, $Q_t$ has to be positive definite, which is ascertained by requiring that $\alpha \geq 0$, $\beta \geq 0$ and $(\alpha + \beta) < 1$.
+The $Q_t$ process is comprised of three components that are weighted according to $\alpha, \beta$: (1) a time-invariant component $Q$, (2) an innovation component from copula shocks $z_{t-1} z_{t-1}^\top$ and (3) an autoregressive component of order one $Q_{t-1}$. In order for the the correlation matrix $\Psi_t$ to be positive definite, $Q_t$ has to be positive definite, which is ascertained by requiring that $\alpha \geq 0$, $\beta \geq 0$ and $(\alpha + \beta) < 1$. The model nests a constant copula by forcing $\alpha = \beta = 0$.
 
 % XXX NOTATION
 % XXX cDCC correction for copula shocks
 
 The parameters of the copula model -- the distribution parameters of the multivariate skewed Student's t distribution and the dynamics parameters of the cDCC -- are estimated by maximizing the log-likelihood:
 \begin{align}
-  {\arg\max}_{\nu_c, \gamma_{ic}, \alpha, \beta} \sum_{t = 1}^T \ln c_t(u_{1, t+1}, \ldots, u_{N, t+1}; \nu_c, \gamma_{ic}, \alpha, \beta)
+  \arg\!\max_{\nu_c, \gamma_{ic}, \alpha, \beta} \sum_{t = 1}^T \ln c_t(u_{1, t+1}, \ldots, u_{N, t+1}; \nu_c, \gamma_{ic}, \alpha, \beta)
 \end{align}
 The process of copula estimation with \emph{c}DCC dynamics is quite involved. A detailed description can be found~\autocref{app:copula_cdcc}.
 
