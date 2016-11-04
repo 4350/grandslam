@@ -39,7 +39,7 @@ copula_fit <- function(spec, u, X = NULL, distribution = 'norm',
   }
   else if (length(pars$pars) == 1) {
     stopifnot(length(pars$ci) == 2)
-    stopifnot(distribution == 't')
+    stopifnot(distribution == 't' || distribution == 'std')
     
     optimized <- stats::optim(
       pars$pars,
