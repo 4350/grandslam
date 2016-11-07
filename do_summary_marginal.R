@@ -39,6 +39,7 @@ sqr_ret_LB_10 <- apply(df.estim[,-1], 2, function(ret_sqr) Weighted.Box.test(ret
 
 summary_table <- df.estim %>%
     dplyr::select(-Date) %>%
+    select(Mkt.RF, SMB, Mom, HML, CMA, RMW) %>%
     basicStats() %>%
     .[c('nobs','Maximum','Minimum','Mean','Median','Stdev','Skewness','Kurtosis'),] %>%
     round(., digits = 4)
@@ -51,7 +52,57 @@ summary_table <- rbind(summary_table,
   round(., digits = 4)
 
 write.table(summary_table, file = 'output/MarginalStats/summaryTable.Estim.csv')
-#stargazer(sum.table, summary = FALSE)
+#stargazer(summary_table, summary = FALSE)
+
+
+# QQ Plots ----------------------------------------------------------------
+
+plot_df <- df.estim[,-1] %>%
+  gather('factor','value')
+
+plot_df$factor <- factor(plot_df$factor, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+
+line_df <- plot_df %>%
+  group_by(factor) %>%
+  summarize(q25    = quantile(value,0.25),
+            q75    = quantile(value,0.75),
+            norm25 = qnorm(0.25),
+            norm75 = qnorm(0.75),
+            slope  = (q25 - q75) / (norm25 - norm75),
+            intercept    = q25 - slope * norm25
+            ) %>%
+  select(factor,slope,intercept)
+
+g <- ggplot(plot_df, 
+       aes(
+         sample = value
+         )
+       )+
+  stat_qq(size = 1)+
+  geom_abline(
+    aes(intercept = intercept, slope = slope),
+    linetype = 2,
+    data = line_df
+  )+
+  annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+  facet_wrap( ~ factor, scales = 'free_y', nrow = 2, ncol = 3)+
+  theme_Publication() +
+  theme(strip.background = element_blank())+
+  scale_colour_Publication() +
+  ylab('Sample') +
+  xlab('Theoretical') +
+  theme(legend.position = 'none')+
+  scale_y_continuous(labels = scales::percent)
+
+ggsave('output/MarginalStats/qq_returns.png', g, device = 'png', width = 14, height = 8, units = 'cm', limitsize = F)
+  
+
+# Corr matrix data --------------------------------------------------------
+
+cor_matrix <- cor(df.estim[,-1] %>% select(Mkt.RF, SMB, Mom, HML, CMA, RMW))
+cor_matrix[upper.tri(cor_matrix)] <- NA
+stargazer(cor_matrix)
+
 
 # Marginal plots ----
 varlist = list('Mkt.RF','HML','SMB','Mom','RMW','CMA')
