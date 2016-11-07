@@ -145,6 +145,7 @@ do_qq_plot <- function(qq_data) {
   ggplot(qq_data, aes(x = theo_x, y = sample_y)) +
     geom_point(size = 1) +
     geom_abline(linetype = 2, intercept = 0, slope = 1) +
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
     facet_wrap(~ order, nrow = 2, ncol = 3)+
     theme_Publication() +
     ylab('Sample quantile')+
