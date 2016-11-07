@@ -130,6 +130,7 @@ summary.cumretplots <- function(df, outlabel) {
   df[,2:ncol(df)] <- exp(df[,2:ncol(df)])-1
   # Long format for plot
   df <- gather(df, "factor", "ret", 2:ncol(df))
+  df$factor <- factor(df$factor, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
   
   # Mutate to create cumulative and standardized returns at 10% annual vol
   df <- df %>% 
