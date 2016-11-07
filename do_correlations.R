@@ -51,7 +51,6 @@ load_all('wimbledon')
   
 }
 
-
 # Threshold correlations --------------------------------------------------
 
 # Loop for each value factors to get threshold correlation for all factors
@@ -59,11 +58,11 @@ load_all('wimbledon')
 
 thCorrList.ret <- th_corr(df = df.estim %>% select(-Date),
                           simulatetoggle = 0
-                          )
+)
 
 thCorrList.res <- th_corr(df = df.stdres %>% select(-Date),
                           simulatetoggle = 0
-                          )
+)
 
 
 # Bind to one df for plot
@@ -125,9 +124,8 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
 
 # Do threshold plot and save for main text ----------------------------------------------
 
-.plot_th_corr <- function(plotdf,
-                          df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
-                          width, height) {
+.plot_th_corr <- function(plotdf = plotdf.res,
+                          df.labels = df.labels.res, COLFACTORS, ROWFACTORS) {
   # Select the column factors for plot this plot
   plotdf <- plotdf %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
   df.labels <- df.labels %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
@@ -138,37 +136,35 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
                 fill = 'grey10',
                 alpha = 0.1
     ) +
-    geom_line(aes(x = qs, y = value, color = 'Threshold correlation')) +
-    geom_abline(aes(slope = 0, intercept = standard_corr,
-                    color = 'Correlation'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels)+
+    geom_line(aes(x = qs, y = value, colour = 'Threshold correlation')) +
+    geom_abline(aes(colour = 'Correlation', intercept = standard_corr, slope = 0),
+                colour = 'grey20', size = 0.25, linetype = 2, data = df.labels
+    )+
     theme_Publication() +
-    scale_colour_Publication() +
+    scale_colour_Publication()+
+    theme(legend.position = 'none')+
     ylab('Correlation') +
     xlab('Quantiles') +
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.50, .75)) + 
-    theme(legend.position = 'none')+
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
-    facet_grid(order2 ~ order, switch = 'y')
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    ggtitle(sprintf("%s - %s", COLFACTORS, ROWFACTORS))
   
-  OUTPATH <- 'output/thresholdCorrelations/threshold_%s.png'
-  ggsave(sprintf(OUTPATH, OUTNAME),
-    g, device = 'png', width = width, height = height, units = 'cm'
-    )
-
+  g
+  
 }
 
 
 # Threshold plot including returns ----------------------------------------
 
-.plot_th_corr_incl_ret <- function(plotdf, plotdf.ret,
-                          df.labels, df.labels.ret,
-                          COLFACTORS, ROWFACTORS, OUTNAME,
-                          width, height) {
+.plot_th_corr_incl_ret <- function(plotdf = plotdf.res, plotdf2 = plotdf.ret,
+                                   df.labels = df.labels.res, df.labels2 = df.labels.ret,
+                                   COLFACTORS, ROWFACTORS) {
   # Select the column factors for plot this plot
   plotdf <- plotdf %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
-  plotdf.ret <- plotdf.ret %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  plotdf2 <- plotdf2 %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
   df.labels <- df.labels %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
-  df.labels.ret <- df.labels.ret %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  df.labels2 <- df.labels2 %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
   
   # Then do threshold plot
   g <- ggplot(data = plotdf) +
@@ -180,27 +176,29 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
     geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
                 fill = 'grey10',
                 alpha = 0.1,
-                data = plotdf.ret
+                data = plotdf2
     ) +
     geom_line(aes(x = qs, y = value, color = 'Threshold correlation (returns)'),
-              data = plotdf.ret) +
+              data = plotdf2) +
     geom_abline(aes(slope = 0, intercept = standard_corr,
-                    color = 'Correlation (residuals)'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels)+
+                    color = 'Correlation (residuals)'), 
+                colour = 'grey20', size = 0.25, linetype = 2, data = df.labels
+    )+
     geom_abline(aes(slope = 0, intercept = standard_corr,
-                    color = 'Correlation (returns)'), colour = 'grey20', size = 0.25, linetype = 3, data = df.labels.ret)+
+                    color = 'Correlation (returns)'), 
+                colour = 'grey20', size = 0.25, linetype = 3, data = df.labels2,
+                show.legend = TRUE)+
     theme_Publication() +
     scale_colour_Publication() +
+    theme(legend.position = 'none')+
     ylab('Correlation') +
     xlab('Quantiles') +
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.50, .75)) + 
-    theme(legend.position = 'none')+
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
-    facet_grid(order2 ~ order, switch = 'y')
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    ggtitle(sprintf("%s - %s", COLFACTORS, ROWFACTORS))
   
-  OUTPATH <- 'output/thresholdCorrelations/threshold_incl_ret%s.png'
-  ggsave(sprintf(OUTPATH, OUTNAME),
-         g, device = 'png', width = width, height = height, units = 'cm'
-  )
+  g
   
 }
 
@@ -216,23 +214,60 @@ plotdf.res$order2 <- factor(plotdf.res$order2, levels = c('Mkt.RF','SMB','Mom','
 plotdf.ret$order <- factor(plotdf.ret$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
+# Draw the pages for results main part
 
-.plot_th_corr(plotdf = plotdf.res, df.labels.res,
-              COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
-              14, 16)
-.plot_th_corr(plotdf = plotdf.res, df.labels.res,
-              COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
-              14, 12)
+Results_P1 <- grid.arrange(
+  .plot_th_corr(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
+  .plot_th_corr(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
+  .plot_th_corr(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
+  .plot_th_corr(COLFACTORS = 'Mom', ROWFACTORS = 'HML'),
+  .plot_th_corr(COLFACTORS = 'Mom', ROWFACTORS = 'CMA'),
+  .plot_th_corr(COLFACTORS = 'Mom', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/thresholdCorrelations/Results_P1.png', Results_P1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
-.plot_th_corr_incl_ret(plotdf.res, plotdf.ret,
-                       df.labels.res, df.labels.ret,
-              COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
-              14, 16)
-.plot_th_corr_incl_ret(plotdf.res, plotdf.ret,
-                       df.labels.res, df.labels.ret,
-              COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
-              14, 12)
+Results_P2 <- grid.arrange(
+  .plot_th_corr(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
+  .plot_th_corr(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
+  .plot_th_corr(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
+  .plot_th_corr(COLFACTORS = 'HML', ROWFACTORS = 'CMA'),
+  .plot_th_corr(COLFACTORS = 'HML', ROWFACTORS = 'RMW'),
+  .plot_th_corr(COLFACTORS = 'CMA', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/thresholdCorrelations/Results_P2.png', Results_P2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
+# And draw for appendix part
+Appendix_P1 <- grid.arrange(
+  .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'HML'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'CMA'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/thresholdCorrelations/Appendix_P1.png', Appendix_P1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+
+Appendix_P2 <- grid.arrange(
+  .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'HML', ROWFACTORS = 'CMA'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'HML', ROWFACTORS = 'RMW'),
+  .plot_th_corr_incl_ret(COLFACTORS = 'CMA', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/thresholdCorrelations/Appendix_P2.png', Appendix_P2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
 # Threshold correlation with scatter to  explain before main results, for MKT-HML pair ------------------------------
 # One function for scatter with residuals and one for scatter with returns, axes differ etc...
@@ -240,8 +275,8 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
 # Function for graph
 
 .plot_th_corr_scatter <- function(plotdf, plotdf.scatter,
-                          df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
-                          width, height) {
+                                  df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
+                                  width, height) {
   # Select the column factors for plot this plot
   plotdf <- plotdf %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
   plotdf.scatter <- plotdf.scatter %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
@@ -265,16 +300,17 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
     xlab('Quantiles') +
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) +
     theme(legend.position = 'none')+
-    scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
-    facet_grid(order2 ~ order, switch = 'y')
-   
+    scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90))+
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    ggtitle("Correlations plot")
+  
   # Then do scatter plot(s)
   g_scatter <- ggplot() +
     geom_bin2d(
       data = plotdf.scatter,
       mapping = aes(
         x = value1, y = value2, color = 'GARCH residuals'
-        ),
+      ),
       binwidth = c(0.10, 0.10)
     )+
     # Boxes
@@ -323,24 +359,22 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
     # 90%
     geom_text(data = plotdf.scatter.text,
               aes(x = 3.75, y = py90+0.3, label = paste('ThCorr 90%')), family = 'Minion Pro', size = 2, parse = F)+
-        
+    
     # Theme options
     theme_Publication() +
     scale_colour_Publication()+
     theme(legend.position = 'none')+
     # Axes
-    ylab('Standardized residuals (HML)') +
-    xlab('Standardized residuals (Mkt.RF)') +
-    coord_cartesian(xlim = c(-5,5), ylim = c(-5, 5)) +
-    # Correlation coefficient
-    #geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
-    # Facet
-    facet_grid(order2 ~ order, switch = 'y')
-
+    ylab('HML') +
+    xlab('Mkt.RF') +
+    coord_cartesian(xlim = c(-5,5), ylim = c(-5, 5))+
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    ggtitle("Scatter plot")
+  
   # Combine the two in grid
   out.graph <- arrangeGrob(g_scatter, g, ncol = 2)
   # Save plot
-
+  
   OUTPATH <- 'output/thresholdCorrelations/threshold_scatter_%s.png'
   ggsave(sprintf(OUTPATH, OUTNAME),
          out.graph, device = 'png', width = width, height = height, units = 'cm'
@@ -349,8 +383,8 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
 }
 
 .plot_th_corr_scatter_ret <- function(plotdf, plotdf.scatter,
-                                  df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
-                                  width, height) {
+                                      df.labels, COLFACTORS, ROWFACTORS, OUTNAME,
+                                      width, height) {
   # Select the column factors for plot this plot
   plotdf <- plotdf %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
   plotdf.scatter <- plotdf.scatter %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
@@ -374,8 +408,9 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
     xlab('Quantiles') +
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.5, 1)) +
     theme(legend.position = 'none')+
-    scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
-    facet_grid(order2 ~ order, switch = 'y')
+    scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90))+
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    ggtitle("Correlations plot")
   
   # Then do scatter plot(s)
   g_scatter <- ggplot() +
@@ -436,16 +471,18 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
     # Theme options
     theme_Publication() +
     scale_colour_Publication()+
+    scale_x_continuous(labels = scales::percent, breaks = c(-.10, -.05, 0, .05, .10)) +
     scale_y_continuous(labels = scales::percent, breaks = c(-.10, -.05, 0, .05, .10)) +
     theme(legend.position = 'none')+
     # Axes
-    ylab('Log return (HML)') +
-    xlab('Log return (Mkt.RF)') +
-    coord_cartesian(xlim = c(-.1,.1), ylim = c(-.1, .1)) +
+    ylab('HML') +
+    xlab('Mkt.RF') +
+    coord_cartesian(xlim = c(-.1,.1), ylim = c(-.1, .1))+
     # Correlation coefficient
     #geom_text(data = df.labels, aes(x = 0, y = -4.5, label = paste("r = ", standard_corr)), family = 'Minion Pro', size = 3, parse = F)+
     # Facet
-    facet_grid(order2 ~ order, switch = 'y')
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    ggtitle("Scatter plot")
   
   # Combine the two in grid
   out.graph <- arrangeGrob(g_scatter, g, ncol = 2)
@@ -460,20 +497,19 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
 
 # Do graph with residuals and returns
 .plot_th_corr_scatter(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels.res,
-              COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
-              14, 7)
-
-.plot_th_corr_scatter_ret(plotdf = plotdf.ret, plotdf.scatter = plotdf.scatter.ret, df.labels.ret,
                       COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
                       14, 7)
+
+.plot_th_corr_scatter_ret(plotdf = plotdf.ret, plotdf.scatter = plotdf.scatter.ret, df.labels.ret,
+                          COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
+                          14, 7)
 
 # Threshold correlations simulated - for comparing compula performance to real world ----------------------------------------
 
 # Function for plot
 
-.plot_th_corr_simulated <- function(plotdf, ribbondf, df.labels,
-                          COLFACTORS, ROWFACTORS, OUTNAME,
-                          width, height) {
+.plot_th_corr_simulated <- function(plotdf = models, ribbondf = models_empirical, df.labels = df.labels.res,
+                                    COLFACTORS, ROWFACTORS) {
   # Select the column factors for plot this plot
   plotdf <- plotdf %>% filter(factor1 %in% COLFACTORS, factor2 %in% ROWFACTORS)
   ribbondf <- ribbondf %>% filter(factor1 %in% COLFACTORS, factor2 %in% ROWFACTORS)
@@ -498,12 +534,10 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.20, .60)) + 
     theme(legend.position = 'none')+
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
-    facet_grid(factor2 ~ factor1, switch = 'y')
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    ggtitle(sprintf("%s - %s", COLFACTORS, ROWFACTORS))
   
-  OUTPATH <- 'output/thresholdCorrelations/threshold_simulated_%s.png'
-  ggsave(sprintf(OUTPATH, OUTNAME),
-         g, device = 'png', width = width, height = height, units = 'cm'
-  )
+  g
   
 }
 
@@ -518,7 +552,7 @@ models_empirical <- plotdf.res %>%
          coef = value,
          lb = lb,
          ub = ub
-         ) %>%
+  ) %>%
   mutate(model = 'empirical')
 
 models <- bind_rows(models, models_empirical) %>% select(-ub, -lb)
@@ -528,32 +562,43 @@ models$factor2 <- factor(models$factor2, levels = c('Mkt.RF','SMB','Mom','HML','
 
 # Plot simulated graphs
 
-.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels.res,
-              COLFACTORS = c('Mkt.RF','Mom'), ROWFACTORS = c('HML', 'CMA','RMW'), sprintf('%s_Page1', ID),
-              14, 16)
-.plot_th_corr_simulated(plotdf = models, ribbondf = models_empirical, df.labels.res,
-              COLFACTORS = c('RMW','CMA'), ROWFACTORS = c('HML','CMA'), sprintf('%s_Page2', ID),
-              14, 12)
+Simulated_P1 <- grid.arrange(
+  .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
+  .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
+  .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
+  .plot_th_corr_simulated(COLFACTORS = 'Mom', ROWFACTORS = 'HML'),
+  .plot_th_corr_simulated(COLFACTORS = 'Mom', ROWFACTORS = 'CMA'),
+  .plot_th_corr_simulated(COLFACTORS = 'Mom', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/thresholdCorrelations/Simulated_P1.png', Simulated_P1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+
+Simulated_P2 <- grid.arrange(
+  .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
+  .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
+  .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
+  .plot_th_corr_simulated(COLFACTORS = 'HML', ROWFACTORS = 'CMA'),
+  .plot_th_corr_simulated(COLFACTORS = 'HML', ROWFACTORS = 'RMW'),
+  .plot_th_corr_simulated(COLFACTORS = 'CMA', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/thresholdCorrelations/Simulated_P2.png', Simulated_P2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
 
 #  ------------------------------------------------------------------------
-
-
-
-
-
-
-
-
 
 
 # Rolling correlations ----------------------------------------------------
 
 # Create list to hold correlation sets
 rollCorrList.ret = roll_corr(df = df.estim %>% select(-Date), 
-                                   df.date = df.estim %>% select(Date), 
-                                   window = 52
-                                   )
+                             df.date = df.estim %>% select(Date), 
+                             window = 52
+)
 
 rollCorrList.res = roll_corr(df = df.stdres %>% select(-Date), 
                              df.date = df.stdres %>% select(Date), 
