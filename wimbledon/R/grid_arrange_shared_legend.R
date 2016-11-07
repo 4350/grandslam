@@ -23,4 +23,5 @@ grid_arrange_shared_legend <- function(..., ncol = length(list(...)), nrow = 1, 
   grid.newpage()
   grid.draw(combined)
   
+  
 }
