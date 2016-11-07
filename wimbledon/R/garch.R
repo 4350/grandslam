@@ -148,6 +148,7 @@ do_qq_plot <- function(qq_data) {
     annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
     facet_wrap(~ order, nrow = 2, ncol = 3)+
     theme_Publication() +
+    theme(strip.background = element_blank())+
     ylab('Sample quantile')+
     xlab('Theoretical quantile')
   
