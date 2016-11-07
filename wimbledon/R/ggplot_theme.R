@@ -13,7 +13,7 @@ theme_Publication <- function(base_size=11, base_family="Minion Pro") {
   (theme_foundation(base_size = base_size, base_family = base_family)
   + theme(plot.title = element_text(family = "Minion Pro", 
                                     face = "bold",
-                                    size = rel(1), 
+                                    size = rel(0.8), 
                                     hjust = 0.5),
           text = element_text(family = "Minion Pro", 
                               face = "plain",
@@ -26,7 +26,7 @@ theme_Publication <- function(base_size=11, base_family="Minion Pro") {
                               margin = margin(), 
                               debug = FALSE),
           plot.background = element_rect(colour = NA),
-          axis.title = element_text(face = "plain",size = rel(0.9)),
+          axis.title = element_text(face = "plain",size = rel(0.8)),
           axis.title.x = element_text(margin = margin(t = 0.8 * half_line,
                                                       b = 0.8 * half_line/2)),
           axis.title.y = element_text(angle = 90,
