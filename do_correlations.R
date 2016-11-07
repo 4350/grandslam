@@ -217,7 +217,7 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
 
 # Draw the pages for results main part
 
-Results_P1 <- grid.arrange(
+threshold1 <- grid.arrange(
   .plot_th_corr(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
   .plot_th_corr(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
   .plot_th_corr(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
@@ -228,9 +228,9 @@ Results_P1 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/Results_P1.png', Results_P1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold1.png', threshold1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
-Results_P2 <- grid.arrange(
+threshold2 <- grid.arrange(
   .plot_th_corr(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
   .plot_th_corr(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
   .plot_th_corr(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
@@ -241,10 +241,10 @@ Results_P2 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/Results_P2.png', Results_P2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold2.png', threshold2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
 # And draw for appendix part
-Appendix_P1 <- grid.arrange(
+appendix_threshold1 <- grid.arrange(
   .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
   .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
   .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
@@ -255,9 +255,9 @@ Appendix_P1 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/Appendix_P1.png', Appendix_P1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/appendix_threshold1.png', appendix_threshold1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
-Appendix_P2 <- grid.arrange(
+appendix_threshold2 <- grid.arrange(
   .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
   .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
   .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
@@ -268,7 +268,7 @@ Appendix_P2 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/Appendix_P2.png', Appendix_P2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/appendix_threshold2.png', appendix_threshold2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
 # Threshold correlation with scatter to  explain before main results, for MKT-HML pair ------------------------------
 # One function for scatter with residuals and one for scatter with returns, axes differ etc...
@@ -563,7 +563,7 @@ models$factor2 <- factor(models$factor2, levels = c('Mkt.RF','SMB','Mom','HML','
 
 # Plot simulated graphs
 
-Simulated_P1 <- grid.arrange(
+threshold_simulated1 <- grid.arrange(
   .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
   .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
   .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
@@ -574,9 +574,9 @@ Simulated_P1 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/Simulated_P1.png', Simulated_P1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold_simulated1.png', threshold_simulated1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
-Simulated_P2 <- grid.arrange(
+threshold_simulated2 <- grid.arrange(
   .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
   .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
   .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
@@ -587,7 +587,7 @@ Simulated_P2 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/Simulated_P2.png', Simulated_P2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold_simulated2.png', threshold_simulated2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
 
 #  ------------------------------------------------------------------------
@@ -622,61 +622,132 @@ plotdf.ret$order2 <- factor(plotdf.ret$order2, levels = c('Mkt.RF','SMB','Mom','
 plotdf.res$order <- factor(plotdf.res$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 plotdf.res$order2 <- factor(plotdf.res$order2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
-# Do roll plot only residuals and save ----------------------------------------------
-g <- ggplot(plotdf.res, aes(x = Date, y = value)
-) +
-  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-              fill = 'grey10',
-              alpha = 0.1
+# Roll plot functions ----------------------------------------------
+
+.plot_roll <- function(plot_df = plotdf.res, 
+                       df_labels = df.labels.res, 
+                       df_stdres = df.stdres, COLFACTORS, ROWFACTORS) {
+  # For COLFACTORS ROWFACTORS only
+  plot_df <- plot_df %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  df_labels <- df_labels %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  
+  g <- ggplot(plot_df, aes(x = Date, y = value)
   ) +
-  geom_line(aes(color = 'Rolling correlation')) +
-  geom_abline(aes(slope = 0, intercept = standard_corr,
-                  color = 'Unconditional correlation'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels.res)+
-  theme_Publication() +
-  scale_colour_Publication() +
-  ylab('Correlation') +
-  xlab('Year') +
-  scale_x_date(date_labels = "%y") +
-  theme(legend.position = 'none')+
-  coord_cartesian(ylim = c(-1, 1), xlim = c(df.stdres$Date[1], df.stdres$Date[length(df.stdres$Date)])) +
-  #geom_text(data = df.labels.res, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
-  facet_grid(order ~ order2, switch = 'y')
+    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = 'grey10',
+                alpha = 0.1
+    ) +
+    geom_line(aes(color = 'Rolling correlation')) +
+    geom_abline(aes(slope = 0, intercept = standard_corr,
+                    color = 'Unconditional correlation'), colour = 'grey20', size = 0.25, linetype = 2, data = df_labels)+
+    theme_Publication() +
+    scale_colour_Publication() +
+    ylab('Correlation') +
+    xlab('Year') +
+    scale_x_date(date_labels = "%y") +
+    theme(legend.position = 'none')+
+    coord_cartesian(ylim = c(-1, 1), xlim = c(df_stdres$Date[1], df_stdres$Date[length(df_stdres$Date)]))+
+    annotate("segment",x=tail(df_stdres$Date,1),xend=head(df_stdres$Date,1),y=Inf,yend=Inf,color="black",lwd=1)+
+    ggtitle(sprintf("%s - %s", COLFACTORS, ROWFACTORS))
+  
+  g
+}
 
-ggsave('output/rollingCorrelations/rolling52.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
-
-# Do roll plot both returns and residuals and save ----------------------------------------------
-g <- ggplot(plotdf.res, aes(x = Date, y = value)
-) +
-  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-              fill = 'grey10',
-              alpha = 0.1
+.plot_roll_incl_ret <- function(plot_df = plotdf.res, plot_df2 = plotdf.ret, 
+                                df_labels = df.labels.res, df_labels2 = df.labels.ret, 
+                                df_stdres = df.stdres,
+                                COLFACTORS, ROWFACTORS) {
+  
+  # For COLFACTORS ROWFACTORS only
+  plot_df <- plot_df %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  plot_df2 <- plot_df2 %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  df_labels <- df_labels %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  df_labels2 <- df_labels2 %>% filter(order %in% COLFACTORS, order2 %in% ROWFACTORS)
+  
+  g <- ggplot(plot_df, aes(x = Date, y = value)
   ) +
-  geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-              fill = 'grey10',
-              alpha = 0.1,
-              data = plotdf.ret
-  ) +
-  geom_line(aes(color = 'Rolling correlation residuals')) +
-  geom_line(aes(color = 'Rolling correlations returns'),
-            data = plotdf.ret) +
-  geom_abline(aes(slope = 0, intercept = standard_corr,
-                  color = 'Unconditional correlation residuals'), colour = 'grey20', size = 0.25, linetype = 2, data = df.labels.res)+
-  geom_abline(aes(slope = 0, intercept = standard_corr,
-                  color = 'Unconditional correlation returns'), colour = 'grey20', size = 0.25, linetype = 3, data = df.labels.ret)+
-  theme_Publication() +
-  theme(legend.position = 'none')+
-  scale_colour_Publication() +
-  ylab('Correlation') +
-  xlab('Year') +
-  scale_x_date(date_labels = "%y") +
-  coord_cartesian(ylim = c(-1, 1), xlim = c(df.stdres$Date[1], df.stdres$Date[length(df.stdres$Date)])) +
-  #geom_text(data = df.labels.res, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
-  #geom_text(data = df.labels.ret, aes(x = as.Date('2010-01-01'), y = -0.90, label = paste('r = ',standard_corr)), family = 'Minion Pro', size = 3, parse = FALSE)+
-  facet_grid(order ~ order2, switch = 'y')
+    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = 'grey10',
+                alpha = 0.1
+    ) +
+    geom_ribbon(aes(ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+                fill = 'grey10',
+                alpha = 0.1,
+                data = plot_df2
+    ) +
+    geom_line(aes(color = 'Rolling correlation residuals')) +
+    geom_line(aes(color = 'Rolling correlations returns'),
+              data = plot_df2) +
+    geom_abline(aes(slope = 0, intercept = standard_corr,
+                    color = 'Unconditional correlation residuals'), colour = 'grey20', size = 0.25, linetype = 2, data = df_labels)+
+    geom_abline(aes(slope = 0, intercept = standard_corr,
+                    color = 'Unconditional correlation returns'), colour = 'grey20', size = 0.25, linetype = 3, data = df_labels2)+
+    theme_Publication() +
+    theme(legend.position = 'none')+
+    scale_colour_Publication() +
+    ylab('Correlation') +
+    xlab('Year') +
+    scale_x_date(date_labels = "%y") +
+    coord_cartesian(ylim = c(-1, 1), xlim = c(df_stdres$Date[1], df_stdres$Date[length(df_stdres$Date)]))+
+    annotate("segment",x=tail(df_stdres$Date,1),xend=head(df_stdres$Date,1),y=Inf,yend=Inf,color="black",lwd=1)+
+    ggtitle(sprintf("%s - %s", COLFACTORS, ROWFACTORS))
+  
+  g
+}
 
-ggsave('output/rollingCorrelations/rolling_both52.png', g, device = 'png', width = 14, height = 18, units = 'cm', limitsize = F)
+# Do roll plots and save
+
+rolling1 <- grid.arrange(
+  .plot_roll(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
+  .plot_roll(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
+  .plot_roll(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
+  .plot_roll(COLFACTORS = 'Mom', ROWFACTORS = 'HML'),
+  .plot_roll(COLFACTORS = 'Mom', ROWFACTORS = 'CMA'),
+  .plot_roll(COLFACTORS = 'Mom', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/rollingCorrelations/rolling1.png', rolling1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
 
-# Rolling from simulations ------------------------------------------------
-# Lets think about it.
+rolling2 <- grid.arrange(
+  .plot_roll(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
+  .plot_roll(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
+  .plot_roll(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
+  .plot_roll(COLFACTORS = 'HML', ROWFACTORS = 'CMA'),
+  .plot_roll(COLFACTORS = 'HML', ROWFACTORS = 'RMW'),
+  .plot_roll(COLFACTORS = 'CMA', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/rollingCorrelations/rolling2.png', rolling2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
+
+appendix_rolling1 <- grid.arrange(
+  .plot_roll_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
+  .plot_roll_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
+  .plot_roll_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
+  .plot_roll_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'HML'),
+  .plot_roll_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'CMA'),
+  .plot_roll_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/rollingCorrelations/appendix_rolling1.png', appendix_rolling1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+
+
+appendix_rolling2 <- grid.arrange(
+  .plot_roll_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
+  .plot_roll_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
+  .plot_roll_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
+  .plot_roll_incl_ret(COLFACTORS = 'HML', ROWFACTORS = 'CMA'),
+  .plot_roll_incl_ret(COLFACTORS = 'HML', ROWFACTORS = 'RMW'),
+  .plot_roll_incl_ret(COLFACTORS = 'CMA', ROWFACTORS = 'RMW'),
+  ncol = 2,
+  nrow = 3,
+  as.table = FALSE
+)
+ggsave('output/rollingCorrelations/appendix_rolling2.png', appendix_rolling2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
