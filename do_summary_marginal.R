@@ -49,7 +49,7 @@ summary_table <- rbind(summary_table,
                        'Return LB [10] p-value' = ret_LB_10,
                        'Squared return LB [5] p-value' = sqr_ret_LB_5,
                        'Squared return LB [10] p-value' = sqr_ret_LB_10) %>%
-  round(., digits = 4)
+  round(., digits = 3)
 
 write.table(summary_table, file = 'output/MarginalStats/summaryTable.Estim.csv')
 #stargazer(summary_table, summary = FALSE)
