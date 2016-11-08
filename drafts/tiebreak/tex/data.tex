@@ -1,6 +1,6 @@
 %!TEX root = ../main.tex
 \section{Data}
-
+\label{sec:data}
 In the data section, we describe the source of our data and how the factor strategies are constructed. We then present summary statistics including tests for serial correlation and volatility clustering, as well as quantile-quantile (QQ) plots. Finally, we discuss the unconditional correlation of the factor strategies.
 
 \subsection{Data description: Factor return series}
@@ -41,29 +41,44 @@ French's financial statement data originates from Compustat, stock return data f
   \\[-1.8ex] 
   & Mkt.RF & SMB & Mom & HML & CMA & RMW \\ 
 \hline \\[-1.8ex] 
-nobs & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ \\ 
+Observations & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ \\ 
 Maximum & $0.126$ & $0.060$ & $0.120$ & $0.117$ & $0.054$ & $0.094$ \\ 
 Minimum & $$-$0.198$ & $$-$0.098$ & $$-$0.175$ & $$-$0.083$ & $$-$0.044$ & $$-$0.062$ \\ 
-Mean & $0.001$ & $0.0003$ & $0.001$ & $0.001$ & $0.001$ & $0.001$ \\ 
+Mean & $0.001$ & $0.000$ & $0.001$ & $0.001$ & $0.001$ & $0.001$ \\ 
 Median & $0.003$ & $0.001$ & $0.002$ & $0.0005$ & $0.0004$ & $0.0005$ \\ 
 Stdev & $0.022$ & $0.012$ & $0.019$ & $0.012$ & $0.009$ & $0.009$ \\ 
 Skewness & $$-$0.688$ & $$-$0.504$ & $$-$1.390$ & $0.331$ & $0.306$ & $0.724$ \\ 
 Kurtosis & $6.191$ & $4.997$ & $11.987$ & $7.318$ & $3.149$ & $13.005$ \\ 
 Return LB [5] p-value          & $0.263$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
 Return LB [10] p-value         & $0.007$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
-Squared return LB [5] p-value  & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
-Squared return LB [10] p-value & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
+Return\textsuperscript{2} LB [5] p-value  & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
+Return\textsuperscript{2} LB [10] p-value & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
 %\bottomrule \\[-1.8ex] 
 \end{tabularx} 
 \end{table}
-For all series, there are 2,766 consecutive data points and no missing data. Mkt-RF is the most volatile and extreme of the series, with weekly returns between -19.8\% and 12.6\% and a standard deviation of 2.2\%. Among the value strategies, CMA and RMW seem to be less extreme than HML, with less negative minimums and smaller standard deviations. The factor strategies have excess kurtosis, or fat tails, that is typical for financial returns. The excess kurtoses of the Mom, HML and RMW factors are even higher than the kurtosis of the Mkt-RF factor. However, while market returns are negatively skewed, the value strategies HML, CMA and RMW instead exhibit positive skewness. QQ-plots versus normal theoretical quantiles in \autoref{qq_returns} graphically show the non-normality, which appears especially pronounced for the Mom and RMW factors.
+For all series, there are 2,766 consecutive data points and no missing data. Mkt-RF is the most volatile and extreme of the series, with weekly returns between -19.8\% and 12.6\% and a standard deviation of 2.2\%. Among the value strategies, CMA and RMW seem to be less extreme than HML, with less negative minimums and smaller standard deviations. The factor strategies have excess kurtosis, or fat tails, that is typical for financial returns. The excess kurtoses of the Mom, HML and RMW factors are even higher than the kurtosis of the Mkt-RF factor. However, while market returns are negatively skewed, the value strategies HML, CMA and RMW instead exhibit positive skewness. QQ-plots versus normal theoretical quantiles in \autoref{fig:qq_returns} graphically show the non-normality, which appears especially pronounced for the Mom and RMW factors.
 
-We conduct Ljung-Box tests of the factor returns to control for weekly autocorrelation. The p-values of these tests are given in \autoref{tab:summarydata} and are very low for all factors except Mkt-RF, leading to a strong rejection of the zero autocorrelation null hypothesis. For Mkt-RF, the p-value is not enough for a rejection of zero autocorrelation at the 5 week maximum lag length, but strongly rejected for 10 weeks of maximum lags. We also conduct Ljung-Box tests of the squared factor returns to control for volatility clustering (ARCH effects). Here, the null hypothesis is that there are no ARCH effects, and p-values given in \autoref{tab:summarydata} strongly rejects the null for all factors at both max lag length of 5 and 10.
+\begin{figure}[H]
+  \caption{QQ-plots versus normal distribution}
+  \label{fig:qq_returns}
+  %\toprule
+  \centering
+  \begin{minipage}{\textwidth}
+  \includegraphics[scale=1]{graphics/qq_returns.png}  
+  %\bottomrule
+  \vspace{3mm}
+  \footnotesize
+  Quantile-quantile plots of theoretical (normal) and sample quantiles. Data from a normal distribution should line up on the dashed line. Weekly log returns 1963-2016
+  \end{minipage}
+\end{figure}
 
-We conclude that factor return series are non-normal and exhibit both autocorrelation as well as autoregressive heteroscedasticity. These predictable phenomena in financial return data are typically captured by models that incorporate autoregressive components for both the conditional mean and variance equations, such as the family of ARMA-GARCH models, which are further discussed in \autoref{sec:method}.
+
+We conduct Ljung-Box tests of the factor returns to control for weekly autocorrelation.\footnote{For a detailed description of the test, see \autoref{sub:diagnostic_test_procedures}} The p-values of these tests are given in \autoref{tab:summarydata} and are very low for all factors except Mkt-RF, leading to a strong rejection of the zero autocorrelation null hypothesis. For Mkt-RF, the p-value is not enough for a rejection of zero autocorrelation at the 5 week maximum lag length, but strongly rejected for 10 weeks of maximum lags. We also conduct Ljung-Box tests of the squared factor returns to control for volatility clustering (ARCH effects). Here, the null hypothesis is that there are no ARCH effects, and p-values given in \autoref{tab:summarydata} strongly rejects the null for all factors at both max lag length of 5 and 10.
+
+We conclude that factor return series are non-normal and exhibit both autocorrelation as well as autoregressive heteroscedasticity. These predictable phenomena in financial return data are typically captured by models that incorporate autoregressive components for both the conditional mean and variance equations, such as the family of ARMA-GARCH models, which are further discussed in \autoref{sec:univariate_modeling}.
 \begin{figure}[H]
   \caption{Cumulative returns to factor strategies}
-  \label{diag:cumret}
+  \label{fig:cumret}
   %\toprule
   \centering
   \begin{minipage}{\textwidth}
@@ -76,7 +91,7 @@ We conclude that factor return series are non-normal and exhibit both autocorrel
 \end{figure}
 \begin{figure}[H]
   \caption{Standardized cumulative returns to factor strategies}
-  \label{diag:cumretstd}
+  \label{fig:cumretstd}
   %\toprule
   \centering
   \begin{minipage}{\textwidth}
@@ -88,7 +103,7 @@ We conclude that factor return series are non-normal and exhibit both autocorrel
   \end{minipage}
 \end{figure}
 
-Plots of cumulative returns clearly show the high returns to the momentum strategy through the sample period. However, normalizing the series to 10\% annual volatility gives a more nuanced picture of mean-variance performance. Since 1963, each of the strategies except for SMB has outperformed the market factor. Furthermore, factor strategies seem to crash at different times and diversify eachother, e.g. Mom performing well during 1999-2000 and RMW performing well during 2008-2009. The unconditional correlation matrix of returns is given in \autoref{tab:corr_matrix} and the general low or even negative correlation coefficients show the diversification benefits of factor strategies. The HML - CMA pair does stand out, however, with an unconditional correlation of 0.625, which could be related to a partial overlap of the factor components as discussed in \autoref{sec:literature} -- past investment is shown to be positively empirically related to the current book-to-market ratio. The substantially higher correlation in this asset pair indicates lower diversification benefits between the two strategies and begs the question whether both should be included in a factor portfolio.
+Plots of cumulative returns (\autoref{fig:cumret}) clearly show the high returns to the momentum strategy through the sample period. However, normalizing the series to 10\% annual volatility (\autoref{fig:cumretstd}) gives a more nuanced picture of mean-variance performance. Since 1963, each of the strategies except for SMB has outperformed the market factor. Furthermore, factor strategies seem to crash at different times and diversify eachother, e.g. Mom performing well during 1999-2000 and RMW performing well during 2008-2009. The unconditional correlation matrix of returns is given in \autoref{tab:corr_matrix} and the general low or even negative correlation coefficients show the diversification benefits of factor strategies. The HML - CMA pair does stand out, however, with an unconditional correlation of 0.625, which could be related to a partial overlap of the factor components as discussed in \autoref{sec:literature} -- past investment is shown to be positively empirically related to the current book-to-market ratio. The substantially higher correlation in this asset pair indicates lower diversification benefits between the two strategies and begs the question whether both should be included in a factor portfolio.
 
 \begin{table}[!htbp] \centering 
   \caption{Correlation matrix} 
@@ -96,7 +111,7 @@ Plots of cumulative returns clearly show the high returns to the momentum strate
 \begin{tabularx}{\textwidth}{X}
   \\[-1.8ex]%\toprule
   \\[-1.8ex] 
-  \footnotesize Correlation matrix of weekly factor return series. Weekly data 1963-2016
+  \footnotesize Unconditional sample correlation matrix of factor return series. Weekly data 1963-2016
 \end{tabularx}
 \begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X c c c c c c} 
   \\[-1.8ex]\midrule
