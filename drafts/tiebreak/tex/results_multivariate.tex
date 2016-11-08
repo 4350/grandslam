@@ -1,11 +1,4 @@
 %!TEX root = ../main.tex
-\section{Modeling multivariate dependence: Copula} % (fold)
-\label{sec:multivariate_modeling}
-
-\subsection{Copula}
-%\label
-% method of model
-% estimation of model
 
 \subsection{Copula results with constant correlations}
 %\label
@@ -16,7 +9,7 @@ A key purpose of the copula is to better capture tail dependence between factor 
 By simulating a 250,000 weeks of shocks in the copula, and then transforming these shocks into standardized residuals for each of the factors, we can test copula's ability to generate the tail dependence in the data. The results are given in~\autoref{fig:threshold_simulated1} and \autoref{fig:threshold_simulated2}.
 
 % plot
-\begin{figure}[H]
+\begin{figure}[htbp]
   \caption{Threshold correlations -- comparison of ARMA-GARCH residuals and simulated residuals from constant copulae. Page 1/2}
   \label{fig:threshold_simulated1}
   %\toprule
@@ -29,7 +22,7 @@ By simulating a 250,000 weeks of shocks in the copula, and then transforming the
   ARMA-GARCH threshold correlation plots with 95\% confidence bounds are compared to simulated threshold correlations from the constant copulae with normal, Student's \textit{t} and skewed Student's \textit{t} innovations. 250,000 simulation runs for each. Correlation pairs in graph titles. Weekly data 1963-2016
   \end{minipage}
 \end{figure}
-\begin{figure}[H]
+\begin{figure}[htbp]
   \caption{Threshold correlations -- comparison of ARMA-GARCH residuals and simulated residuals from constant copulae. Page 2/2}
   \label{fig:threshold_simulated2}
   %\toprule
@@ -51,7 +44,6 @@ Second, we find that although the skewed Student's \textit{t} does generate some
 
 In conclusion, threshold correlation comparison between empirical and simulated data shows the limitations of our copula approach. Although the copulae are flexible and can express tail dependence, which is a clear improvement to no tail dependence at all, it does not overlap very well with the data. For example, the Student's \textit{t} copula only has one degree of freedom parameter that controls the fatness of tails, and the skewed Student's \textit{t} copula only has one skewness parameter for each series. This imposes limits on how strongly the model can express fat tails or asymmetries between factors A and B and simultaneously express other fat tails or asymmetries (or lack thereof) between factors A and C. For a collection of six factors with heterogenous dependence, this is even harder. This is a clear limitation of the quite parsimonious copula approach, and will be discussed further in the concluding section. Although imperfect, the copula modeling of tail dependence could constitute a significant improvement to alternatives, especially in the field of risk management, where understanding of tail events is paramount.
 
-\subsection{Copula results}
 % TABLES NEED TO BE MODIFIED IN THE FOLLOWING WAYS
 % 1) Change {tabular} to {tabularx}{\textwidth} and make leftmost column an X column
 %     and change top and bottom \hline to \toprule \bottomrule
@@ -82,7 +74,7 @@ In conclusion, threshold correlation comparison between empirical and simulated 
 % Table created by stargazer v.5.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
 % Date and time: ons, okt 12, 2016 - 12:37:02
 % Requires LaTeX packages: dcolumn 
-\begin{table}[!htbp] \centering 
+\begin{table}[!htbpp] \centering 
   \caption{Copula results: Constant specifications} 
   \label{tab:copula_estimates_constant} 
 \begin{tabularx}{\textwidth}{X}
@@ -140,7 +132,7 @@ Correlation $(Q)$ persistence $(\alpha+\beta)$ & \multicolumn{1}{c}{N/A} & \mult
 % Table created by stargazer v.5.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
 % Date and time: ons, okt 12, 2016 - 12:37:02
 % Requires LaTeX packages: dcolumn 
-\begin{table}[!htbp] \centering 
+\begin{table}[!htbpp] \centering 
   \caption{Copula results: \textit{c}DCC specifications} 
   \label{tab:copula_estimates_dynamic} 
 \begin{tabularx}{\textwidth}{X}
@@ -193,21 +185,118 @@ Correlation $(Q)$ persistence $(\alpha+\beta)$ & \multicolumn{1}{c}{0.981} & \mu
 \textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
 \end{tabularx} 
 \end{table} 
-% potentially subsection exogenous regressors
-%
 
-\section{Putting the model to work}
+\pagebreak
+
+\section{Putting our copula model to work}
 \label{sec:model_work}
 % now, lets see what this model can say about a few things
 
-\subsection{Mean-variance investing}
-%\label
-% fama french regressions, what actually happens to MV weights, do they go to zero?
-% explain method for out-of-sample distributions, simulation based
-% show that weights don't go to zero, not for sample and not for advanced super copula model
-% what is the out-of-sample investment performance of relying on the best copula model?
-% it looks pretty good but not drastically better than relying on sample average - OOS is hard
+\subsection{Abnormal return (alpha) regressions}
+\label{subsec:alpha_reg}
+\textcite{FF2015} runs factor regressions where both the LHS variable and the RHS variables are zero-cost factor portfolios. In this type of zero-cost portfolio regression, the intercept is to be interpreted as the abnormal return, or Jensen's alpha, of adding the LHS factor to a portfolio already consisting of the RHS factors \autocite{Jensen1968}. As a specific example, we begin by considering the regression that has caused the discussion on whether HML is a redundant variable. They run the regression
+\begin{align}
+  r^{HML}_t = \alpha + \beta_1 r^{Mkt.RF}_t + \beta_2 r^{SMB}_t + \beta_3 r^{RMW}_t + \beta_4 r^{CMA}_t + \epsilon_t
+\end{align}
+where $r^i_t$ denote monthly returns. The central finding is that HML is completely subsumed by the four factors Mkt.RF, SMB, RMW and CMA -- the alpha of the regression is very small and not statistically significant. In other words, adding HML to a portfolio of the other four factors should give no alpha.
+
+Our analysis deviates from that in \textcite{FF2015} as we consider weekly return data and a slightly extended data window.
+
+In \autoref{fig:abnormal_five}, regressions for the five-factor model are presented. Each column represents a unique regression, putting one of the five factors as the LHS variable and using the remaining four factors as regressors (in rows). First, we note that, similar to the results in \textcite{FF2015}, the alpha of HML is not significant, indicating that the factor is completely subsumed by the remaining four factors and does not create additional value in a portfolio setting. All of the remaining four factors do generate alpha to their respective four-factor alternatives. [Compare factor loadings to monthly returns?] Second, the factor loadings are quite interesting: (1) Mkt.RF negative -1 on CMA, -.45 on RMW, (2) HML explained very well by CMA with loading .85 (3) CMA not as well explained by HML, loading .39. Expected, and supports that HML to a large extent proxies for CMA?
+
+Now, we include the momentum factor Mom, effectively moving to a six-factor model, and present new regressions in \autoref{fig:abnormal_six}. First, we note that now the move to a six-factor universe has made the alpha of HML positive and significant. Somehow, the inclusion of momentum improves the understanding of factor returns in such a way that the benefit of HML is resurrected. Second, factor loadings in regression (3) tell a story of how HML loads negatively on momentum, while maintaining the strong loading on CMA. However, CMA and HML differ in their respective loadings on the Mom factor -- with CMA instead loading positively on momentum.
+
+There are so many more things to say here. Let's do this together tomorrow.
+
+\begin{table}[!htbp] \centering 
+  \caption{Abnormal return regressions -- Five factor model} 
+  \label{fig:abnormal_five} 
+\begin{tabularx}{\textwidth}{X}
+\\[-1.8ex]\toprule
+\\[-1.8ex] 
+\footnotesize Abnormal return regressions on zero-cost equity factor portfolios, following the analysis in \textcite{FF2015}. Heteroskedasticy robust standard errors in parentheses, following \textcite{White1982}. Alpha to be interpreted as abnormal return (Jensen's alpha). Weekly log returns 1963-2016
+\end{tabularx}
+\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}}X rrrrr} 
+\\[-1.8ex]\midrule 
+\\[-1.8ex] 
+  & \multicolumn{5}{c}{\textit{LHS variable:}} \\ 
+\cline{2-6} 
+\\[-1.8ex] & \multicolumn{5}{c}{ } \\ 
+ & Mkt.RF & SMB & HML & CMA & RMW \\ 
+\\[-1.8ex] & (1) & (2) & (3) & (4) & (5)\\ 
+\hline \\[-1.8ex] 
+ Alpha & 0.0022$^{***}$ & 0.0008$^{***}$ & 0.0002 & 0.0006$^{***}$ & 0.0009$^{***}$ \\ 
+  & (0.0004) & (0.0002) & (0.0002) & (0.0001) & (0.0002) \\ 
+  & & & & & \\ 
+ Mkt.RF &  & $-$0.0006 & $-$0.0180 & $-$0.1103$^{***}$ & $-$0.0778$^{***}$ \\ 
+  &  & (0.0182) & (0.0194) & (0.0111) & (0.0111) \\ 
+  & & & & & \\ 
+ SMB & $-$0.0018 &  & 0.0010 & $-$0.0314$^{**}$ & $-$0.2366$^{***}$ \\ 
+  & (0.0530) &  & (0.0223) & (0.0141) & (0.0256) \\ 
+  & & & & & \\ 
+ HML & $-$0.0742 & 0.0015 &  & 0.3897$^{***}$ & $-$0.0141 \\ 
+  & (0.0819) & (0.0317) &  & (0.0245) & (0.0405) \\ 
+  & & & & & \\ 
+ CMA & $-$0.9965$^{***}$ & $-$0.0973$^{**}$ & 0.8526$^{***}$ &  & $-$0.1463$^{***}$ \\ 
+  & (0.0944) & (0.0445) & (0.0370) &  & (0.0432) \\ 
+  & & & & & \\ 
+ RMW & $-$0.4522$^{***}$ & $-$0.4726$^{***}$ & $-$0.0198 & $-$0.0942$^{***}$ &  \\ 
+  & (0.0650) & (0.0429) & (0.0580) & (0.0269) &  \\ 
+  & & & & & \\ 
+\bottomrule \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{5}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabularx} 
+\end{table}
+
+\begin{table}[!htbp] \centering 
+  \caption{Abnormal return regressions -- Six factor model} 
+  \label{fig:abnormal_six} 
+\begin{tabularx}{\textwidth}{X}
+\\[-1.8ex]\toprule
+\\[-1.8ex] 
+\footnotesize Abnormal return regressions on zero-cost equity factor portfolios, following the analysis in \textcite{FF2015}. Heteroskedasticy robust standard errors in parentheses, following \textcite{White1982}. Alpha to be interpreted as abnormal return (Jensen's alpha). Weekly log returns 1963-2016
+\end{tabularx}
+\begin{tabularx}{\textwidth}{@{\extracolsep{0pt}}X rrrrrr} 
+\\[-1.8ex]\midrule 
+\\[-1.8ex] 
+ & \multicolumn{6}{c}{\textit{LHS variable:}} \\ 
+\cline{2-7} 
+\\[-1.8ex] & \multicolumn{6}{c}{ } \\ 
+ & Mkt.RF & SMB & HML & CMA & RMW & Mom \\ 
+\\[-1.8ex] & (1) & (2) & (3) & (4) & (5) & (6)\\ 
+\hline \\[-1.8ex] 
+ Alpha & 0.0024$^{***}$ & 0.0008$^{***}$ & 0.0005$^{***}$ & 0.0004$^{***}$ & 0.0009$^{***}$ & 0.0016$^{***}$ \\ 
+  & (0.0004) & (0.0002) & (0.0002) & (0.0001) & (0.0002) & (0.0003) \\ 
+  & & & & & & \\ 
+ Mkt.RF &  & 0.0009 & $-$0.0320$^{**}$ & $-$0.0964$^{***}$ & $-$0.0744$^{***}$ & $-$0.0891$^{***}$ \\ 
+  &  & (0.0183) & (0.0153) & (0.0087) & (0.0117) & (0.0265) \\ 
+  & & & & & & \\ 
+ SMB & 0.0026 &  & 0.0079 & $-$0.0330$^{**}$ & $-$0.2367$^{***}$ & 0.0384 \\ 
+  & (0.0527) &  & (0.0197) & (0.0134) & (0.0263) & (0.0453) \\ 
+  & & & & & & \\ 
+ HML & $-$0.1484$^{**}$ & 0.0127 &  & 0.4248$^{***}$ & 0.0080 & $-$0.6535$^{***}$ \\ 
+  & (0.0719) & (0.0316) &  & (0.0193) & (0.0352) & (0.0816) \\ 
+  & & & & & & \\ 
+ CMA & $-$0.9131$^{***}$ & $-$0.1082$^{**}$ & 0.8673$^{***}$ &  & $-$0.1671$^{***}$ & 0.6385$^{***}$ \\ 
+  & (0.0832) & (0.0446) & (0.0325) &  & (0.0405) & (0.0871) \\ 
+  & & & & & & \\ 
+ RMW & $-$0.4302$^{***}$ & $-$0.4749$^{***}$ & 0.0100 & $-$0.1021$^{***}$ &  & 0.1513 \\ 
+  & (0.0654) & (0.0429) & (0.0434) & (0.0250) &  & (0.0932) \\ 
+  & & & & & & \\ 
+ Mom & $-$0.1147$^{***}$ & 0.0171 & $-$0.1814$^{***}$ & 0.0868$^{***}$ & 0.0337$^{*}$ &  \\ 
+  & (0.0348) & (0.0203) & (0.0262) & (0.0121) & (0.0203) &  \\ 
+  & & & & & & \\ 
+\bottomrule \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{5}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabularx} 
+\end{table}
+
+\subsection{Out-of-sample mean-variance investing}
+\label{subsec:mean_variance}
+
+Ok, so given fama french regressions, what actually happens to MV weights, do they go to zero? Explain method for out-of-sample distributions, simulation based. Show that weights don't go to zero, not for sample and not for advanced super copula model. What is the out-of-sample investment performance of relying on the best copula model? It looks pretty good but not drastically better than relying on sample average -- OOS is hard.
 
 \subsection{Conditional diversification benefits}
-%\label
-% what are the theoretical diversificaiton benefits of including hml? is HML or CMA riskier if one can only choose either or? CDB analysis
+\label{subsec:cdb}
+
+What are the theoretical diversificaiton benefits of including HML? Is HML or CMA riskier if one can only choose either or? What is the impact of RMW?

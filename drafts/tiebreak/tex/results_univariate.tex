@@ -32,7 +32,7 @@ The ARMA-GARCH models are estimated on each series using maximum likelihood esti
 
 % subsection general_univariate_model_gjr_garch (end)
 
-\subsection{Selection Process} % (fold)
+\subsection{Factor specific model selection process} % (fold)
 \label{sub:selection_process}
 
 Our estimation process is as follows: For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1, 1) model). We then compute the Bayesian Information Criterion (BIC~\autocite{Schwarz1978}) for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
@@ -43,7 +43,7 @@ In a well-specified model, we expect there to be no significant serial correlati
 
 % subsection selection_process (end)
 
-\subsection{Diagnostic test procedures}
+\subsection{Model diagnostic test procedures}
 \label{sub:diagnostic_test_procedures}
 
 \textbf{Autocorrelation test}
@@ -72,7 +72,7 @@ where $\hat{z}_t^2$ are the standardized squared residuals of the ARMA-GARCH mod
 
 % subsection diagnostic_test_procedures (end)
 
-\subsection{ARMA-GARCH selection and estimation results}
+\subsection{Model selection and estimation results}
 \label{sub:uni_selection_estimation_results}
 
 The result of our selection and estimation procedure are presented in~\autoref{tab:garch_value} and~\autoref{tab:garch_nonvalue}. The Mkt-RF factor is the only model that requires a GJR-GARCH $\eta \neq 0$, while the remaining models are all standard GARCH (1, 1). The minimization of BIC leads to ARMA(0, 0) for Mkt-RF, ARMA(1, 0) for Mom and CMA and ARMA(1, 1) for the remaining factors HML, SMB, RMW. 
@@ -81,7 +81,7 @@ Based on these ARMA-GARCH specifications, the Ljung-Box and LM tests indicate no
 
 The lack of significant sign bias in the GARCH specifications for all models except Mkt-RF is interesting, but in line with the argument that any leverage effects could cancel out in a zero-cost long-short equity portfolio; the Mkt-RF is the only factor that is net-long equities and also exhibited the expected negative sign bias as a GARCH model. In \autoref{tab:garch_nonvalue}, we note that the sign bias of Mkt-RF has been eliminated in the GJR-GARCH model. 
 
-The candidate specifications under normal and Student's \textit{t} distributed innovations all display misaligned QQ-plots, see \autoref{fig:qq_norm} and \autoref{fig:qq_std}. The empirical distributions deviate from the 45 degree theoretical lines, especially in the more extreme quantiles. This indicates asymmetry in the residual series. In unreported results, we have controlled that the misspecification of normal and Student's \textit{t} residuals is persistent even if GJR-GARCH models are fitted for all factors -- leverage effects can't explain the misspecification. By comparision (see~\autoref{fig:qq_ghst}), the QQ-plot with skewed Student's \textit{t} innovations seems to fit the data well. We proceed with skewed Student's \textit{t} residual distributions.
+The candidate specifications under normal and Student's \textit{t} distributed innovations all display misaligned QQ-plots, see \autoref{fig:qq_norm_std}. The empirical distributions deviate from the 45 degree theoretical lines, especially in the more extreme quantiles. This indicates asymmetry in the residual series. In unreported results, we have controlled that the misspecification of normal and Student's \textit{t} residuals is persistent even if GJR-GARCH models are fitted for all factors -- leverage effects can't explain the misspecification. By comparision (see~\autoref{fig:qq_ghst}), the QQ-plot with skewed Student's \textit{t} innovations seems to fit the data well. We proceed with skewed Student's \textit{t} residual distributions.
 
 Now, we turn to the estimation results of the chosen ARMA-GJR-GARCH models in~\autoref{tab:garch_value} and~\autoref{tab:garch_nonvalue}. 
 
@@ -112,7 +112,7 @@ Now, we turn to the estimation results of the chosen ARMA-GJR-GARCH models in~\a
 %
 % 6) Copy the whole table, only change caption, label, factor/spec labels and (1)-(3) to (4)-(6)
 %% TABLE 1 value factors HML, RMW, CMA
-\begin{table}[!htbp] \centering 
+\begin{table}[!htbpp] \centering 
   \caption{ARMA-GARCH results: Mkt-RF, SMB, Mom} 
   \label{tab:garch_nonvalue} 
 \begin{tabularx}{\textwidth}{X}
@@ -169,7 +169,7 @@ Sign bias (+) p-value & \multicolumn{1}{c}{0.182} & \multicolumn{1}{c}{0.106} & 
 \end{tabularx} 
 \end{table}
 
-\begin{table}[!htbp] \centering 
+\begin{table}[!htbpp] \centering 
   \caption{ARMA-GARCH results: HML, RMW, CMA} 
   \label{tab:garch_value} 
 \begin{tabularx}{\textwidth}{X}
@@ -225,34 +225,24 @@ Sign bias (+) p-value & \multicolumn{1}{c}{0.357} & \multicolumn{1}{c}{0.664} & 
 \textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
 \end{tabularx} 
 \end{table}
+\begin{figure}[htbpp]
+  \caption{QQ-plots on residuals from ARMA-GARCH with normal and Student's \textit{t} innovations}
+  \label{fig:qq_norm_std}
+  %\toprule
+  \centering
+  \begin{minipage}{\textwidth}
+  \includegraphics[scale = 1]{graphics/qq_norm.png}
+  \centerline{(i) Normal innovations} \\
+  \includegraphics[scale = 1]{graphics/qq_std.png}
+  \centerline{(ii) Student's \textit{t} innovations} \\
+  %\bottomrule
+  \vspace{3mm}
+  \footnotesize
+  Quantile-quantile plots of theoretical standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from the theoretical distribution should line up on the dashed line. Based on weekly data 1963-2016
+  \end{minipage}
+\end{figure}
 
-\begin{figure}[H]
-  \caption{QQ-plots on residuals from ARMA-GARCH with normal innovations}
-  \label{fig:qq_norm}
-  %\toprule
-  \centering
-  \begin{minipage}{\textwidth}
-  \includegraphics[scale=1]{graphics/qq_norm.png}  
-  %\bottomrule
-  \vspace{3mm}
-  \footnotesize
-  Quantile-quantile plots of theoretical (normal) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from a normal distribution should line up on the dashed line. Based on weekly data 1963-2016
-  \end{minipage}
-\end{figure}
-\begin{figure}[H]
-  \caption{QQ-plots on residuals from ARMA-GARCH with Student's \textit{t} innovations}
-  \label{fig:qq_std}
-  %\toprule
-  \centering
-  \begin{minipage}{\textwidth}
-  \includegraphics[scale=1]{graphics/qq_std.png}  
-  %\bottomrule
-  \vspace{3mm}
-  \footnotesize
-  Quantile-quantile plots of theoretical (Student's \textit{t}) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from a normal distribution should line up on the dashed line. Based on weekly data 1963-2016
-  \end{minipage}
-\end{figure}
-\begin{figure}[H]
+\begin{figure}[htbp]
   \caption{QQ-plots on residuals from ARMA-GARCH with skewed Student's \textit{t} innovations}
   \label{fig:qq_ghst}
   %\toprule
@@ -262,7 +252,7 @@ Sign bias (+) p-value & \multicolumn{1}{c}{0.357} & \multicolumn{1}{c}{0.664} & 
   %\bottomrule
   \vspace{3mm}
   \footnotesize
-  Quantile-quantile plots of theoretical (skewed Student's \textit{t}) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from a normal distribution should line up on the dashed line. Based on weekly data 1963-2016
+  Quantile-quantile plots of theoretical (skewed Student's \textit{t}) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from the theoretical distribution should line up on the dashed line. Based on weekly data 1963-2016
   \end{minipage}
 \end{figure}
 
@@ -274,6 +264,6 @@ Second, we comment on the non-value related factors in~\autoref{tab:garch_nonval
 
 In the variance equation, we note that the Mkt-RF is estimated with GJR dynamics, and the relatively low $\alpha = 0.037$ sensitivity to shocks is increased considerably by $\eta = 0.181$ in the case of a \emph{negative} shock. Furthermore, the Mom factor stands out with a much higher estimate of $\alpha$ (0.186) than any of the other series (all around 0.10) and a lower $\beta$ (0.793). This means that volatility in the momentum factor is more sensitive than other factor strategies to return shocks and less predictable by past volatility alone. We also note that the Mkt-RF and Mom factors exhibit relatively higher unconditional volatilities (of 0.022 and 0.018) than do other factors (around 0.010).
 
-For both the value-related and non-value related factors, many of the estimates of $\gamma$, the skewness of the skewed Student's \textit{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates for SMB and Mom. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots (\autoref{fig:qq_norm}, \autoref{fig:qq_std}) indicate misspecification for models with both the normal and Student's \textit{t} innovations.
+For both the value-related and non-value related factors, many of the estimates of $\gamma$, the skewness of the skewed Student's \textit{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates for SMB and Mom. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots (\autoref{fig:qq_norm_std}) indicate misspecification for models with both the normal and Student's \textit{t} innovations.
 
 % section modeling_factor_returns (end)

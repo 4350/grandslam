@@ -100,9 +100,8 @@ This is a step-by-step description of the procedure used to find the copula corr
     \begin{align}
         \varepsilon_{i,t} = \frac{\varepsilon^c_{i, t} - E_{t-1}[\varepsilon^c_{i,t}]}{E_{t-1}[\sigma(\varepsilon^c_{i,t})]}
     \end{align}
-    \item Compute the diagonal elements in $Q_t$ over time recursively, initializing with unit diagonal, and using Q-residuals $\{z_i\}$
+    \item Compute the diagonal elements in $Q_t$ over time recursively, initializing with unit diagonal, and using Q-residuals $\{z_i\}$. Utilizing that $\S_{ii} = 1$ (for any correlation matrix), the process for diagonal elements of Q simplifies to
     \begin{align}
-        \intertext{Utilizing that $\S_{ii} = 1$ (for any correlation matrix), the process for diagonal elements of Q simplifies to}
         q_{ii, t} &= (1 - \alpha - \beta) + \alpha z_{t-1} z_{t-1}^\top + \beta q_{ii, t-1}
         \intertext{where residuals $\{z_{i}\}$ are initialized at zero and then calculated as}
         z_{i, t} &= \varepsilon_{i, t} \sqrt{q_{ii, t}}
@@ -117,34 +116,34 @@ This is a step-by-step description of the procedure used to find the copula corr
     \end{align}
     \item Standardize $\hat{Q_t}$ to the copula correlation matrix $\hat{R_t}$ and calculate the sum of log-likelihoods for a given parameter set $\Theta = \{\nu, \gamma, \alpha, \beta\}$
 \end{enumerate}
-\subsection{Exogenous regressors in copula cDCC}
-It is relatively straightforward to make $S$ time-varying by adding a time-varying component $\Upsilon_t$ to it. Following the general case of~\autocite{ChristoffersenErrunzaJacobLanglois2012}, $\Upsilon_t$ is constructed from an $N\times(N + N_X)$ matrix $A$ where $N$ is the number of factors, and $N_X$ the number of explanatory variables. With the $N \times N_X$ matrix of coefficients $\theta$ and explanatory variables $X$, construct $A$ from an $NxN$ identity matrix and the element-wise multiplications of $\theta$ and $X$:
-\begin{align}
-  A &=
-    \begin{bmatrix}
-    1 & 0 & \cdots & 0            & \quad & \theta_{11} X_{11,t} & \cdots & \theta_{1N_X} X_{1N_X,t} \\
-    0 & 1 & \cdots & 0            & \quad & \theta_{21} X_{21,t} & \cdots & \theta_{2N_X} X_{2N_X,t} \\
-    \vdots & \vdots & \ddots & 0  & \quad & \vdots &               \vdots & \vdots \\
-    0 & 0 & \cdots & 1            & \quad & \theta_{N1} X_{N1,t} & \cdots & \theta_{NN_X} X_{NN_X,t}
-    \end{bmatrix}
-\end{align}
-Normalize $A$ by dividing each element with the root mean square of its row to ensure $\Upsilon_t$ is a correlation matrix:
-\begin{align}
-  \bar{A}_{ij} &= \frac{A_{ij}}{\sqrt{\sum_{k = 1}^{N + N_X} A_{ik}^2}}
-\end{align}
-Finally,
-\begin{align}
-  \Upsilon_t &= \bar{A} \bar{A}^\top
-\end{align}
-It is now straightforward to let e.g. $X_{ij} = t$ for a time-trend, or any other independent variable, common or asset specific. The new time-invariant component $\Omega$ should be estimated based on the sample averages of both the standardized shocks and $\Upsilon_t$. Replacing~\autoref{cdcc:momS} in the above list, we estimate $\hat{\Omega}$ as:
-\begin{align}
-  \hat{\Omega} &=
-    \frac{
-      \frac{1}{T} \sum^{T} z_t z_t^\top -
-      \phi
-      \frac{1}{T} \sum^{T} \Upsilon_t
-    }{1 - \phi}
-\end{align}
+% \subsection{Exogenous regressors in copula cDCC}
+% It is relatively straightforward to make $S$ time-varying by adding a time-varying component $\Upsilon_t$ to it. Following the general case of~\autocite{ChristoffersenErrunzaJacobLanglois2012}, $\Upsilon_t$ is constructed from an $N\times(N + N_X)$ matrix $A$ where $N$ is the number of factors, and $N_X$ the number of explanatory variables. With the $N \times N_X$ matrix of coefficients $\theta$ and explanatory variables $X$, construct $A$ from an $NxN$ identity matrix and the element-wise multiplications of $\theta$ and $X$:
+% \begin{align}
+%   A &=
+%     \begin{bmatrix}
+%     1 & 0 & \cdots & 0            & \quad & \theta_{11} X_{11,t} & \cdots & \theta_{1N_X} X_{1N_X,t} \\
+%     0 & 1 & \cdots & 0            & \quad & \theta_{21} X_{21,t} & \cdots & \theta_{2N_X} X_{2N_X,t} \\
+%     \vdots & \vdots & \ddots & 0  & \quad & \vdots &               \vdots & \vdots \\
+%     0 & 0 & \cdots & 1            & \quad & \theta_{N1} X_{N1,t} & \cdots & \theta_{NN_X} X_{NN_X,t}
+%     \end{bmatrix}
+% \end{align}
+% Normalize $A$ by dividing each element with the root mean square of its row to ensure $\Upsilon_t$ is a correlation matrix:
+% \begin{align}
+%   \bar{A}_{ij} &= \frac{A_{ij}}{\sqrt{\sum_{k = 1}^{N + N_X} A_{ik}^2}}
+% \end{align}
+% Finally,
+% \begin{align}
+%   \Upsilon_t &= \bar{A} \bar{A}^\top
+% \end{align}
+% It is now straightforward to let e.g. $X_{ij} = t$ for a time-trend, or any other independent variable, common or asset specific. The new time-invariant component $\Omega$ should be estimated based on the sample averages of both the standardized shocks and $\Upsilon_t$. Replacing~\autoref{cdcc:momS} in the above list, we estimate $\hat{\Omega}$ as:
+% \begin{align}
+%   \hat{\Omega} &=
+%     \frac{
+%       \frac{1}{T} \sum^{T} z_t z_t^\top -
+%       \phi
+%       \frac{1}{T} \sum^{T} \Upsilon_t
+%     }{1 - \phi}
+% \end{align}
 
 \newpage
 

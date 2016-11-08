@@ -23,7 +23,7 @@ where $F_i^{-1}(p)$ the empirical quantile of $r_i$ at percentile $p$.
 
 Graphically, threshold correlation are understood as the standard correlation estimate in more and more distant parts of the first and third quadrant as $p$ approaches either zero or unity. This subsetting of data is illustrated in \autoref{fig:illustrate_threshold}. 
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \caption{Threshold correlation explained. Mkt-RF - HML factor pair}
   \label{fig:illustrate_threshold}
   %\toprule
@@ -42,7 +42,7 @@ In the left hand plots, we see the scatter of returns and ARMA-GARCH residuals o
 
 Although threshold correlations are nothing but linear correlation coefficients for a subset of the data, they do provide an intuitive measure of tail dependence -- how correlated are returns in bad times? And does this differ from the correlation in good times? Ceteris paribus, assets pairs with weaker or negative threshold correlation as $p \rightarrow 0$ are better diversified, as they have less tendency to coincide in extreme negative realizations. [ADD SOMETHING ABOUT Between two normal distributed variables you expect /\-shape (for positively correlated variables).]
 
-\begin{figure}[H]
+\begin{figure}[htbp]
   \caption{Threshold correlations on ARMA-GARCH residuals. Page 1/2}
   \label{fig:threshold1}
   %\toprule
@@ -55,7 +55,7 @@ Although threshold correlations are nothing but linear correlation coefficients 
   Threshold correlation plots with 95\% confidence bounds. Correlation pairs in graph titles. Unconditional correlation given by the dashed line. Weekly ARMA-GARCH residuals from the chosen models, all data 1963-2016
   \end{minipage}
 \end{figure}
-\begin{figure}[H]
+\begin{figure}[htbp]
   \caption{Threshold correlations on ARMA-GARCH residuals. Page 2/2}
   \label{fig:threshold2}
   %\toprule
@@ -91,7 +91,7 @@ We compute rolling correlation estimates in order to investigate whether the fac
 \end{align}
 where $r_i$, $r_j$ are the $N \cdot (N-1) / 2$ different pairs of the factor strategies' ARMA-GARCH residuals or log returns and $w$ is the rolling window of data. We use one year of data with $w = 52$ on weekly data. As previously, we use residuals from the ARMA-GARCH models in the rolling correlation analysis instead of returns directly and present results in~\autoref{fig:rolling1} and \autoref{fig:rolling2}.\footnote{A comparison of rolling correlations on returns and residuals is available in~\autoref{app:rolling_return}.}
 % plots
-\begin{figure}[H]
+\begin{figure}[htbp]
   \caption{Rolling correlations on ARMA-GARCH residuals. Page 1/2}
   \label{fig:rolling1}
   %\toprule
@@ -104,7 +104,7 @@ where $r_i$, $r_j$ are the $N \cdot (N-1) / 2$ different pairs of the factor str
   Rolling correlation plots with 95\% confidence bounds. Correlation pairs in graph titles. Unconditional correlation given by the dashed line. Weekly ARMA-GARCH residuals from the chosen models, all data 1963-2016
   \end{minipage}
 \end{figure}
-\begin{figure}[H]
+\begin{figure}[htbp]
   \caption{Rolling correlations on ARMA-GARCH residuals. Page 2/2}
   \label{fig:rolling2}
   %\toprule
@@ -124,7 +124,7 @@ Second, by visual inspection, the correlations of a few asset pairs could be sus
 
 Third, the HML and CMA factors again stand out as different to other asset pairs. The unconditional correlation is much closer to the rolling estimates than for other factor pairs. However, while the correlation is quite high and constant for much of the early sample period, the lower correlations towards the end give reasons to think that they might in fact provide strong diversification benefits during certain times.
 
-\subsection{Conclusions from analysis of multivariate dependence in univariate residuals}
+\subsection{Takeaways from analysis of multivariate dependence}
 Univariate residuals appear to be white noise series with no serial correlation or ARCH effects. However, there exists important dependence between residuals of different strategies. First, threshold correlations show that there is tail dependence -- in times when factor pairs simultaneously realize in their best and worst percentiles, correlations are significantly different from the unconditional mean. In fact, threshold correlations are substantially higher than the unconditional mean, which indicates that diversification benefits are smaller than expected when factors simultaneously experience bad times. Second, rolling correlations show that correlations between series are highly time-varying and seem to exhibit persistence. This should mean that a dynamic model of correlations will improve on the description of joint returns.
 
 Both analyses also show that the HML - CMA asset pair is quite different from the other pairs, exhibiting a much higher and more stable dependence. Differently put, they look quite similar as opposed to any other factor pair, and the merit of including both in factor portfolios seems more unclear.
