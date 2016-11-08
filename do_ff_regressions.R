@@ -56,6 +56,6 @@ ff_reg_exclude_one <- function(df) {
 
 # Do ----------------------------------------------------------------------
 
-df %>% select(-Mom) %>% ff_reg_exclude_one()
+df %>% select(Mkt.RF, SMB, HML, CMA, RMW) %>% ff_reg_exclude_one()
 
-df %>% ff_reg_exclude_one()
+df %>% select(Mkt.RF, SMB, HML, CMA, RMW, Mom) %>% ff_reg_exclude_one()
