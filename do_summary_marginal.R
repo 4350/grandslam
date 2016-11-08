@@ -84,17 +84,18 @@ g <- ggplot(plot_df,
     linetype = 2,
     data = line_df
   )+
+  coord_cartesian(xlim = c(-4,4))+
   annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
-  facet_wrap( ~ factor, scales = 'free_y', nrow = 2, ncol = 3)+
+  facet_wrap( ~ factor, nrow = 2, ncol = 3)+
   theme_Publication() +
   theme(strip.background = element_blank())+
   scale_colour_Publication() +
-  ylab('Sample') +
-  xlab('Theoretical') +
+  ylab('Sample log returns') +
+  xlab('Theoretical standardized quantiles') +
   theme(legend.position = 'none')+
   scale_y_continuous(labels = scales::percent)
 
-ggsave('output/MarginalStats/qq_returns.png', g, device = 'png', width = 14, height = 8, units = 'cm', limitsize = F)
+ggsave('output/MarginalStats/qq_returns.png', g, device = 'png', width = 14, height = 10, units = 'cm', limitsize = F)
   
 
 # Corr matrix data --------------------------------------------------------
