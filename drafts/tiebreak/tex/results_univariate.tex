@@ -8,7 +8,7 @@ We proceed by estimating models of each factor's return series, trying to captur
 \subsection{General univariate model: ARMA-GJR-GARCH} % (fold)
 \label{sub:general_univariate_model_gjr_garch}
 
-The ARMA-GARCH is a broad model family designed to eliminate predictable components of financial return series. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). ARCH effects are also referred to as volatility clustering, due to the persistence in magnitude of return shocks. Shocks in financial return series are often not homoskedastic, and the hetreoskedasticy tends to exhibit serial correlation. We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1) model of~\autocite{Bollerslev1986}. The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when negative and positive return shocks have different impact on future volatility~\autocite{Black1976}.
+The ARMA-GARCH is a broad model family designed to eliminate predictable components of financial return series. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). ARCH effects are also referred to as volatility clustering, due to the persistence in magnitude of return shocks. Shocks in financial return series are often not homoskedastic, and the hetreoskedasticy tends to exhibit serial correlation. We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1) model of~\autocite{Bollerslev1986}. The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when positive and negative return shocks have different impact on future volatility~\autocite{Black1976}.
 
 We estimate conditional mean equations \emph{up to} ARMA(3, 3):
 \begin{align}
@@ -81,51 +81,7 @@ Based on these ARMA-GARCH specifications, the Ljung-Box and LM tests indicate no
 
 The lack of significant sign bias in the GARCH specifications for all models except Mkt-RF is interesting, but in line with the argument that any leverage effects could cancel out in a zero-cost long-short equity portfolio; the Mkt-RF is the only factor that is net-long equities and also exhibited the expected negative sign bias as a GARCH model. In \autoref{tab:garch_nonvalue}, we note that the sign bias of Mkt-RF has been eliminated in the GJR-GARCH model. 
 
-The candidate specifications under normal and Student's \textit{t} distributed innovations all display misaligned QQ-plots, see \autoref{fig:qq_norm} and \autoref{fig:qq_std}.
-
-\begin{figure}[H]
-  \caption{QQ-plots on residuals from ARMA-GARCH with normal innovations}
-  \label{fig:qq_norm}
-  %\toprule
-  \centering
-  \begin{minipage}{\textwidth}
-  \includegraphics[scale=1]{graphics/qq_norm.png}  
-  %\bottomrule
-  \vspace{3mm}
-  \footnotesize
-  Quantile-quantile plots of theoretical (normal) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from a normal distribution should line up on the dashed line. Based on weekly data 1963-2016
-  \end{minipage}
-\end{figure}
-
-\begin{figure}[H]
-  \caption{QQ-plots on residuals from ARMA-GARCH with Student's \textit{t} innovations}
-  \label{fig:qq_std}
-  %\toprule
-  \centering
-  \begin{minipage}{\textwidth}
-  \includegraphics[scale=1]{graphics/qq_std.png}  
-  %\bottomrule
-  \vspace{3mm}
-  \footnotesize
-  Quantile-quantile plots of theoretical (Student's \textit{t}) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from a normal distribution should line up on the dashed line. Based on weekly data 1963-2016
-  \end{minipage}
-\end{figure}
-
-The empirical distributions deviate from the 45 degree theoretical lines, especially in the more extreme quantiles. This indicates asymmetry in the residual series. In unreported results, we have controlled that the misspecification of normal and Student's \textit{t} residuals is persistent even if GJR-GARCH models are fitted for all factors. By comparision (see~\autoref{fig:qq_ghst}), the QQ-plot with skewed Student's \textit{t} innovations seems to fit the data well. We proceed with skewed Student's \textit{t} residual distributions.
-
-\begin{figure}[H]
-  \caption{QQ-plots on residuals from ARMA-GARCH with skewed Student's \textit{t} innovations}
-  \label{fig:qq_ghst}
-  %\toprule
-  \centering
-  \begin{minipage}{\textwidth}
-  \includegraphics[scale=1]{graphics/qq_ghst.png}  
-  %\bottomrule
-  \vspace{3mm}
-  \footnotesize
-  Quantile-quantile plots of theoretical (skewed Student's \textit{t}) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from a normal distribution should line up on the dashed line. Based on weekly data 1963-2016
-  \end{minipage}
-\end{figure}
+The candidate specifications under normal and Student's \textit{t} distributed innovations all display misaligned QQ-plots, see \autoref{fig:qq_norm} and \autoref{fig:qq_std}. The empirical distributions deviate from the 45 degree theoretical lines, especially in the more extreme quantiles. This indicates asymmetry in the residual series. In unreported results, we have controlled that the misspecification of normal and Student's \textit{t} residuals is persistent even if GJR-GARCH models are fitted for all factors -- leverage effects can't explain the misspecification. By comparision (see~\autoref{fig:qq_ghst}), the QQ-plot with skewed Student's \textit{t} innovations seems to fit the data well. We proceed with skewed Student's \textit{t} residual distributions.
 
 Now, we turn to the estimation results of the chosen ARMA-GJR-GARCH models in~\autoref{tab:garch_value} and~\autoref{tab:garch_nonvalue}. 
 
@@ -157,62 +113,6 @@ Now, we turn to the estimation results of the chosen ARMA-GJR-GARCH models in~\a
 % 6) Copy the whole table, only change caption, label, factor/spec labels and (1)-(3) to (4)-(6)
 %% TABLE 1 value factors HML, RMW, CMA
 \begin{table}[!htbp] \centering 
-  \caption{ARMA-GARCH results: HML, RMW, CMA} 
-  \label{tab:garch_value} 
-\begin{tabularx}{\textwidth}{X}
-\\[-1.8ex]\toprule
-\\[-1.8ex] 
-\footnotesize Parameter estimates from ARMA-GARCH models on weekly returns 1963-2016. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. Mean equation: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and variance equation: $\epsilon_t = \sigma_t z_t$ and $\sigma_t^2 = \omega + (\alpha + \eta I_{\epsilon_{t-1} \leq 0}) \epsilon_{t - 1}^2 + \beta \sigma^2_{t - 1}$. $\gamma$ and $\nu$ are the skewness and degree of freedom parameters of the skewed Student's \textit{t} innovations. $\eta$ is fixed at zero, as the sign bias test showed no significant misspecification of the GARCH for the HML, RMW and CMA factors. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993}.
-\end{tabularx}
-\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
-\\[-1.8ex]\midrule
-\\[-1.8ex] 
- & \multicolumn{3}{c}{Factor series} \\ 
-\cline{2-4} 
-\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
-\\[-1.8ex] & \multicolumn{1}{c}{HML} & \multicolumn{1}{c}{RMW} & \multicolumn{1}{c}{CMA}\\ 
-\hline \\[-1.8ex] 
- $\mu\,\,(percent)$ & 0.058^{***} & 0.052^{***} & 0.037^{***} \\ 
-  & (0.019) & (0.015) & (0.012) \\ 
-  & & & \\ 
- $\phi_1$ & 0.722^{***} & 0.583^{***} & 0.112^{***} \\ 
-  & (0.077) & (0.183) & (0.019) \\ 
-  & & & \\ 
- $\theta_1$ & -0.608^{***} & -0.460^{**} &  \\ 
-  & (0.085) & (0.201)  &  \\ 
-  & & & \\ 
- $\alpha$ & 0.109^{***} & 0.076^{***} & 0.088^{***} \\ 
-  & (0.004) & (0.002) & (0.002) \\ 
-  & & & \\ 
- $\beta$ & 0.873^{***} & 0.915^{***} & 0.899^{***} \\ 
-  & (0.004) & (0.001) & (0.001) \\ 
-  & & & \\ 
- $\eta$ & 0.000 & 0.000 & 0.000 \\ 
-  & & &  \\ 
-  & & & \\ 
- $\gamma$ & 0.491 & 0.132 & 0.368 \\ 
-  & (0.377) & (0.355) & (0.453) \\ 
-  & & & \\ 
- $\nu$ & 10.349^{***} & 11.079^{**} & 11.223^{***} \\ 
-  & (2.900) & (5.531) & (3.618) \\ 
-  & & & \\ 
- $\omega\,\,(per\,mil)$ & 0.003 & 0.001 & 0.001 \\ 
-\hline \\[-1.8ex] 
-Observations & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} \\ 
-LLH & \multicolumn{1}{c}{8,790} & \multicolumn{1}{c}{9,874} & \multicolumn{1}{c}{9,577} \\
-Unconditional volatility & \multicolumn{1}{c}{0.010} & \multicolumn{1}{c}{0.010} & \multicolumn{1}{c}{0.010} \\
-Variance persistence & \multicolumn{1}{c}{0.982} & \multicolumn{1}{c}{0.992} & \multicolumn{1}{c}{0.987} \\
-Ljung-Box [5] p-value & \multicolumn{1}{c}{1.000} & \multicolumn{1}{c}{1.000} & \multicolumn{1}{c}{0.209} \\ 
-Ljung-Box [10] p-value & \multicolumn{1}{c}{0.978} & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.084} \\ 
-ARCH-LM [5] p-value & \multicolumn{1}{c}{0.094} & \multicolumn{1}{c}{0.778} & \multicolumn{1}{c}{0.821} \\  
-ARCH-LM [10] p-value & \multicolumn{1}{c}{0.324} & \multicolumn{1}{c}{0.938} & \multicolumn{1}{c}{0.939} \\  
-Sign bias (-) p-value & \multicolumn{1}{c}{0.119} & \multicolumn{1}{c}{0.197} & \multicolumn{1}{c}{0.505} \\  
-Sign bias (+) p-value & \multicolumn{1}{c}{0.357} & \multicolumn{1}{c}{0.664} & \multicolumn{1}{c}{0.061} \\  
-\bottomrule \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
-\end{tabularx} 
-\end{table}
-\begin{table}[!htbp] \centering 
   \caption{ARMA-GARCH results: Mkt-RF, SMB, Mom} 
   \label{tab:garch_nonvalue} 
 \begin{tabularx}{\textwidth}{X}
@@ -225,7 +125,7 @@ Sign bias (+) p-value & \multicolumn{1}{c}{0.357} & \multicolumn{1}{c}{0.664} & 
 \\[-1.8ex] 
  & \multicolumn{3}{c}{Factor series} \\ 
 \cline{2-4} 
-\\[-1.8ex] & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)}\\ 
 \\[-1.8ex] & \multicolumn{1}{c}{Mkt-RF} & \multicolumn{1}{c}{SMB} & \multicolumn{1}{c}{Mom}\\ 
 \hline \\[-1.8ex] 
  $\mu\,\,(percent)$ & 0.096^{***} & 0.026 & 0.128^{***} \\ 
@@ -268,6 +168,103 @@ Sign bias (+) p-value & \multicolumn{1}{c}{0.182} & \multicolumn{1}{c}{0.106} & 
 \textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
 \end{tabularx} 
 \end{table}
+
+\begin{table}[!htbp] \centering 
+  \caption{ARMA-GARCH results: HML, RMW, CMA} 
+  \label{tab:garch_value} 
+\begin{tabularx}{\textwidth}{X}
+\\[-1.8ex]\toprule
+\\[-1.8ex] 
+\footnotesize Parameter estimates from ARMA-GARCH models on weekly returns 1963-2016. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. Mean equation: $r_t = \mu + \sum^p \phi_p r_{t-p} + \sum^q \theta_q \epsilon_{t-q} + \epsilon_{t}$ and variance equation: $\epsilon_t = \sigma_t z_t$ and $\sigma_t^2 = \omega + (\alpha + \eta I_{\epsilon_{t-1} \leq 0}) \epsilon_{t - 1}^2 + \beta \sigma^2_{t - 1}$. $\gamma$ and $\nu$ are the skewness and degree of freedom parameters of the skewed Student's \textit{t} innovations. $\eta$ is fixed at zero, as the sign bias test showed no significant misspecification of the GARCH for the HML, RMW and CMA factors. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993}.
+\end{tabularx}
+\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{-3} D{.}{.}{-3} D{.}{.}{-3} } 
+\\[-1.8ex]\midrule
+\\[-1.8ex] 
+ & \multicolumn{3}{c}{Factor series} \\ 
+\cline{2-4} 
+\\[-1.8ex] & \multicolumn{1}{c}{(4)} & \multicolumn{1}{c}{(5)} & \multicolumn{1}{c}{(6)}\\ 
+\\[-1.8ex] & \multicolumn{1}{c}{HML} & \multicolumn{1}{c}{RMW} & \multicolumn{1}{c}{CMA}\\ 
+\hline \\[-1.8ex] 
+ $\mu\,\,(percent)$ & 0.058^{***} & 0.052^{***} & 0.037^{***} \\ 
+  & (0.019) & (0.015) & (0.012) \\ 
+  & & & \\ 
+ $\phi_1$ & 0.722^{***} & 0.583^{***} & 0.112^{***} \\ 
+  & (0.077) & (0.183) & (0.019) \\ 
+  & & & \\ 
+ $\theta_1$ & -0.608^{***} & -0.460^{**} &  \\ 
+  & (0.085) & (0.201)  &  \\ 
+  & & & \\ 
+ $\alpha$ & 0.109^{***} & 0.076^{***} & 0.088^{***} \\ 
+  & (0.004) & (0.002) & (0.002) \\ 
+  & & & \\ 
+ $\beta$ & 0.873^{***} & 0.915^{***} & 0.899^{***} \\ 
+  & (0.004) & (0.001) & (0.001) \\ 
+  & & & \\ 
+ $\eta$ & 0.000 & 0.000 & 0.000 \\ 
+  & & &  \\ 
+  & & & \\ 
+ $\gamma$ & 0.491 & 0.132 & 0.368 \\ 
+  & (0.377) & (0.355) & (0.453) \\ 
+  & & & \\ 
+ $\nu$ & 10.349^{***} & 11.079^{**} & 11.223^{***} \\ 
+  & (2.900) & (5.531) & (3.618) \\ 
+  & & & \\ 
+ $\omega\,\,(per\,mil)$ & 0.003 & 0.001 & 0.001 \\ 
+\hline \\[-1.8ex] 
+Observations & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} & \multicolumn{1}{c}{2,766} \\ 
+LLH & \multicolumn{1}{c}{8,790} & \multicolumn{1}{c}{9,874} & \multicolumn{1}{c}{9,577} \\
+Unconditional volatility & \multicolumn{1}{c}{0.010} & \multicolumn{1}{c}{0.010} & \multicolumn{1}{c}{0.010} \\
+Variance persistence & \multicolumn{1}{c}{0.982} & \multicolumn{1}{c}{0.992} & \multicolumn{1}{c}{0.987} \\
+Ljung-Box [5] p-value & \multicolumn{1}{c}{1.000} & \multicolumn{1}{c}{1.000} & \multicolumn{1}{c}{0.209} \\ 
+Ljung-Box [10] p-value & \multicolumn{1}{c}{0.978} & \multicolumn{1}{c}{0.051} & \multicolumn{1}{c}{0.084} \\ 
+ARCH-LM [5] p-value & \multicolumn{1}{c}{0.094} & \multicolumn{1}{c}{0.778} & \multicolumn{1}{c}{0.821} \\  
+ARCH-LM [10] p-value & \multicolumn{1}{c}{0.324} & \multicolumn{1}{c}{0.938} & \multicolumn{1}{c}{0.939} \\  
+Sign bias (-) p-value & \multicolumn{1}{c}{0.119} & \multicolumn{1}{c}{0.197} & \multicolumn{1}{c}{0.505} \\  
+Sign bias (+) p-value & \multicolumn{1}{c}{0.357} & \multicolumn{1}{c}{0.664} & \multicolumn{1}{c}{0.061} \\  
+\bottomrule \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{3}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabularx} 
+\end{table}
+
+\begin{figure}[H]
+  \caption{QQ-plots on residuals from ARMA-GARCH with normal innovations}
+  \label{fig:qq_norm}
+  %\toprule
+  \centering
+  \begin{minipage}{\textwidth}
+  \includegraphics[scale=1]{graphics/qq_norm.png}  
+  %\bottomrule
+  \vspace{3mm}
+  \footnotesize
+  Quantile-quantile plots of theoretical (normal) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from a normal distribution should line up on the dashed line. Based on weekly data 1963-2016
+  \end{minipage}
+\end{figure}
+\begin{figure}[H]
+  \caption{QQ-plots on residuals from ARMA-GARCH with Student's \textit{t} innovations}
+  \label{fig:qq_std}
+  %\toprule
+  \centering
+  \begin{minipage}{\textwidth}
+  \includegraphics[scale=1]{graphics/qq_std.png}  
+  %\bottomrule
+  \vspace{3mm}
+  \footnotesize
+  Quantile-quantile plots of theoretical (Student's \textit{t}) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from a normal distribution should line up on the dashed line. Based on weekly data 1963-2016
+  \end{minipage}
+\end{figure}
+\begin{figure}[H]
+  \caption{QQ-plots on residuals from ARMA-GARCH with skewed Student's \textit{t} innovations}
+  \label{fig:qq_ghst}
+  %\toprule
+  \centering
+  \begin{minipage}{\textwidth}
+  \includegraphics[scale=1]{graphics/qq_ghst.png}  
+  %\bottomrule
+  \vspace{3mm}
+  \footnotesize
+  Quantile-quantile plots of theoretical (skewed Student's \textit{t}) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from a normal distribution should line up on the dashed line. Based on weekly data 1963-2016
+  \end{minipage}
+\end{figure}
 
 First, we comment on the value-related factors HML, RMW and CMA in \autoref{tab:garch_value}. We find significant intercepts in the mean equation for all three strategies. In terms of return autoregression, the HML factor stands out with a high 0.722 estimate, while CMA is substantially lower at 0.112. This lower estimate can in part be explained by the fact that CMA is estimated without a moving average component $\theta$ that in the presence of a return shock counteracts the autoregressive part, as $\theta$ are estimated with a negative sign for both HML and RMW. 
 

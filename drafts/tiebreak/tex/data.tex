@@ -5,9 +5,9 @@ In the data section, we describe the source of our data and how the factor strat
 
 \subsection{Data description: Factor return series}
 
-Factor return series are downloaded from Ken French's data library.\footnote{\url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html}} We download the daily Fama-French five-factor data set and merge this with the daily momentum data set. Both are available since 1963-07-01, making 1963-07-05 the first week of data. We convert each of the return series into weekly log returns for further use. 
+Factor return series are downloaded from Ken French's data library.\footnote{Ken French Data Library. (2016). \textit{Fama/French 5 Factors (2x3) [Daily]} and \textit{Momentum Factor (Mom) [Daily]}. Available from: \url{http://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html}} We download the daily Fama-French five-factor data set and merge this with the daily momentum data set. Both are available since 1963-07-01, making 1963-07-05 the first week of data. In our sample, 2016-07-01 is the last data point. We convert each of the return series into weekly log returns for further use. 
 
-The Mkt-RF factor is long the value-weighted return of CRSP firms on NYSE, AMEX or NASDAQ with CRSP share codes 10 or 11 and short the one-month Treasury bill rate. The remaining return series are based on zero-cost portfolios that are long certain equities and short other equities, according to a 2 x 3 sort: First, firms are sorted into one of two size groups, small and big, depending on whether the market cap is above or below the median. For each the small and big firm groups, each factor then sorts into one of three groups depending on whether the variable of interest falls below the 30\textsuperscript{th} percentile, between the 30\textsuperscript{th} and the 70\textsuperscript{th} or above the 70\textsuperscript{th}. For the five-factor data set, the factors are:
+The Mkt-RF factor is long the value-weighted return of CRSP firms on NYSE, AMEX or NASDAQ with CRSP share codes 10 or 11 and short the one-month Treasury bill rate. The remaining return series are based on zero-cost portfolios that are long certain equities and short other equities, according to a 2 x 3 sort: First, firms are sorted into one of two size groups, small and big, depending on whether the market cap is above or below the median. In the small and big firm groups, each factor then sorts into one of three groups depending on whether the variable of interest falls below the 30\textsuperscript{th} percentile, between the 30\textsuperscript{th} and the 70\textsuperscript{th} or above the 70\textsuperscript{th}. For the five-factor data set, the factors are:
 \begin{itemize}
   \item High-minus-low, is long firms above the 70\textsuperscript{th} percentile B/M (high) and short stocks below the 30\textsuperscript{th} percentile, in the small and big firm group respectively. \\
   $HML = 1/2 \cdot (Small\,value + Big\,value) - 1/2 \cdot (Small\,growth + Big\,growth)$
@@ -45,19 +45,20 @@ Observations & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ \\
 Maximum & $0.126$ & $0.060$ & $0.120$ & $0.117$ & $0.054$ & $0.094$ \\ 
 Minimum & $$-$0.198$ & $$-$0.098$ & $$-$0.175$ & $$-$0.083$ & $$-$0.044$ & $$-$0.062$ \\ 
 Mean & $0.001$ & $0.000$ & $0.001$ & $0.001$ & $0.001$ & $0.001$ \\ 
-Median & $0.003$ & $0.001$ & $0.002$ & $0.0005$ & $0.0004$ & $0.0005$ \\ 
-Stdev & $0.022$ & $0.012$ & $0.019$ & $0.012$ & $0.009$ & $0.009$ \\ 
+Median & $0.003$ & $0.001$ & $0.002$ & $0.000$ & $0.000$ & $0.000$ \\ 
+Volatility & $0.022$ & $0.012$ & $0.019$ & $0.012$ & $0.009$ & $0.009$ \\
 Skewness & $$-$0.688$ & $$-$0.504$ & $$-$1.390$ & $0.331$ & $0.306$ & $0.724$ \\ 
-Kurtosis & $6.191$ & $4.997$ & $11.987$ & $7.318$ & $3.149$ & $13.005$ \\ 
-Return LB [5] p-value          & $0.263$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
-Return LB [10] p-value         & $0.007$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
-Return\textsuperscript{2} LB [5] p-value  & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
+Kurtosis & $6.191$ & $4.997$ & $11.987$ & $7.318$ & $3.149$ & $13.005$ \\
+\\[-1.8ex]\hline
+  \\[-1.8ex] 
+Return LB [5] p-value & $0.263$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
+Return LB [10] p-value & $0.007$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
+Return\textsuperscript{2} LB [5] p-value & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
 Return\textsuperscript{2} LB [10] p-value & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
 %\bottomrule \\[-1.8ex] 
 \end{tabularx} 
 \end{table}
-For all series, there are 2,766 consecutive data points and no missing data. Mkt-RF is the most volatile and extreme of the series, with weekly returns between -19.8\% and 12.6\% and a standard deviation of 2.2\%. Among the value strategies, CMA and RMW seem to be less extreme than HML, with less negative minimums and smaller standard deviations. The factor strategies have excess kurtosis, or fat tails, that is typical for financial returns. The excess kurtoses of the Mom, HML and RMW factors are even higher than the kurtosis of the Mkt-RF factor. However, while market returns are negatively skewed, the value strategies HML, CMA and RMW instead exhibit positive skewness. QQ-plots versus normal theoretical quantiles in \autoref{fig:qq_returns} graphically show the non-normality, which appears especially pronounced for the Mom and RMW factors.
-
+For all series, there are 2,766 consecutive data points and no missing data. Mkt-RF is the most volatile and extreme of the series, with weekly returns between -19.8\% and 12.6\% and a standard deviation of 2.2\%. Among the value strategies, CMA and RMW seem to be less extreme than HML, with less negative minimums and smaller standard deviations. The factor strategies have excess kurtosis, or fat tails, that is typical for financial returns. The excess kurtoses of the Mom, HML and RMW factors are even higher than the kurtosis of the Mkt-RF factor. However, while market returns are negatively skewed, the value strategies HML, CMA and RMW instead exhibit positive skewness. QQ-plots versus normal theoretical quantiles in \autoref{fig:qq_returns} graphically show the non-normality.
 \begin{figure}[H]
   \caption{QQ-plots versus normal distribution}
   \label{fig:qq_returns}
@@ -111,9 +112,9 @@ Plots of cumulative returns (\autoref{fig:cumret}) clearly show the high returns
 \begin{tabularx}{\textwidth}{X}
   \\[-1.8ex]%\toprule
   \\[-1.8ex] 
-  \footnotesize Unconditional sample correlation matrix of factor return series. Weekly data 1963-2016
+  \footnotesize Unconditional sample correlation matrix of factor log return series. Weekly data 1963-2016
 \end{tabularx}
-\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X c c c c c c} 
+\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X r r r r r r} 
   \\[-1.8ex]\midrule
   \\[-1.8ex] 
   & Mkt.RF & SMB & Mom & HML & CMA & RMW \\ 
