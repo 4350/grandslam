@@ -21,3 +21,4 @@ output
 *.gz
 data/derived/model_GARCH.RData
 
+*.toc
