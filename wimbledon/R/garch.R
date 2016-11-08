@@ -149,8 +149,9 @@ do_qq_plot <- function(qq_data) {
     facet_wrap(~ order, nrow = 2, ncol = 3)+
     theme_Publication() +
     theme(strip.background = element_blank())+
-    ylab('Sample quantile')+
-    xlab('Theoretical quantile')
+    coord_cartesian(xlim = c(-6,6), ylim = c(-6,6))+
+    ylab('Sample standardized residuals')+
+    xlab('Theoretical standardized residuals')
   
 }
 
