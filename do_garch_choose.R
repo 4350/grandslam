@@ -106,7 +106,7 @@ do_garch_BIC_bestfits <- function(df.estim, model, dist, nIS = 0) {
   
   g_qq <- do_qq_plot(do_qq_data(model.GARCH))
   ggsave(file = sprintf('output/garch_diagnostics/%s/%s/%sqqplot_%s_%s.png', model, dist, prefix, model, dist),
-         g_qq, width = 14.0, height = 10, units = 'cm', limitsize = F
+         g_qq, width = 14.0, height = 8, units = 'cm', limitsize = F
          ) 
   
   
@@ -165,7 +165,7 @@ rm(model.GARCH.sGARCH, model.GARCH.gjrGARCH)
 
 g_qq_bestfits <- do_qq_plot(do_qq_data(model.GARCH))
 ggsave(file = 'output/garch_diagnostics/qqplot_bestfits.png',
-       g_qq_bestfits, width = 14.0, height = 10, units = 'cm', limitsize = F
+       g_qq_bestfits, width = 14.0, height = 8, units = 'cm', limitsize = F
 ) 
 
 
