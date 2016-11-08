@@ -158,6 +158,17 @@ rm(bestfits)
 save(model.GARCH, file = 'data/derived/garch/model_GARCH_chosen.RData')
 rm(model.GARCH.sGARCH, model.GARCH.gjrGARCH)
 
+
+# QQ plots for best fits --------------------------------------------------
+
+# Do the QQ plots
+
+g_qq_bestfits <- do_qq_plot(do_qq_data(model.GARCH))
+ggsave(file = 'output/garch_diagnostics/qqplot_bestfits.png',
+       g_qq_bestfits, width = 14.0, height = 10, units = 'cm', limitsize = F
+) 
+
+
 # Get and save residuals ----
 df.res <- data.frame(
   Date = df.estim$Date,
