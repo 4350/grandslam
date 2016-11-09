@@ -121,25 +121,20 @@ do_best_cdb <- function(model_name, strategy, selectors) {
   rm(distribution_simple)
   
   save(cdb_results,
-       file = sprintf('data/derived/cdb/%s_%s.RData', strategy, model_name))
+       file = sprintf('data/derived/cdb/%s_%s.RData', model_name, strategy))
 }
 
 # CDB Optimization -------------------------------------------------------
 
-MODEL_NAME <- 'full_dynamic_ghst_10000'
+MODEL_NAME <- 'full_dynamic_std_10000'
 
-do_best_cdb(MODEL_NAME, 'all',
-            c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'))
+do_best_cdb(MODEL_NAME, '5F',          c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'))
+do_best_cdb(MODEL_NAME, '5F_EXCL_HML', c('Mkt.RF',        'SMB', 'RMW', 'CMA'))
+do_best_cdb(MODEL_NAME, '5F_EXCL_CMA', c('Mkt.RF', 'HML', 'SMB', 'RMW'       ))
 
-# do_best_cdb(MODEL_NAME, 'modern',
-#             c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'))
-
-do_best_cdb(MODEL_NAME, 'HML', c('Mkt.RF', 'HML', 'SMB', 'Mom'))
-do_best_cdb(MODEL_NAME, 'RMW', c('Mkt.RF', 'SMB', 'Mom', 'RMW'))
-do_best_cdb(MODEL_NAME, 'CMA', c('Mkt.RF', 'SMB', 'Mom', 'CMA'))
-
-do_best_cdb(MODEL_NAME, 'RMW+HML', c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'HML'))
-do_best_cdb(MODEL_NAME, 'RMW+CMA', c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'))
+do_best_cdb(MODEL_NAME, '6F',          c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'))
+do_best_cdb(MODEL_NAME, '6F_EXCL_HML', c('Mkt.RF',        'SMB', 'Mom', 'RMW', 'CMA'))
+do_best_cdb(MODEL_NAME, '6F_EXCL_CMA', c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'       ))
 
 # Equal Weights ----------------------------------------------------------
 

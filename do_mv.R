@@ -28,7 +28,6 @@ library(stargazer)
 
 load_all('wimbledon')
 
-MODEL_NAME = 'oos_constant_norm_100000'
 
 # Functions used in optimization  ---------------------------------------------------------------
 
@@ -56,7 +55,7 @@ do_optimize_mv <- function(model_name = NULL, mu = NULL, sigma = NULL, strategy,
     stop('No copula model passed - then optimization requires both mu and sigma')
   }
   # Whether it's on model or assumptions
-  if(!is.null(model_name)) {
+  if(is.null(mu) && is.null(sigma)) {
     based_on <- model_name
     # Load distribution simulated data and change to simple returns
     load(sprintf('data/derived/distributions/%s.RData', model_name))
@@ -69,8 +68,16 @@ do_optimize_mv <- function(model_name = NULL, mu = NULL, sigma = NULL, strategy,
     mv_results <- optimize_mv(distribution = distribution_simple)
     rm(distribution_simple)
   } else {
-    based_on <- 'assumption'
     # Use mu and sigma to get the mv_results
+    # Select mu and sigma for this strategy
+    factors <- c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA')
+    colnames(mu) <- factors
+    colnames(sigma) <- factors
+    rownames(sigma) <- factors
+    
+    mu <- mu[, selectors]
+    sigma <- sigma[selectors, selectors, ]
+    
     mv_results <- optimize_mv(mu = mu, sigma = sigma)
   }
   
@@ -95,11 +102,11 @@ do_optimize_mv <- function(model_name = NULL, mu = NULL, sigma = NULL, strategy,
     sr = mv_results$sr,
     weights = mv_results$weights,
     portfolio_return = portfolio_return,
-    based_on = based_on,
+    based_on = model_name,
     strategy = strategy
   )
   # Give this a specific name
-  save(results, file = sprintf('data/derived/mv/results_%s_%s.Rdata', based_on, strategy))
+  save(results, file = sprintf('data/derived/mv/results_%s_%s.Rdata', model_name, strategy))
   return(results)
 }
 
@@ -294,12 +301,39 @@ do_fixed_weights_mv <- function(strategy, selectors, weights_fixed, T, df.realiz
 # Get optimization results for different copula portfolios ------------------------------------
 
 load('data/derived/weekly-estim.RData')
-results_All <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'All', selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'), df.realized = df.estim)
-results_Four_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+HML', selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'), df.realized = df.estim)
-results_Four_CMA <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+CMA', selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'), df.realized = df.estim)
+MODEL_NAME = 'full_dynamic_std_10000'
 
-results_5F_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_INCL_HML', selectors = c('Mkt.RF','HML','SMB','RMW','CMA'), df.realized = df.estim)
-results_5F <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_EXCL_HML', selectors = c('Mkt.RF','SMB','RMW','CMA'), df.realized = df.estim)
+# Without Momentum
+do_optimize_mv(MODEL_NAME, strategy = '5F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim)
+
+do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_HML',
+               selectors = c('Mkt.RF',        'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim)
+do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW'),
+               df.realized = df.estim)
+
+# With Momentum
+do_optimize_mv(MODEL_NAME, strategy = '6F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim)
+
+do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_HML',
+               selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim)
+do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
+               df.realized = df.estim)
+
+
+# results_All <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'All', selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'), df.realized = df.estim)
+# results_Four_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+HML', selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'), df.realized = df.estim)
+# results_Four_CMA <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'Four+CMA', selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'), df.realized = df.estim)
+# 
+# results_5F_HML <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_INCL_HML', selectors = c('Mkt.RF','HML','SMB','RMW','CMA'), df.realized = df.estim)
+# results_5F <- do_optimize_mv(model_name = MODEL_NAME, strategy = 'FF_5F_EXCL_HML', selectors = c('Mkt.RF','SMB','RMW','CMA'), df.realized = df.estim)
 
 # And for EW portfolio ----
 
@@ -311,8 +345,6 @@ results_EW_6F <- do_fixed_weights_mv(strategy = 'EW_6F', T = 2765,
 
 # Get optimization results for different assumed mu and sigma --------------------------
 load('data/derived/weekly-estim.RData')
-
-# Function to create mu and sigma from sample
 
 .sample_mu <- function(logreturndata, nOOS) {
   ret <- exp(logreturndata) - 1
@@ -326,10 +358,45 @@ load('data/derived/weekly-estim.RData')
   array(sigma, dim = c(ncol(sigma), ncol(sigma), nOOS))
 }
 
-results_Sample <- do_optimize_mv(mu = .sample_mu(df.estim[,-1], 2765), sigma = .sample_sigma(df.estim[,-1], 2765), strategy = 'Sample',
-               selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'), df.realized = df.estim)
-results_Sample_5F <- do_optimize_mv(mu = .sample_mu(df.estim[,c(-1,-5)], 2765), sigma = .sample_sigma(df.estim[,c(-1,-5)], 2765), strategy = 'Sample',
-                                     selectors = c('Mkt.RF','HML','SMB','RMW','CMA'), df.realized = df.estim)
+mu <- .sample_mu(df.estim[, -1], 2765)
+sigma <- .sample_sigma(df.estim[, -1], 2765)
+MODEL_NAME <- 'full_sample'
+
+# Without Momentum
+do_optimize_mv(MODEL_NAME, mu = mu, sigma = sigma,
+               strategy = '5F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim)
+do_optimize_mv(MODEL_NAME, mu = mu, sigma = sigma,
+               strategy = '5F_EXCL_HML',
+               selectors = c('Mkt.RF',        'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim)
+do_optimize_mv(MODEL_NAME, mu = mu, sigma = sigma,
+               strategy = '5F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW'),
+               df.realized = df.estim)
+
+# With Momentum
+do_optimize_mv(MODEL_NAME, mu = mu, sigma = sigma,
+               strategy = '6F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim)
+
+do_optimize_mv(MODEL_NAME, mu = mu, sigma = sigma,
+               strategy = '6F_EXCL_HML',
+               selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim)
+do_optimize_mv(MODEL_NAME, mu = mu, sigma = sigma,
+               strategy = '6F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
+               df.realized = df.estim)
+
+# Function to create mu and sigma from sample
+# 
+# results_Sample <- do_optimize_mv(mu = .sample_mu(df.estim[,-1], 2765), sigma = .sample_sigma(df.estim[,-1], 2765), strategy = 'Sample',
+#                selectors = c('Mkt.RF','HML','SMB','Mom','RMW','CMA'), df.realized = df.estim)
+# results_Sample_5F <- do_optimize_mv(mu = .sample_mu(df.estim[,c(-1,-5)], 2765), sigma = .sample_sigma(df.estim[,c(-1,-5)], 2765), strategy = 'Sample',
+#                                      selectors = c('Mkt.RF','HML','SMB','RMW','CMA'), df.realized = df.estim)
 
 
 # Load and use FF MV results ----------------------------------------------
