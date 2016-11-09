@@ -5,6 +5,7 @@
 
 library(sandwich)
 library(lmtest)
+library(stargazer)
 library(dplyr)
 rm(list = ls())
 load('data/derived/weekly-estim.RData')
