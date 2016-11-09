@@ -4,53 +4,63 @@ library(australian)
 library(dplyr)
 library(stargazer)
 
-# XXX Bootstrap should be named dynamic_norm or something
+copula_results <- function(estimate, bootstrap) {
+  # Load bootstrap results from file
+  path <- file.path('data/derived/bootstrap', bootstrap)
+  results <- lapply(list.files(path), function(file) {
+    load(file.path(path, file))
+    results
+  })
+  
+  # parameters we're interested in
+  copula_parameters <- list(
+    nu = function(c) c@distribution@nu,
+    gamma1 = function(c) c@distribution@gamma[1],
+    gamma2 = function(c) c@distribution@gamma[2],
+    gamma3 = function(c) c@distribution@gamma[3],
+    gamma4 = function(c) c@distribution@gamma[4],
+    gamma5 = function(c) c@distribution@gamma[5],
+    gamma6 = function(c) c@distribution@gamma[6],
+    alpha = function(c) c@dynamics@alpha,
+    beta = function(c) c@dynamics@beta
+  )
+  
+  params <- lapply(copula_parameters, function(fn) {
+    # Extract the parameter estimate from the fitted copula
+    coef <- fn(estimate$fit)
+    names(coef) <- NULL
+    
+    # For each bootstrap result, extract the copula parameter
+    # and then compute the standard deviation of those parameter estimates
+    se <- sd(sapply(results, function(r) fn(r$copula)))
+    
+    # Don't include unused parameters in nested models
+    coef[se == 0 || is.nan(se)] <- NaN
+    se[se == 0] <- NaN
+    
+    t <- coef / se
+    p <- 2 * (pt(-(abs(t)), length(results)))
+    data.frame(coef, se, p)
+  })
+
+  
+  list(
+    fit = bind_rows(params, .id = 'param'),
+    N = length(results)
+  )
+}
+
 load('data/derived/copula/full_dynamic.RData')
-PATH <- 'data/derived/bootstrap/norm'
-estimate <- dynamic_copula_fit$norm
-
-results <- lapply(list.files(PATH), function(data) {
-  load(file.path(PATH, data))
-  results
-})
-
-COPULA_PARAMETERS <- list(
-  nu = function(c) c@distribution@nu,
-  gamma1 = function(c) c@distribution@gamma[1],
-  gamma2 = function(c) c@distribution@gamma[2],
-  gamma3 = function(c) c@distribution@gamma[3],
-  gamma4 = function(c) c@distribution@gamma[4],
-  gamma5 = function(c) c@distribution@gamma[5],
-  gamma6 = function(c) c@distribution@gamma[6],
-  alpha = function(c) c@dynamics@alpha,
-  beta = function(c) c@dynamics@beta
-)
-
-fit_results <- bind_rows(
-  lapply(COPULA_PARAMETERS, function(param_fn) {
-    param_se <- sd(sapply(results, function(r) param_fn(r$copula)))
-    param_estimate <- param_fn(estimate$fit)
-    names(param_estimate) <- NULL
-    
-    param_estimate[param_se == 0] <- NaN
-    param_se[param_se == 0] <- NaN
-    
-    data.frame(
-      estimate = param_estimate,
-      se = param_se
-    )
-  }),
-  .id = 'param'
-)
-
-fit_results$t <- fit_results$estimate / fit_results$se
-fit_results$p <- 2 * (pt(-abs(fit_results$t), length(results)))
+load('data/derived/copula/full_constant.RData')
 
 stargazer(
-  fit_results,
+  copula_results(dynamic_copula_fit$norm, 'norm')$fit,
   type = 'text',
+  digits = 3,
+  digits.extra = 0,
   summary = F,
-  digits = 4,
-  digits.extra = 0
+  rownames = F
 )
-cat(sprintf('N: %d', length(results)))
+
+lapply(dynamic_copula_fit, function(r) r$fit@dynamics@alpha + r$fit@dynamics@beta)
+#lapply(dynamic_copula_fit, function(r) r$ll)
