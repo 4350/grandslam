@@ -1,27 +1,9 @@
 %!TEX root = ../main.tex
 
-\section{Modeling multivariate dependence: Copula Approach} % (fold)
-\label{sec:modeling_multivariate_dependence_copula_approach}
+\section{Modeling dependence in ARMA-GARCH residuals: The DAC model} % (fold)
+\label{sec:dac_copula}
 
-\subsection{Multivariate model selection} % (fold)
-\label{sub:multivariate_model_selection}
-
-% Dimensionality of MGARCH
-Accurate modeling of the joint dynamics of returns is an important and well-studied problem in finance. Unfortunately, straightforward extension of univariate GARCH models to multiple dimensions has proven difficult. Unrestricted multivariate GARCH (MGARCH) models, modeling the conditional covariance matrix directly, become impossible to estimate as the number of covariances grows exponentially with the number of series~\autocite{WhyMGARCHSucks}. It thus becomes necessary to restrict the parameter space, where the BEKK model is a common example~\autocite{BEKKModel}.
-
-% Separate modeling of variance and correlation
-A parsimonious solution is to separate the modeling of return and variance dynamics (modeled using ARMA-GARCH) from that of the conditional correlation dynamics. One such approach is encapsulated by the \emph{dynamic conditional correlation} (DCC) model originally proposed by~\autocite{Engle2002} (and its correction \emph{c}DCC by~\autocite{Aielli2013}). The separation allows for consistent (albeit inefficient) two-step estimation. First, univariate GARCH models are estimated on each series (as we do). Second, an autoregressive process for the correlation matrix is fitted to the standardized residuals $\varepsilon_t$ of those models. The separation makes large-scale estimation feasible.
-
-% Asymmetric cDCC
-DCC is a useful and tractable model for estimating time-varying correlations between return series. However, as it is a model of correlations only, it cannot capture the asymmetric tail dependency seen in the threshold correlations of residuals. Introducing indicator variables for the strength of correlation, similar to how the leverage effect is captured by GJR-GARCH, is a potential solution (as in the AGDCC model by~\autocite{Cappiello2006}).
-
-% Copula cDCC
-Our model for the dependency of factors is the copula version of \emph{c}DCC model called \emph{dynamic asymmetric copula} (DAC), introduced in~\autocite{ChristoffersenErrunzaJacobLanglois2012}. In contrast to fitting the \emph{c}DCC process to standardized residuals directly, we fit a \emph{c}DCC model to a transformation of these shocks. The theoretical motivation behind this transformation is to jointly model returns with separate distributions (e.g. normal and skewed Student's t) in a single framework. The copula approach has the added benefit of separating modeling of the returns themselves from that of the dependency structure.
-
-% subsection multivariate_model_selection (end)
-
-\subsection{Modeling dependence with the DAC model} % (fold)
-\label{sub:copula}
+Analysis of the dependence between univariate residual series from the ARMA-GARCH models led to the conclusion that there exist tail dependency and time-varying dependency between factor strategies, which can be captured by a DAC copula model. We begin by describing the copula specification and the estimation procedure. Then, we explain how different parameterizations of the copula corresponds to different features of the dependence structure. Last, we analyze the estimation results.
 
 % How copula?
 Following~\autocite{ChristoffersenErrunzaJacobLanglois2012}, who builds on~\autocite{Patton2006,Sklar1959}, we can decompose the conditional joint density of returns $f_t(r_{1, t+1}, \ldots, r_{N, t+1})$ into the product of a joint copula function $c_t$ of uniform variables $u_{i,t}$ and the marginal univariate distributions $f_{i,t}(r_{i, t+1})$:
@@ -37,11 +19,7 @@ The uniforms $u_{i, t+1}$ are related to the returns by the probability integral
 \end{align}
 In a ARMA-GARCH copula model, the univariate ARMA-GARCH processes describe the conditional densities $f_{i,t}(r_{i, t+1})$, while the copula $c_t$ is a model of the joint behavior of their probability integral transforms. The key benefit of this approach is that $c_t$ is independent of the marginal distributions, which allows separate modeling and estimation. Two-step quasi maximum likelihood, also known as inference-by-margins (IFM) introduced by~\autocite{Joe1997}, first estimates the marginal distributions and subsequently the copula distribution, taking the marginal densities as given. Because the joint density is separate from the marginal densities, we can use different assumptions for each component.
 
-In the most general case, we use a multivariate skewed Student's t DAC model introduced by~\autocite{ChristoffersenErrunzaJacobLanglois2012}. The joint distribution is parametrised by a single degrees of freedom parameter $\nu_c$, $N$ skewness parameters $\gamma_{c,i}$ and a (time-varying) correlation matrix $\Psi_{t}$ (details about the joint density function $c_t$ are in~\autoref{app:ghstmv}). The normal and Student's t copula are nested in this model, as when $\gamma_{c,i}$, we obtain a multivariate Student's t distribution, and if additionally $\nu_c = \infty$, we obtain the multivariate standard normal distribution.
-
-% Interpretation of parameters \gamma, \nu and \Psi?
-
-The copula is made dynamic by evolving the correlation matrix $\Psi_t$ according to an underlying \emph{c}DCC process $Q_t$~\autocites[cf.]{Engle2002,Aielli2013}. Using the notation from~\autocite{ChristoffersenLanglois2013}:
+In the most general case, we use a multivariate skewed Student's t DAC model introduced by~\autocite{ChristoffersenErrunzaJacobLanglois2012}. The joint distribution is parametrised by a single degrees of freedom parameter $\nu_c$, $N$ skewness parameters $\gamma_{c,i}$ and a (time-varying) correlation matrix $\Psi_{t}$ (details about the joint density function $c_t$ are in~\autoref{app:ghstmv}). The normal and Student's t copula are nested in this model, as when $\gamma_{c,i}$, we obtain a multivariate Student's t distribution, and if additionally $\nu_c = \infty$, we obtain the multivariate standard normal distribution. Furthermore, the copula is made dynamic by evolving the correlation matrix $\Psi_t$ according to an underlying \emph{c}DCC process $Q_t$~\autocites[cf.]{Engle2002,Aielli2013}. Using the notation from~\autocite{ChristoffersenLanglois2013}:
 \begin{align}
   Q_t &= (1 - \alpha - \beta) Q
     + \beta Q_{t - 1}
@@ -53,13 +31,15 @@ The $Q_t$ process is comprised of three components that are weighted according t
 
 % XXX NOTATION
 % XXX cDCC correction for copula shocks
-
 The parameters of the copula model -- the distribution parameters of the multivariate skewed Student's t distribution and the dynamics parameters of the cDCC -- are estimated by maximizing the log-likelihood:
 \begin{align}
   \arg\!\max_{\nu_c, \gamma_{ic}, \alpha, \beta} \sum_{t = 1}^T \ln c_t(u_{1, t+1}, \ldots, u_{N, t+1}; \nu_c, \gamma_{ic}, \alpha, \beta)
 \end{align}
 The process of copula estimation with \emph{c}DCC dynamics is quite involved. A detailed description can be found~\autoref{app:copula_cdcc}.
 
+Clearly, the interpretation of the copula parameters is closely associated to the structure of multivariate dependence. By different restrictions on the parameters in the DAC model, we are able to activate or deactivate certain features of the copula: First, the degree of freedom parameter $nu_c$ is to be interpreted as a the measure of tail dependency. When $nu \neq 0$, the lower and upper tails of the joint distribution are fatter than in the normal case, which is coherent with the evidence from threshold correlations in \autoref{subsec:threshold_corr}. Second, the skewness parameters $gamma_{c_i}$ are to be interpreted as the extent of asymmetry in the correlation structure. When $\gamma \neq 0$, there is asymmetry in correlations, which is also coherent with the earlier threshold correlation analysis. Third, the $\alpha$ and $\beta$ parameters determine whether the copula generates time-varying correlations. If $\alpha \neq 0$ and $\beta \neq 0$, the copula is dynamic, which is consistent with the findings of the rolling correlation analysis (\autoref{subsec:roll_corr}). The possible parameter restrictions lead to six potential copula models, which are illustrated graphically in~\autoref{copula_infographic}.
+
+Next, we examine the constant copula specifications and then proceed to the dynamic models.
 % subsection copula (end)
 
 % section modeling_multivariate_dependence_copula_approach (end)

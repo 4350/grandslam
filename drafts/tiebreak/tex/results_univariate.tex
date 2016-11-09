@@ -1,14 +1,15 @@
-%!TEX root = ../main.tex
+  %!TEX root = ../main.tex
+
 
 \section{Univariate modeling of factor returns} % (fold)
 \label{sec:univariate_modeling}
 
-We proceed by estimating models of each factor's return series, trying to capture the established effects of non-normality, autocorrelation and volatility clustering. By estimating econometric models, we can characterize and filter these effects. Furthermore, we can incorporate the effects in conditional forecasts. In this section, we describe the general structure of our models, our systematic model selection approach and the estimation results.
+We proceed by estimating models of each factor's return series and attempt to capture the effects of non-normality, autocorrelation and volatility clustering that were established in \autoref{sec:data}. By estimating ARMA-GARCH, we can characterize and filter these effects. Furthermore, we can incorporate the effects in conditional forecasts. In this section, we describe the general structure of our models, our systematic model selection approach and the estimation results.
 
 \subsection{General univariate model: ARMA-GJR-GARCH} % (fold)
 \label{sub:general_univariate_model_gjr_garch}
 
-The ARMA-GARCH is a broad model family designed to eliminate predictable components of financial return series. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). ARCH effects are also referred to as volatility clustering, due to the persistence in magnitude of return shocks. Shocks in financial return series are often not homoskedastic, and the hetreoskedasticy tends to exhibit serial correlation. We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1) model of~\autocite{Bollerslev1986}. The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when positive and negative return shocks have different impact on future volatility~\autocite{Black1976}.
+The ARMA-GARCH is a broad model family designed to eliminate predictable components of financial return series. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). ARCH effects are also referred to as volatility clustering, due to the persistence in magnitude of return shocks. Shocks in financial return series are often not homoskedastic, and the heteroskedasticy tends to exhibit serial correlation. We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1) model of~\autocite{Bollerslev1986}. The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when positive and negative return shocks have different impact on future volatility~\autocite{Black1976}.
 
 We estimate conditional mean equations \emph{up to} ARMA(3, 3):
 \begin{align}
@@ -35,42 +36,15 @@ The ARMA-GARCH models are estimated on each series using maximum likelihood esti
 \subsection{Factor specific model selection process} % (fold)
 \label{sub:selection_process}
 
-Our estimation process is as follows: For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1, 1) model). We then compute the Bayesian Information Criterion (BIC~\autocite{Schwarz1978}) for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
+Our selection process is as follows: For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1, 1) model). We then compute the Bayesian Information Criterion (BIC~\autocite{Schwarz1978}) for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
 
 First, the candidate models are checked for remaining serial correlation and ARCH effects. Second, we examine whether there are significant leverage effects that warrant the use of a GJR-GARCH instead of a standard GARCH. Third, we use QQ-plots to control for misspecification in the residual process, and to find a suitable distribution for the standardized residuals $z_t$.
 
-In a well-specified model, we expect there to be no significant serial correlation, ARCH effects or sign bias in the residuals. Furthermore, the QQ-plots of the standardized residuals should show that their empirical distribution is comparable to the theoretical distribution (be distributed around the 45 degree line).
+In a well-specified model, we expect there to be no significant serial correlation, ARCH effects or sign bias in the residuals. We employ weighted Ljung-Box, ARCH LM and sign bias tests that are detailed in \autoref{app:univariate_diagnostics}. Furthermore, the QQ-plots of the standardized residuals should show that their empirical distribution is comparable to the assumed theoretical distribution (be distributed around the 45 degree line).
 
 % subsection selection_process (end)
 
-\subsection{Model diagnostic test procedures}
-\label{sub:diagnostic_test_procedures}
-
-\textbf{Autocorrelation test}
-
-The autocorrelation test is a weighted Ljung-Box test, following~\textcite{FisherGallagher2012} and~\textcite{LjungBox1978}. Under the null of a correctly specified model with no serial correlation, the weighted Ljung-Box test has been shown to generate results closer to its asymptotic distribution than the standard Ljung-Box test. The test statistic is given by
-\begin{align}
-	Q_W = T (T+2) \sum\limits^m_{k = 1} \frac{m-k+1}{m} \frac{\hat{r}_{k}^{2} (\hat{\epsilon}_{t} / \hat{\sigma}_{t})}{T-k}
-\end{align}
-where $T$ is the number of observations, $\hat{r}^{2}_{k} ( \hat{\epsilon}_{t} / \hat{\sigma}_{t} )$ is the squared sample autocorrelation of standardized residuals with lag order $k$ and max lag order $m$. Under the null, the test statistic is asymptotically distributed $\sum\limits^m_{k = 1} \chi^2_k \gamma_k$, where $\{\chi^2_k\}$ are independent chi-squared random variables with one degree of freedom and $\{\gamma_k\}$ are eigenvalues of a weighting matrix. We consider two maximum lag orders, 5 and 10 weeks. The maximum lag length was chosen by visual inspection of the autocorrelation functions for standardized residuals.
-
-\textbf{Volatility clustering test}
-
-For ARCH effects, we use the weighted LM test, following~\textcite{FisherGallagher2012} and~\textcite{LiMak1994}. The test has the null of no autocorrelation in standardized squared residuals from the model, and the test statistic is given by:
-\begin{align}
-	LM_W = T \sum\limits_{k = b + 1}^{m} \frac{m - k + (b+1)}{m} \hat{r}^{2}_{k} (\hat{\epsilon}^{2}_{t} / \hat{\sigma}_{t})
-\end{align}
-where $T$ is the number of observations, $b$ the number of autoregressive lags in the GARCH ($b=1$), $\hat{r}^2_k (\hat{\epsilon}^2_t / \hat{\sigma}_t)$ is the squared sample autocorrelation of standardized squared residuals with lag order $k$ and max lag order $m$. Under the null, the test statistic is asymptotically distributed $\sum\limits^m_{k = 1} \chi^2_k w_k$, where $\{\chi^2_k\}$ are independent chi-squared random variables with one degree of freedom and $\{w_k\}$ are the weighting parameters ($w = (m - k + (b+1))/m$). The maximum lag length was chosen by visual inspection of the autocorrelation functions for standardized squared residuals.
-
-\textbf{Leverage effect test}
-
-We use the sign bias test of~\textcite{EngleNg1993} to determine whether there are significant leverage effects in the factor returns. Run the regression
-\begin{align}
-	\hat{z}_t^2 = c_0 + c_1 I_{\hat{\epsilon}_{t-1} < 0} + c_2 I_{\hat{\epsilon}_{t-1} < 0} \cdot \hat{\epsilon}_{t-1} + c_3 I_{\hat{\epsilon}_{t-1} \geq 0} \cdot \hat{\epsilon}_{t-1} + u_t
-\end{align}
-where $\hat{z}_t^2$ are the standardized squared residuals of the ARMA-GARCH model, $I_\cdot$ are indicator functions that are equal to one when the subscript conditions are true, and $\hat{\epsilon}_{t-1}$ are the lagged ARMA-GARCH residuals. For the test of negative sign bias (i.e. leverage effect), the null hypothesis is $H_0: c_2 = 0$, and for the test of positive sign bias (i.e. reverse leverage effect), the null hypothesis is $H_0: c_3 = 3$. The Wald test statistics are asymptotically distributed $\chi^2$ with one degree of freedom.
-
-% subsection diagnostic_test_procedures (end)
+  
 
 \subsection{Model selection and estimation results}
 \label{sub:uni_selection_estimation_results}
@@ -250,19 +224,15 @@ Sign bias (+) p-value & \multicolumn{1}{c}{0.357} & \multicolumn{1}{c}{0.664} & 
   \begin{minipage}{\textwidth}
   \includegraphics[scale=1]{graphics/qq_ghst.png}  
   %\bottomrule
-  \vspace{3mm}
+  \vspace{3mm}      
   \footnotesize
   Quantile-quantile plots of theoretical (skewed Student's \textit{t}) standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications. Data from the theoretical distribution should line up on the dashed line. Based on weekly data 1963-2016
   \end{minipage}
 \end{figure}
 
-First, we comment on the value-related factors HML, RMW and CMA in \autoref{tab:garch_value}. We find significant intercepts in the mean equation for all three strategies. In terms of return autoregression, the HML factor stands out with a high 0.722 estimate, while CMA is substantially lower at 0.112. This lower estimate can in part be explained by the fact that CMA is estimated without a moving average component $\theta$ that in the presence of a return shock counteracts the autoregressive part, as $\theta$ are estimated with a negative sign for both HML and RMW. 
+In the variance equation, all factors exhibit high $\alpha$ and $\beta$ leading to a high variance persistence, between 0.96 and 0.99. Generally, variance persistence, which is related to volatility clustering, tends to be high in financial return series. [WHAT DOES IT MEAN WHY DO I CARE] We note that the zero-cost factor portfolios are no exception. The HML factor has a higher $\alpha$ estimate, indicating that shocks of equal size translate into slightly stronger volatility for HML than for RMW and CMA. RMW, on the other hand, has both the lowest $\alpha$ estimate and the highest $\beta$ estimate, indicating higher persistence and lower sensitivity of volatility to shocks.
 
-In the variance equation, all three factors exhibit high variance persistence, between 0.98 and 0.99. Generally, variance persistence, which is related to volatility clustering, tends to be high in financial return series. We note that the zero-cost factor portfolios are no exception. The HML factor has a higher $\alpha$ estimate, indicating that shocks of equal size translate into slightly stronger volatility for HML than for RMW and CMA. RMW, on the other hand, has both the lowest $\alpha$ estimate and the highest $\beta$ estimate, indicating higher persistence and lower sensitivity of volatility to shocks.
-
-Second, we comment on the non-value related factors in~\autoref{tab:garch_nonvalue}. The level of the intercept in the mean equation is considerably higher for Mkt-RF and Mom than for the other factor strategies, with 0.096\% and 0.128\% respectively. The SMB factor instead has the lowest mean estimate that is not significantly different from zero. These estimates are in line with our expectations from a visual inspection of the cumulative return graphs in the data section~\autoref{fig:cumretstd}. We note that the Mkt-RF factor is, according to our model selection procedure, best fitted by a ARMA(0, 0) mean equation, indicating no predictive power of 1-week lagged returns. 
-
-In the variance equation, we note that the Mkt-RF is estimated with GJR dynamics, and the relatively low $\alpha = 0.037$ sensitivity to shocks is increased considerably by $\eta = 0.181$ in the case of a \emph{negative} shock. Furthermore, the Mom factor stands out with a much higher estimate of $\alpha$ (0.186) than any of the other series (all around 0.10) and a lower $\beta$ (0.793). This means that volatility in the momentum factor is more sensitive than other factor strategies to return shocks and less predictable by past volatility alone. We also note that the Mkt-RF and Mom factors exhibit relatively higher unconditional volatilities (of 0.022 and 0.018) than do other factors (around 0.010).
+We note that the Mkt-RF factor is, according to our model selection procedure, best fitted by a ARMA(0, 0) mean equation, indicating no predictive power of 1-week lagged returns. Also, in the variance equation, we note that the relatively low $\alpha = 0.037$ sensitivity to shocks is increased considerably by $\eta = 0.181$ in the case of a \emph{negative} shock. Furthermore, the Mom factor stands out with a much higher estimate of $\alpha$ (0.186) than any of the other series (all around 0.10) and a lower $\beta$ (0.793). This means that volatility in the momentum factor is more sensitive than other factor strategies to return shocks and less predictable by past volatility alone. We also note that the Mkt-RF and Mom factors exhibit relatively higher unconditional volatilities (of 0.022 and 0.018) than do other factors (around 0.010).
 
 For both the value-related and non-value related factors, many of the estimates of $\gamma$, the skewness of the skewed Student's \textit{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates for SMB and Mom. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots (\autoref{fig:qq_norm_std}) indicate misspecification for models with both the normal and Student's \textit{t} innovations.
 
