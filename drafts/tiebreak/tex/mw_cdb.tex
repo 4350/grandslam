@@ -1,0 +1,34 @@
+%!TEX root = ../main.tex
+
+\subsection{Conditional Diversification Benefit} % (fold)
+\label{sub:conditional_diversification_benefit}
+
+% Picture different between 5-factor and 6-factor
+\autoref{fig:cdb} plots conditional diversification benefit measures of the six different strategies, based on the symmetric dynamic copula model. We have smoothed the plots to quarterly moving averages in order to make them easier to read. There are a number of interesting results emerging from this picture.
+
+\begin{figure}
+  \caption{Conditional diversification benefit (CDB) from symmetric dynamic copula model for six different strategies, full sample (1963--2016). The line has been smoothed on a rolling quarterly window to make it easier to read.}
+  \includegraphics[width=\textwidth]{graphics/cdb_5F_6F.png}
+  \label{fig:cdb}
+\end{figure}
+
+% CDB is very high; factor strategies are good diversifiers
+First, we note that regardless of whether Momentum is included or not, factor strategies appear to offer high levels of diversification. In absolute terms, all strategies sit close to or above $90$ for the majority of the studied time period. The differences between strategies are small with a high degree of overlap; given the uncertainty in estimates, the interpretation of differences must be interpreted conservatively.
+
+Second, there is also no obvious trend to be seen, however, there are notable ``dips'' in the diversification benefit measures. When we turn to look at these dips, representing times when diversification is relatively hard to come by, we see that they roughly coincide in both the five and six factor models.
+
+% HML is a better diversifier on average
+% CMA better when diversification is hard to come by
+Third, in comparing the diversification benefits offered by substituting CMA for HML and vice versa, a complicated picture appears. Looking at the six factor portfolio, the strategy where HML is excluded has a lower level of diversification benefit on most weeks compared to where CMA is excluded. This pattern appears reversed at critical times, however. When the full six factor CDB is low -- before 1965, around 1978, 2007 and 2011 -- the maximum diversification benefit of an HML strategy is in all cases except 2011 below that of the CMA strategy. HML thus appears to be the better diversifier in ``normal'' times, however, when diversification is hard to come by, CMA outperforms it. Excluding Momentum, the status of HML as a superior diversifier in normal times is much less clear; while its underperformance is even more noticeable when diversification potential is lower.
+
+\autoref{tab:cdb_table} displays CDB summary statistics and the results of paired t-tests of the differences between strategies. This table tells the same story as the graph. In a five-factor setting, there is no significant difference in the expected diversification benefit from swapping CMA for HML, however, HML is a significantly better diversifier in a six-factor setting. The difference, although significant, is however small.
+
+\input{tex/tables/cdb_table}
+
+% What periods does low CDB correspond to?
+% Story related to threshold correlations and patterns seen Mkt-HML
+
+% No obvious corresponde with the market's performance. This does not appear
+% to be related to the tail dependency so mcuh...
+
+% subsection conditional_diversification_benefit (end)

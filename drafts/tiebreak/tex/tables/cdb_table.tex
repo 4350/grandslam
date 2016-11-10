@@ -1,0 +1,43 @@
+%!TEX root = ../../main.tex
+
+\begin{table}
+  \centering
+  \footnotesize
+  \renewcommand{\arraystretch}{1.2}
+  
+  \caption{Conditional diversification benefit (CDB) statistics from symmetric dynamic copula model, full sample (1963--2016). \emph{Difference} shows the average pair-wise difference in CDB between the column's and row's strategy, respectively, with t-test standard errors and significance levels (the first pair is thus the difference in pair-wise CDB between a five-factor strategy with and without CMA)}
+
+  \begin{tabularx}{\textwidth}{@{} l X dddd X dd @{}}
+    \toprule
+    &&
+      \multicolumn{4}{c}{CDB} && 
+      \multicolumn{2}{c}{Difference} \\
+    \cmidrule{3-6} \cmidrule{8-9}
+    &&
+      \multicolumn{1}{c}{Mean} &
+      \multicolumn{1}{c}{SD} &
+      \multicolumn{1}{c}{Min} &
+      \multicolumn{1}{c}{Max} &&
+      \multicolumn{1}{c}{All} &
+      \multicolumn{1}{c}{Excl. CMA} \\
+    \midrule
+    \textbf{Five Factors} \\
+    \emph{All}       && 88.937 & 3.410 & 61.469 & 95.135 &&   &                        \\
+                     &&        &       &        &        &&   &                        \\
+    \emph{excl. CMA} && 87.439 & 4.221 & 61.346 & 95.105 &&   1.497^{***} &             \\
+                     &&        &       &        &        &&  (0.053)      &             \\
+    \emph{excl. HML} && 87.448 & 3.731 & 61.722 & 94.274 &&   1.489^{***} & -0.009      \\
+                     &&        &       &        &        &&  (0.050)      & (0.065)     \\
+    \midrule
+    \textbf{Six Factors} \\
+    \emph{All}       && 89.783 & 2.898 & 72.850 & 95.043 &&   &                       \\
+                     &&        &       &        &        &&   &                       \\
+    \emph{excl. CMA} && 88.602 & 3.657 & 69.143 & 95.160 &&  1.181^{***} &             \\
+                     &&        &       &        &        && (0.050)      &             \\
+    \emph{excl. HML} && 88.259 & 3.053 & 71.987 & 94.447 &&  1.524^{***} &  0.343^{***}  \\
+                     &&        &       &        &        && (0.049)      & (0.060)     \\
+    \bottomrule
+  \end{tabularx}
+
+  \label{tab:cdb_table}
+\end{table}
