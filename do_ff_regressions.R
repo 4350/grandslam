@@ -30,7 +30,7 @@ ff_reg <- function(y, x, df) {
                              paste(x, collapse = '+')))
   # Run regression
   reg_fit <- lm(formula, df)
-  coeftest(reg_fit, vcov = sandwich)
+  coeftest(reg_fit, vcov. = NeweyWest(reg_fit, lag = 10))
 }
 
 ff_reg_rsq <- function(y, x, df) {
@@ -68,19 +68,56 @@ ff_reg_exclude_one <- function(df) {
   
   names(out_list) = factors
   names(out_rsq) = factors
-  stargazer(out_list, order = c('Constant', factors), column.labels = factors, digits = 4)
-  stargazer(out_list, order = c('Constant', factors), type = 'text', column.labels = factors, digits = 4)
+  stargazer(out_list, order = c('Constant', factors),
+            align = TRUE,
+            notes.align = 'c',
+            digits = 4,
+            digit.separator = ',',
+            column.labels = factors)
+  out_rsq
+}
+
+#' Returns latex/ascii table of regression results
+#' on a data frame with four regs of interest
+#' @param df Data frame with x, y
+#' @return latex and ascii tables from stargazer
+#' with robust standard errors
+ff_reg_interest <- function(df) {
+  factors <- colnames(df)
+  
+  # Regressions
+  out_list = list(
+    HML_5F = ff_reg('HML', c('Mkt.RF','SMB','CMA','RMW'), df),
+    CMA_5F = ff_reg('CMA', c('Mkt.RF','SMB','HML','RMW'), df),
+    HML_6F = ff_reg('HML', c('Mkt.RF','SMB','CMA','RMW', 'Mom'), df),
+    CMA_6F = ff_reg('CMA', c('Mkt.RF','SMB','HML','RMW', 'Mom'), df)
+  )
+
+  # Rsquareds
+  out_rsq = list(
+    HML_5F = ff_reg_rsq('HML', c('Mkt.RF','SMB','CMA','RMW'), df),
+    CMA_5F = ff_reg_rsq('CMA', c('Mkt.RF','SMB','HML','RMW'), df),
+    HML_6F = ff_reg_rsq('HML', c('Mkt.RF','SMB','CMA','RMW', 'Mom'), df),
+    CMA_6F = ff_reg_rsq('CMA', c('Mkt.RF','SMB','HML','RMW', 'Mom'), df)
+  )
+  
+  stargazer(out_list, order = c('Constant', factors), 
+            align = TRUE,
+            notes.align = 'c',
+            digits = 4,
+            digit.separator = ','
+            )
   out_rsq
 }
 
 
 # Do ----------------------------------------------------------------------
 
-df %>% select(Mkt.RF, SMB, HML, CMA, RMW) %>% ff_reg_exclude_one()
+%df %>% select(Mkt.RF, SMB, HML, CMA, RMW) %>% ff_reg_exclude_one()
 
-df %>% select(Mkt.RF, SMB, HML, CMA, RMW, Mom) %>% ff_reg_exclude_one()
+%df %>% select(Mkt.RF, SMB, HML, CMA, RMW, Mom) %>% ff_reg_exclude_one()
 
+# Do interest  ------------------------------------------------------------
 
-# Get rsquared ------------------------------------------------------------
-
+df %>% select(Mkt.RF, SMB, HML, CMA, RMW, Mom) %>% ff_reg_interest()
 
