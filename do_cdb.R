@@ -131,10 +131,23 @@ MODEL_NAME <- 'full_dynamic_std_10000'
 do_best_cdb(MODEL_NAME, '5F',          c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'))
 do_best_cdb(MODEL_NAME, '5F_EXCL_HML', c('Mkt.RF',        'SMB', 'RMW', 'CMA'))
 do_best_cdb(MODEL_NAME, '5F_EXCL_CMA', c('Mkt.RF', 'HML', 'SMB', 'RMW'       ))
+do_best_cdb(MODEL_NAME, '5F_EXCL_RMW', c('Mkt.RF', 'HML', 'SMB',        'CMA'))
+
 
 do_best_cdb(MODEL_NAME, '6F',          c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'))
 do_best_cdb(MODEL_NAME, '6F_EXCL_HML', c('Mkt.RF',        'SMB', 'Mom', 'RMW', 'CMA'))
 do_best_cdb(MODEL_NAME, '6F_EXCL_CMA', c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'       ))
+do_best_cdb(MODEL_NAME, '6F_EXCL_RMW', c('Mkt.RF', 'HML', 'SMB', 'Mom',        'CMA'))
+
+do_best_cdb(MODEL_NAME, '3F_HML',     c('Mkt.RF', 'HML', 'SMB'))
+do_best_cdb(MODEL_NAME, '3F_HML_RMA', c('Mkt.RF', 'HML', 'SMB', 'RMW'))
+do_best_cdb(MODEL_NAME, '3F_CMA',     c('Mkt.RF', 'CMA', 'SMB'))
+do_best_cdb(MODEL_NAME, '3F_CMA_RMW', c('Mkt.RF', 'CMA', 'SMB', 'RMW'))
+
+do_best_cdb(MODEL_NAME, '4F_HML',             c('Mkt.RF', 'HML', 'SMB', 'Mom'))
+do_best_cdb(MODEL_NAME, '4F_HML_RMW',         c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'))
+do_best_cdb(MODEL_NAME, '4F_CMA',             c('Mkt.RF', 'CMA', 'SMB', 'Mom'))
+do_best_cdb(MODEL_NAME, '4F_CMA_RMW',         c('Mkt.RF', 'CMA', 'SMB', 'Mom', 'RMW'))
 
 # Equal Weights ----------------------------------------------------------
 
