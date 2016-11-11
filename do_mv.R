@@ -9,7 +9,7 @@
 #' even if we only rebalance 1%. so.. the rebalancing limits is rather about getting robust
 #' performance, following equal weights mindset, risk parity etc. then maybe 2x equal weights? 50%?
 #' Think about how to scale sharpe ratio. Should be oK as we do.
-  
+
 # Library and setup -------------------------------------------------------
 rm(list = ls())
 library(tictoc)
@@ -52,14 +52,7 @@ load_all('wimbledon')
 #' @return saves a list of results to RData files mv_results_...
 #' 
 do_optimize_mv <- function(model_name, strategy, selectors, df.realized) {
-  # Load risk-free data for making returns excess
-  load('data/derived/weekly-RF.RData')
-  # Make simple
-  rf <- exp(df.RF[,-1]) - 1
-  rm(df.RF)
   
-  # Whether it's on model or assumptions
-  based_on <- model_name
   # Load distribution simulated data and change to simple returns
   load(sprintf('data/derived/distributions/%s.RData', model_name))
   distribution_simple <- exp(distribution) - 1
@@ -76,9 +69,6 @@ do_optimize_mv <- function(model_name, strategy, selectors, df.realized) {
   weights <- matrix(NA, ncol = N, nrow = T)
   sr <- rep(NA, T)
   
-  # Cut length of RF
-  rf <- tail(rf, T)
-  
   # Get MV optimal weights and SRs
   
   for (t in times) {
@@ -87,12 +77,8 @@ do_optimize_mv <- function(model_name, strategy, selectors, df.realized) {
     mu_t <- colMeans(distribution_simple[,,t])
     sigma_t <- cov(distribution_simple[,,t])
     
-    # Subtract rf to get excess mu
-    mu_x_t <- mu_t - rf[t,1]
-    rm(mu_t)
-    
     # Run optimizer
-    op <- optimize_mv_constrOptim(weights = rep(1/N,N), fn = sharpe_ratio_fn(mu_x_t, sigma_t))
+    op <- optimize_mv_constrOptim(weights = rep(1/N,N), fn = sharpe_ratio_fn(mu_t, sigma_t))
     
     toc()
     
@@ -171,17 +157,58 @@ optimize_mv_constrOptim <- function(weights, fn) {
 
 #' Calculates sharpe ratio
 #' 
-#' @param mu_x_t N length vector of expected excess returns (simple)
+#' @param mu_t N length vector of expected excess returns (simple)
 #' @param sigma_t NxN variance-covariance matrix
 #' 
 #' @return function for optimization, negative sharpe ratio
-sharpe_ratio_fn <- function(mu_x_t, sigma_t) {
+sharpe_ratio_fn <- function(mu_t, sigma_t) {
   # 
   function(weights) {
-    sr <- (weights %*% mu_x_t) / sqrt(weights %*% sigma_t %*% weights)
+    sr <- (weights %*% mu_t) / sqrt(weights %*% sigma_t %*% weights)
     -sr
   }
   
+}
+
+#' Optimize with fixed mu, sigma
+#' 
+do_optimize_fixed <- function(model_name, strategy, selectors, df.realized) {
+  
+  # Save the dates and then select
+  dates <- df.realized[,'Date']
+  # Select returns and change daily returns to simple returns
+  df.realized <- df.realized[ , selectors]
+  df.realized <- exp(df.realized) - 1
+  
+  N <- ncol(df.realized)
+  T <- nrow(df.realized)
+  
+  # Get MV optimal weights and SRs
+  mu = colMeans(df.realized)
+  sigma = cov(df.realized)
+  op <- optimize_mv_constrOptim(weights = rep(1/N,N), fn = sharpe_ratio_fn(mu, sigma))
+    
+  # Outputs
+  weights <- matrix(op$weights, ncol = N, nrow = T, byrow = TRUE)
+  sr <- rep(op$sr, T)
+  
+  colnames(weights) <- selectors
+  
+  # Calculate the portfolios realized return
+  portfolio_return <- rowSums(weights * df.realized)
+  
+  # Save list of data points as .RData file
+  results <- list(
+    Date = dates$Date,
+    sr = sr,
+    weights = weights,
+    portfolio_return = portfolio_return,
+    based_on = model_name,
+    strategy = strategy
+  )
+  # Give this a specific name
+  save(results, file = sprintf('data/derived/mv/results_%s_%s.Rdata', model_name, strategy))
+  return(results)
 }
 
 # Get optimization results for different copula portfolios ------------------------------------
@@ -214,4 +241,14 @@ do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_CMA',
                df.realized = df.estim)
 
 
+
+# Optimize sample ---------------------------------------------------------
+
+do_optimize_fixed('full_sample', strategy = '5F',
+                  selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
+                  df.realized = df.estim)
+
+do_optimize_fixed('full_sample', strategy = '6F',
+                  selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'),
+                  df.realized = df.estim)
 
