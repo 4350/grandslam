@@ -41,3 +41,13 @@ stats <- lapply(returns, function(strategy) {
 
 cat(sprintf('== %s ==\n\n', MODEL_NAME))
 print(bind_rows(stats, .id = 'Strategy'))
+
+# Summary statistics of weights ----
+weights <- load_field('weights')
+
+wdf <- bind_rows(lapply(weights, function(weight) {
+  # lol
+  100 * data.frame(t(data.frame(apply(weight, 2, mean))))
+}), .id = 'Strategy')
+
+stargazer::stargazer(wdf, summary = FALSE, type = 'text', digits = 2)
