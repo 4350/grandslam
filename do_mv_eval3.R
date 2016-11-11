@@ -31,12 +31,13 @@ stats <- lapply(returns, function(strategy) {
   stats_labels <- c('Mean', 'Stdev', 'Skewness', 'Kurtosis')
   stats <- as.list(fBasics::basicStats(strategy)[stats_labels, ])
   names(stats) <- stats_labels
-  stats$Mean <- 52 * stats$Mean
-  stats$Stdev <- sqrt(52) * stats$Stdev
+  stats$Mean <- 52 * stats$Mean * 100
+  stats$Stdev <- sqrt(52) * stats$Stdev * 100
   
   # SR
   SR <- stats$Mean / (stats$Stdev)
-  data.frame(stats, SR = SR)
+  MDD <- maxDrawdown(strategy)
+  data.frame(stats, MDD = MDD, SR = SR)
 })
 
 cat(sprintf('== %s ==\n\n', MODEL_NAME))
