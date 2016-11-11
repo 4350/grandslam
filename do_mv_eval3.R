@@ -2,8 +2,8 @@ rm(list = ls())
 
 library(dplyr)
 
-MODEL_NAME <- 'results_full_dynamic_std_10000'
-# MODEL_NAME <- 'results_full_sample'
+#MODEL_NAME <- 'results_oos_dynamic_std_10000'
+MODEL_NAME <- 'results_oos_sample'
 
 STRATEGIES <- list(
   '5F',
