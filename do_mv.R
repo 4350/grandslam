@@ -172,20 +172,22 @@ sharpe_ratio_fn <- function(mu_t, sigma_t) {
 
 #' Optimize with fixed mu, sigma
 #' 
-do_optimize_fixed <- function(model_name, strategy, selectors, df.realized) {
+do_optimize_fixed <- function(model_name, strategy, selectors, df.sample, df.realized) {
   
   # Save the dates and then select
   dates <- df.realized[,'Date']
   # Select returns and change daily returns to simple returns
   df.realized <- df.realized[ , selectors]
+  df.sample <- df.sample[ , selectors]
   df.realized <- exp(df.realized) - 1
+  df.sample <- exp(df.sample) - 1
   
   N <- ncol(df.realized)
   T <- nrow(df.realized)
   
   # Get MV optimal weights and SRs
-  mu = colMeans(df.realized)
-  sigma = cov(df.realized)
+  mu = colMeans(df.sample)
+  sigma = cov(df.sample)
   op <- optimize_mv_constrOptim(weights = rep(1/N,N), fn = sharpe_ratio_fn(mu, sigma))
     
   # Outputs
@@ -211,7 +213,7 @@ do_optimize_fixed <- function(model_name, strategy, selectors, df.realized) {
   return(results)
 }
 
-# Get optimization results for different copula portfolios ------------------------------------
+# Get optimization results dynamic std full ------------------------------------
 
 load('data/derived/weekly-estim.RData')
 MODEL_NAME = 'full_dynamic_std_10000'
@@ -240,15 +242,71 @@ do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_CMA',
                selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
                df.realized = df.estim)
 
+# Get optimization results dynamic std oos ------------------------------------
+
+load('data/derived/weekly-estim.RData')
+MODEL_NAME = 'oos_dynamic_std_10000'
+
+# Without Momentum
+do_optimize_mv(MODEL_NAME, strategy = '5F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim)
+
+do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_HML',
+               selectors = c('Mkt.RF',        'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim)
+do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW'),
+               df.realized = df.estim)
+
+# With Momentum
+do_optimize_mv(MODEL_NAME, strategy = '6F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim)
+
+do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_HML',
+               selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim)
+do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
+               df.realized = df.estim)
 
 
-# Optimize sample ---------------------------------------------------------
+# Optimize sample full ---------------------------------------------------------
 
+load('data/derived/weekly-estim.RData')
 do_optimize_fixed('full_sample', strategy = '5F',
                   selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
-                  df.realized = df.estim)
+                  df.sample = df.estim[1:2766,],
+                  df.realized = df.estim[2:2766,])
 
-do_optimize_fixed('full_sample', strategy = '6F',
-                  selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'),
-                  df.realized = df.estim)
+do_optimize_fixed('full_sample', strategy = '5F_EXCL_HML',
+                  selectors = c('Mkt.RF',        'SMB', 'RMW', 'CMA'),
+                  df.sample = df.estim[1:2766,],
+                  df.realized = df.estim[2:2766,])
+
+do_optimize_fixed('full_sample', strategy = '5F_EXCL_CMA',
+                  selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW'),
+                  df.sample = df.estim[1:2766,],
+                  df.realized = df.estim[2:2766,])
+
+
+
+# Optimize sample oos ---------------------------------------------------------
+
+load('data/derived/weekly-estim.RData')
+do_optimize_fixed('oos_sample', strategy = '5F',
+                  selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
+                  df.sample = df.estim[1:1852,],
+                  df.realized = df.estim[1853:2766,])
+
+do_optimize_fixed('oos_sample', strategy = '5F_EXCL_HML',
+                  selectors = c('Mkt.RF',        'SMB', 'RMW', 'CMA'),
+                  df.sample = df.estim[1:1852,],
+                  df.realized = df.estim[1853:2766,])
+
+do_optimize_fixed('oos_sample', strategy = '5F_EXCL_CMA',
+                  selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW'),
+                  df.sample = df.estim[1:1852,],
+                  df.realized = df.estim[1853:2766,])
 
