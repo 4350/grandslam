@@ -44,13 +44,23 @@ df <- select(
   CMA
 )
 
-# Create two weekly data sets, one for full period and one for estimation window (1963-)
+# Create weekly data set
 df.estim <- df %>%
   dplyr::filter(Date >= '1963-07-05')
 
+# Get risk-free data set
+df.RF <-
+  left_join(
+    read.csv("data/source/ff_5factors-daily.csv") %>% to.weekly,
+    read.csv("data/source/ff_momentum-daily.csv") %>% to.weekly,
+    by = "Date"
+  ) %>%
+  select(Date, RF) %>%
+  filter(Date >= '1963-07-05')
+
 # Save for later loading
-save(df, file = "data/derived/weekly-full.RData")
 save(df.estim, file = "data/derived/weekly-estim.RData")
+save(df.RF, file = "data/derived/weekly-RF.RData")
 rm(to.weekly)
 
 # Load US recession data from NBER and convert to weekly data set ---------
