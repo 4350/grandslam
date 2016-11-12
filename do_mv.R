@@ -48,15 +48,24 @@ load_all('wimbledon')
 #' @param df.realized data frame like df.estim, including dates and 6 factors
 #' of log returns, at least as long as the out-of-sample period which is given by
 #' the length of the distribution or mu and sigma
+#' @param df.mean optional df of factors used to calculate mean if 
+#' copula estimate from mean equation is not to be used
 #' 
 #' @return saves a list of results to RData files mv_results_...
 #' 
-do_optimize_mv <- function(model_name, strategy, selectors, df.realized) {
+do_optimize_mv <- function(model_name, strategy, selectors, df.realized, df.mean = NULL) {
   
   # Load distribution simulated data and change to simple returns
   load(sprintf('data/derived/distributions/%s.RData', model_name))
   distribution_simple <- exp(distribution) - 1
   rm(distribution)
+  
+  # Simplify df.mean if inputted. Select selectors
+  if(!is.null(df.mean)) {
+    df.mean <- exp(df.mean[,-1]) - 1
+    df.mean <- df.mean[, selectors]
+  }
+  
   # Subset the data using selectors
   colnames(distribution_simple) <- c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA')
   distribution_simple <- distribution_simple[, selectors, ]
@@ -73,8 +82,17 @@ do_optimize_mv <- function(model_name, strategy, selectors, df.realized) {
   
   for (t in times) {
     tic(sprintf('Optimal weights at t = %d', t))
-    # Inputs needed from simulated 1-step-ahead distribution
-    mu_t <- colMeans(distribution_simple[,,t])
+    
+    # Mu either from mean or copula distribution
+    
+    if(!is.null(df.mean)) {
+      mu_t <- colMeans(df.mean)
+    } else {
+      mu_t <- colMeans(distribution_simple[,,t])
+    }
+    
+    # Sigma always from copula distribution
+    
     sigma_t <- cov(distribution_simple[,,t])
     
     # Run optimizer
@@ -213,7 +231,7 @@ do_optimize_fixed <- function(model_name, strategy, selectors, df.sample, df.rea
   return(results)
 }
 
-# Get optimization results dynamic std full ------------------------------------
+# Get optimization results dynamic std full copula means ------------------------------------
 
 load('data/derived/weekly-estim.RData')
 MODEL_NAME = 'full_dynamic_std_10000'
@@ -242,7 +260,7 @@ do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_CMA',
                selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
                df.realized = df.estim)
 
-# Get optimization results dynamic std oos ------------------------------------
+# Get optimization results dynamic std oos  copula means ------------------------------------
 
 load('data/derived/weekly-estim.RData')
 MODEL_NAME = 'oos_dynamic_std_10000'
@@ -270,6 +288,80 @@ do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_HML',
 do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_CMA',
                selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
                df.realized = df.estim)
+
+
+# Get optimization results dynamic std full sample means ------------------------------------
+
+load('data/derived/weekly-estim.RData')
+MODEL_NAME = 'full_dynamic_std_10000'
+
+# Without Momentum
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_5F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim,
+               df.mean = df.estim)
+
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_5F_EXCL_HML',
+               selectors = c('Mkt.RF',        'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim,
+               df.mean = df.estim)
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_5F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW'),
+               df.realized = df.estim,
+               df.mean = df.estim)
+
+# With Momentum
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_6F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim,
+               df.mean = df.estim)
+
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_6F_EXCL_HML',
+               selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim,
+               df.mean = df.estim)
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_6F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
+               df.realized = df.estim,
+               df.mean = df.estim)
+
+# Get optimization results dynamic std oos  sample means ------------------------------------
+
+load('data/derived/weekly-estim.RData')
+MODEL_NAME = 'oos_dynamic_std_10000'
+
+# Without Momentum
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_5F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim,
+               df.mean = df.estim[1:1852,])
+
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_5F_EXCL_HML',
+               selectors = c('Mkt.RF',        'SMB', 'RMW', 'CMA'),
+               df.realized = df.estim,
+               df.mean = df.estim[1:1852,])
+
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_5F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW'),
+               df.realized = df.estim,
+               df.mean = df.estim[1:1852,])
+
+# With Momentum
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_6F',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim,
+               df.mean = df.estim[1:1852,])
+
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_6F_EXCL_HML',
+               selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'),
+               df.realized = df.estim,
+               df.mean = df.estim[1:1852,])
+
+do_optimize_mv(MODEL_NAME, strategy = 'MEANS_6F_EXCL_CMA',
+               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
+               df.realized = df.estim,
+               df.mean = df.estim[1:1852,])
+
 
 
 # Optimize sample full 5F ---------------------------------------------------------
