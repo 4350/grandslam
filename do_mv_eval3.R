@@ -1,17 +1,18 @@
 rm(list = ls())
 
 library(dplyr)
+library(PerformanceAnalytics)
 
-#MODEL_NAME <- 'results_oos_dynamic_std_10000'
-MODEL_NAME <- 'results_oos_sample'
+MODEL_NAME <- 'results_full_dynamic_std_10000'
+#MODEL_NAME <- 'results_full_sample'
 
 STRATEGIES <- list(
   '5F',
-  '5F_EXCL_HML',
   '5F_EXCL_CMA',
+  '5F_EXCL_HML',
   '6F',
-  '6F_EXCL_HML',
-  '6F_EXCL_CMA'
+  '6F_EXCL_CMA',
+  '6F_EXCL_HML'
 )
 
 load_field <- function(field) {
@@ -51,4 +52,4 @@ wdf <- bind_rows(lapply(weights, function(weight) {
   100 * data.frame(t(data.frame(apply(weight, 2, mean))))
 }), .id = 'Strategy')
 
-stargazer::stargazer(wdf, summary = FALSE, type = 'text', digits = 2)
+stargazer::stargazer(wdf, summary = FALSE, type = 'text', digits = 3)
