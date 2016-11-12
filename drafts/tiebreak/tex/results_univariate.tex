@@ -1,13 +1,13 @@
   %!TEX root = ../main.tex
 
 
-\section{Univariate modeling of factor returns} % (fold)
-\label{sec:univariate_modeling}
+\subsection{Univariate modeling of factor returns} % (fold)
+\label{subsec:univariate_modeling}
 
 We proceed by estimating models of each factor's return series and attempt to capture the effects of non-normality, autocorrelation and volatility clustering that were established in \autoref{sec:data}. By estimating ARMA-GARCH, we can characterize and filter these effects. Furthermore, we can incorporate the effects in conditional forecasts. In this section, we describe the general structure of our models, our systematic model selection approach and the estimation results.
 
-\subsection{General univariate model: ARMA-GJR-GARCH} % (fold)
-\label{sub:general_univariate_model_gjr_garch}
+\subsubsection{General univariate model: ARMA-GJR-GARCH} % (fold)
+\label{subsubsec:general_univariate_model_gjr_garch}
 
 The ARMA-GARCH is a broad model family designed to eliminate predictable components of financial return series. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). ARCH effects are also referred to as volatility clustering, due to the persistence in magnitude of return shocks. Shocks in financial return series are often not homoskedastic, and the heteroskedasticy tends to exhibit serial correlation. We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1) model of~\autocite{Bollerslev1986}. The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when positive and negative return shocks have different impact on future volatility~\autocite{Black1976}.
 
@@ -33,8 +33,8 @@ The ARMA-GARCH models are estimated on each series using maximum likelihood esti
 
 % subsection general_univariate_model_gjr_garch (end)
 
-\subsection{Factor specific model selection process} % (fold)
-\label{sub:selection_process}
+\subsubsection{Factor specific model selection process} % (fold)
+\label{subsubsec:selection_process}
 
 Our selection process is as follows: For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1, 1) model). We then compute the Bayesian Information Criterion (BIC~\autocite{Schwarz1978}) for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
 
@@ -46,8 +46,8 @@ In a well-specified model, we expect there to be no significant serial correlati
 
   
 
-\subsection{Model selection and estimation results}
-\label{sub:uni_selection_estimation_results}
+\subsubsection{Model selection and estimation results}
+\label{subsubsec:uni_selection_estimation_results}
 
 The result of our selection and estimation procedure are presented in~\autoref{tab:garch_value} and~\autoref{tab:garch_nonvalue}. The Mkt-RF factor is the only model that requires a GJR-GARCH $\eta \neq 0$, while the remaining models are all standard GARCH (1, 1). The minimization of BIC leads to ARMA(0, 0) for Mkt-RF, ARMA(1, 0) for Mom and CMA and ARMA(1, 1) for the remaining factors HML, SMB, RMW. 
 

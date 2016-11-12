@@ -1,62 +1,148 @@
 %!TEX root = ../main.tex
 
-\subsection{Out-of-sample mean-variance investing}
-\label{subsec:mean_variance}
+\section{Out-of-sample mean-variance investing}
+\label{sec:mean_variance}
 
-Based on abnormal return regressions similar to those we present in \autoref{fig:abnormal}, and the work on mean-variance portfolios in \textcite{HubermanKandel1987}, \textcite{FF2015} conjecture that the HML factor will not improve the mean-variance tangency portfolio when added to a portfolio of Mkt-RF, SMB, RMW and CMA. Differently put, this is equivalent to HML having a zero weight from the mean-variance optimization. 
+Based on abnormal return regressions and the work on mean-variance portfolios in \textcite{HubermanKandel1987}, \textcite{FF2015} conjecture that the HML factor will not improve the mean-variance tangency portfolio when added to a portfolio of Mkt-RF, SMB, RMW and CMA. Differently put, this is equivalent to HML having a zero weight in mean-variance optimization. In this section, we carry out mean-variance optimization using both sample and model inputs. We define the five- and six-factor models with and without HML and CMA, in order to study the optimal weights of the HML and CMA factors over time.
 
-Next, we aim to examine this in an out-of-sample mean-variance exercise, where two thirds of the data are used for estimation and the last third for evaluation. The breakpoint for the first week out-of-sample is therefore 1999-01-01, which leaves more than 16 years of data including two important market crises.
+\subsection{Implementation}
 
-\textbf{Caveat on investing in zero-cost portfolios}
+In mean-variance investing in factors, it is important to distinguish what we mean by investing in a zero-cost portfolio. While investing in a zero-cost portfolio does per se not require any cash upfront, brokers and the Federal Reserve's Regulation T require collateral for short positions and when buying on margin. It is therefore not the case that an investor may earn the factor strategy premia without investing some upfront capital. The degree of leverage chosen will impact the cash required upfront, as well as determine the risk that the portfolio receives a margin call, in which additional collateral must be posted to keep the positions. While this is an interesting matter and discussion in its own right, this thesis will analyze factor returns only as excess returns on zero-cost portfolios, without concerning the costs of implementation. While this is a simplification, it is not quite as strong as it seems for the purpose at hand. As we are not concerned with the absolute performance of strategies, but instead with the optimized weights over time, the transaction costs are not relevant, as long as all factors have similar transaction costs.
 
-In mean-variance investing in factors, it is important to distinguish what we mean by investing in a zero-cost portfolio. While investing in a zero-cost portfolio does per se not require any cash upfront, brokers and the Federal Reserve's Regulation T require collateral for short positions and when buying on margin. It is therefore not the case that an investor may earn the factor strategy premia without investing some upfront capital. The degree of leverage chosen will impact the cash required upfront, as well as determine the risk that the portfolio receives a margin call, in which additional collateral must be posted to keep the positions. While this is an interesting matter and discussion in its own right, this thesis will assume that factor returns are available not as zero-cost portfolios, but as returns on long-only assets.
+We run mean-variance optimizations in six different asset universes presented in \autoref{fig:asset_universes}. The different asset universes allow us to distinguish the effects of HML and CMA respectively, and to compare the five-factor model to the six-factor model that includes momentum. 
 
-While this is a big simplification, it is not quite as strong as it seems for the purpose at hand. A broker or financial intermediary could, against a certain transaction fee, offer a fund or product that effectively delivers a swap on the factor return series. As we are not concerned with the absolute performance of strategies, but instead with the optimized weights and the \emph{relative} performance of constraining the universe of allowed assets (e.g. choosing either HML or CMA in a five-factor model), the transaction cost of the swap arrangement is irrelevant, as long as all factors are equally expensive to acquire. \footnote{Furthermore, if factors had different costs, this could also be explicitly modeled, punishing the more expensive strategies.}
+\begin{table}[!htbp] \centering 
+  \caption{Asset universes} 
+  \label{fig:asset_universes} 
+\begin{tabularx}{\textwidth}{X}
+\\[-1.8ex]\toprule
+\\[-1.8ex] 
+\footnotesize The six asset universes considered in mean-variance investing
+\end{tabularx}
+\begin{tabularx}{\textwidth}{@{\extracolsep{0pt}}l c c c c c c } 
+\\[-1.8ex]\midrule 
+ Five-factor model 				& Mkt-RF & SMB & HML & CMA & RMW &	 	\\
+ Five-factor model (excl. HML) 	& Mkt-RF & SMB & 	 & CMA & RMW &	 	\\
+ Five-factor model (excl. CMA) 	& Mkt-RF & SMB & HML & 	   & RMW &	 	\\
+ \hline
+ Six-factor model 				& Mkt-RF & SMB & HML & CMA & RMW &	Mom 	\\
+ Six-factor model (excl. HML) 	& Mkt-RF & SMB & 	 & CMA & RMW &	Mom 	\\
+ Six-factor model (excl. CMA) 	& Mkt-RF & SMB & HML & 	   & RMW &	Mom 	\\
+\bottomrule \\[-1.8ex] 
+\end{tabularx} 
+\end{table}
 
-Furthermore, the case of considering the zero-cost factors as long-only factors also corresponds to the case when the investor contributes 100\% of the cash for the long component in each factor and short sells the short component, thereby leaving the long component as margin for the short, resulting in a margin of 100\%, which is higher than the 50\% prescribed by Regulation T. In summary, considering factor returns to be achievable as long-only positions should not have a large impact on the conclusions of the case in point.
+\subsection{Mean-variance optimization with restrictions}
 
-\textbf{Construction of mean-variance exercise}
+Following \textcite{ChristoffersenLanglois2013}, we impose two general restrictions on the portfolios: First, all factor weights must be positive, as the interpretation of a negative factor weight is the same as betting against the factor. Given the history of factor premia, we believe that investors will not bet against the outperformance of factors. Although we assume that factor returns are achievable as long-only assets, please note that this restriction in practice does not mean that short sales are prohibited, as factor strategies are inherently long-short. Second, factor weights must sum to 1, as we do not consider the case of levered portfolios. This second restriction deviates slightly from \textcite{ChristoffersenLanglois2013}, who allow some leverage to the total portfolio in their maximum CRRA utility exercise. Given these two restrictions, our mean-variance optimized weights are the tangency weights, subject to a constraint of no negative weights.
 
-We form mean-variance optimal portfolios based on both sample estimates of means and covariances, as well as based on conditional 1-week ahead estimates from our copula model. The one-week ahead estimates allow us to plot the optimal weights of factors over time, to determine whether the HML weight actually tends to zero.
-
-We run mean-variance optimization for six different asset universes:
-\begin{enumerate}[{(1)}]
-	\item The five-factor model: \\
-	Mkt-RF, SMB, HML, CMA, RMW
-	\item The five-factor model excluding HML: \\
-	Mkt-RF, SMB, CMA, RMW
-	\item The five-factor model excluding CMA: \\
-	Mkt-RF, SMB, HML, RMW
-	\item The six-factor model: \\
-	Mkt-RF, SMB, Mom, HML, CMA, RMW
-	\item The six-factor model excluding HML: \\
-	Mkt-RF, SMB, Mom, CMA, RMW
-	\item The six-factor model excluding CMA: \\
-	Mkt-RF, SMB, Mom, HML, RMW
-\end{enumerate}
-
-The different asset universes allow us to distinguish the effects of HML and CMA respectively, and to compare the five-factor model to the six-factor model as the five-factor model is known to be misspecified with omitted variable bias from the momentum factor.
-
-Following \textcite{ChristoffersenLanglois2013}, we impose two general restrictions on the portfolios: First, all factor weights must be positive, as the interpretation of a negative factor weight is the same as betting against the factor. Given the history of factor premia, we believe that investors will not bet against the outperformance of factors. Although we assume that factor returns are achievable as long-only assets, please note that this restriction in practice does not mean that short sales are prohibited, as factor strategies are inherently long-short. 
-
-Second, factor weights must sum to 1, as we do not consider the case of levered portfolios. This second restriction deviates slightly from \textcite{ChristoffersenLanglois2013}, as our paper does not allow buying on margin in the Mkt-RF factor, as this would mean that the optimized portfolio has leverage and therefore is different from the tangency portfolio. The mean-variance optimal portfolios in our exercise are the tangency portfolios.
-
-At the end of each week $t$, the optimization problem becomes
+Due to the restrictions, the analytical solution to the mean-variance problem is not equal to the tangency portfolio. Instead, we use a numerical optimization routine, and maximize the Sharpe ratio of different portfolios at the end of each week $t$. The optimization problem then becomes:
 \begin{align}
-	\arg\!\max_{w} w_t^\top \mu_{t+1} - \frac{\gamma}{2}\,w_t^\top \Sigma_{t+1} w && s.t.\,\,w_t^\top \mathbf{1}_N = 1
+	\arg\!\max_{w_t} \frac{w_t^\top \mu_{t+1}}{\sqrt{w_t^\top \Sigma_{t+1} w_t}} && s.t.\,\,w_t^\top \mathbf{1}_N &= 1 \\
+	&& w_i &\geq 0 \,\, \forall i \notag
 \end{align}
-where $w_t$ is the set of weights, $\mu_{t+1}$ is the conditional one-step-ahead expected excess factor return, $\gamma$ is the risk aversion, $\Sigma_{t+1}$ is the conditional one-step-ahead variance-covariance matrix, and $\mathbf{1}_N$ is a vector of ones. The tangency portfolio solution is
-\begin{align}
-    w_t^* = \frac{1}{\mu_{t+1}^\top \Sigma_{t+1}^{-1} \mathbf{1}_N} \, \Sigma_{t+1}^{-1} \mu_{t+1}
-\end{align}
+where $w_t$ is the set of weights, $\mu_{t+1}$ is the conditional one-step-ahead expected excess factor return, $\gamma$ is the risk aversion, $\Sigma_{t+1}$ is the conditional one-step-ahead variance-covariance matrix, and $\mathbf{1}_N$ is a vector of ones. Note that in the case of sample means and covariances, $\mu$ and $\Sigma$ are constant and given by the sample estimators. 
 
-\textbf{Results}
-We study the mean-variance optimal weights over time to determine whether HML does receive a positive weight, in which case HML also improves the tangency portfolio. In \autoref{fig:hml_weights_5} we present the optimized weights over time for two different asset universes: (1) the five-factor model excluding HML (total four factors) and (2) the full five-factor model including HML. 
+\subsection{Mean-variance results}
+[Comment on tables]
+[Add graphs]
 
-First, we note that the weight of HML is not zero when introduced in the investible universe. This appears to be the case for both the sample estimate of means and covariances, as well as the dynamic estimates from the copula model. Both simple sample analysis and the more sophisticated copula model agree that HML does in fact improve the tangency portfolio, in contrast to the conjecture in \textcite{FF2015}.
+In \autoref{fig:hml_weights_5} we present the optimized weights over time for two different asset universes: (1) the five-factor model excluding HML (total four factors) and (2) the full five-factor model including HML. The left hand panels are weights as optimized, whereas the right hand panels have been smoothed using 1-year moving averages.
 
-Second, we note that the dynamic weight of HML seems to be highly similar to the decrease in CMA, while all the remaining factors seem to stay very close to their original weights when moving to the six-factor model. In other words, the weight that is attributed to HML is drawn nearly directly from the weight of CMA, in each period. Our interpretation is that in a five-factor excluding HML, CMA proxies for HML, which is why CMA absorbs nearly all the weight.
+First, we note that the weight of HML is not zero when introduced in the investible universe. This appears to be the case for both the sample estimate of means and covariances, as well as the dynamic estimates from the copula model. Dynamic weights from the copula model suggest that HML does in fact improve the tangency portfolio. Although we impose the additional restriction of no negative weights, this finding does stand in contrast to the conjecture in \textcite{FF2015} that HML should not improve the tangency portfolio. While the unconstrained tangency portfolio may or may not include HML, the simple restriction of no negative weights makes HML an important part of the optimal portfolio.
+
+Second, we note that the dynamic weight of HML seems to be highly similar to the decrease in weight in CMA, while all the remaining factors seem to stay very close to their original weights when moving to the six-factor model. In other words, the weight that is attributed to HML is drawn nearly directly from the weight of CMA, in each period. Our interpretation is that in a five-factor excluding HML, CMA proxies for HML, which is why CMA absorbs nearly all the weight.
 
 If we replace the asset universe where HML is excluded from the five-factor model with the universe where CMA is excldued, we get the results in \autoref{fig:cma_weights_5}. We note that the weight of CMA when added to a portfolio already including HML does not as clearly cannibalize on HML as was the case vice versa; the CMA weights seems to come from decreases in all the factor strategies, albeit most strongly in HML. This is interesting, and in line with the abnormal return regressions in this thesis (\autoref{fig:abnormal}), as well as in \textcite{FF2015} and \textcite{Asness2015} -- when HML is the LHS variable, it loads uniquely on CMA; when CMA is the LHS variable, it loads significantly on a number of factors. Our interpretation is that HML is more orthogonal to the other factors than CMA. While this does not reveal whether or not the value premia of HML and CMA are the same, it does indicate that HML is better diversified than CMA. 
 
 When repeated for the six-factor model excluding HML and CMA, the results of this analysis are unchanged, as can be seen in \autoref{fig:hml_weights_5} and \autoref{fig:cma_weights_6}. Furthermore, results are [unchanged for all dynamic copulae specifications].
+
+\begin{table}
+  \centering
+
+  \renewcommand{\arraystretch}{1.2}
+  \caption{Realized return and risk measures and average weights of mean-variance portfolios, based on symmetric dynamic copula model, in-sample (1963--2016). All measures expressed in percentages on an annual basis, where applicable.}
+
+  \begin{tabularx}{\textwidth}{@{} l ddd X ddd @{}}
+    \toprule
+
+    &
+      \multicolumn{6}{c}{Five-factor model} \\
+    &
+      \multicolumn{3}{c}{Model} &&
+      \multicolumn{3}{c}{Sample} \\
+    \cmidrule{2-4} \cmidrule{6-8}
+
+    &
+      \multicolumn{1}{c}{All} &
+      \multicolumn{1}{c}{excl. CMA} &
+      \multicolumn{1}{c}{excl. HML} &&
+      \multicolumn{1}{c}{All} &
+      \multicolumn{1}{c}{excl. CMA} &
+      \multicolumn{1}{c}{excl. HML} \\
+    \midrule
+
+    \textbf{Realized} \\
+    Return & 6.334 & 7.160 & 6.453 && 3.713 & 3.718 & 3.676 \\
+    SD     & 4.006 & 4.817 & 4.370 && 2.934 & 3.464 & 2.936 \\
+    Skewness & 0.153 & -0.666 & -0.196 && 0.516 & 0.458 & 0.477 \\
+    SR & 1.582 & 1.486 & 1.477 && 1.265 & 1.073 & 1.252 \\
+    MDD & 10.190 & 14.150 & 10.044 && 14.575 & 23.503 & 12.433 \\
+    \midrule
+    \textbf{Weights} \\
+    Mkt.RF & 11.653 & 13.583 & 12.565 && 13.615 & 13.842 & 13.661 \\
+    HML    & 18.490 & 26.617 &        && 6.231  & 26.691 &       \\
+    SMB    & 14.866 & 18.252 & 17.492 && 13.964 & 17.975 & 14.132 \\
+    RMW    & 37.193 & 41.549 & 38.066 && 32.956 & 41.492 & 33.210 \\
+    CMA    & 17.798 &        & 31.878 && 33.234 &        & 38.996 \\
+     \bottomrule
+  \end{tabularx}
+
+  \label{tab:mv_realized_insample_5F}
+\end{table}
+
+\begin{table}
+  \centering
+
+  \renewcommand{\arraystretch}{1.2}
+  \caption{Realized return and risk measures and average weights of mean-variance portfolios, based on symmetric dynamic copula model, in-sample (1963--2016). All measures expressed in percentages on an annual basis, where applicable.}
+
+  \begin{tabularx}{\textwidth}{@{} l ddd X ddd @{}}
+    \toprule
+
+    &
+      \multicolumn{6}{c}{Six-factor model} \\
+    &
+      \multicolumn{3}{c}{Model} &&
+      \multicolumn{3}{c}{Sample} \\
+    \cmidrule{2-4} \cmidrule{6-8}
+
+    &
+      \multicolumn{1}{c}{All} &
+      \multicolumn{1}{c}{excl. CMA} &
+      \multicolumn{1}{c}{excl. HML} &&
+      \multicolumn{1}{c}{All} &
+      \multicolumn{1}{c}{excl. CMA} &
+      \multicolumn{1}{c}{excl. HML} \\
+    \midrule
+
+    \textbf{Realized} \\
+    Return & 6.900 & 8.023 & 7.244 && 4.316 & 4.555 & 4.144 \\
+    SD     & 3.975 & 4.456 & 4.375 && 2.990 & 3.351 & 2.995 \\
+    Skewness & -1.586 & -1.153 & -1.460 && 0.004 & -0.216 & 0.129 \\
+    SR & 1.736 & 1.801 & 1.656 && 1.443 & 1.359 & 1.384 \\
+    MDD & 9.756 & 10.761 & 9.926 && 9.427 & 12.322 & 8.975 \\
+    \midrule
+    \textbf{Weights} \\
+    Mkt.RF & 8.906  & 9.669  & 9.059  && 13.201 & 13.164 & 13.357 \\
+    HML    & 17.517 & 24.371 &        && 13.221 & 26.956 &        \\
+    SMB    & 13.165 & 15.605 & 15.214 && 12.019 & 13.432 & 12.671 \\
+    RMW    & 30.980 & 33.669 & 31.087 && 27.650 & 30.211 & 29.044 \\
+    CMA    & 15.579 &        & 28.447 && 22.193 &        & 35.188 \\
+    Mom    & 13.853 & 16.685 & 16.194 && 11.715 & 16.238 & 9.740  \\
+
+    \bottomrule
+  \end{tabularx}
+
+  \label{tab:mv_realized_insample_6F}
+\end{table}

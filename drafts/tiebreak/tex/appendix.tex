@@ -1,7 +1,7 @@
 %!TEX root = ../main.tex
 \appendix
 \appendixpageoff
-\section{Appendix A. Threshold correlations on return series}
+\section{Threshold correlations on return series}
 \label{app:threshold_return}
 \begin{figure}[H]
   \caption{Threshold correlations on returns as well as ARMA-GARCH residuals. Page 1/2}
@@ -32,7 +32,7 @@
 
 \newpage
 
-\section{Appendix B. Rolling correlations on return series}
+\section{Rolling correlations on return series}
 \label{app:rolling_return}
 \begin{figure}[H]
   \caption{Rolling correlations on returns as well as ARMA-GARCH residuals. Page 1/2}
@@ -63,7 +63,7 @@
 
 \newpage
 
-\section{Appendix C. Skewed Student-\textit{t} distribution} 
+\section{Skewed Student-\textit{t} distribution} 
 \label{app:ghstmv}
 In line with stylized facts on financial return series, the factor strategies exhibit fat tails and skewness - features that are poorly represented by the normal Gaussian. Our univariate estimations as well as our copula builds on the~\textcite{Hansen1994} skewed Student-\textit{t} distribution. The skewed Student-\textit{t} distribution is, more generally, nested in the generalized hyperbolic distribution~\autocite{McNeilFreyEmbrecht2005}.
 
@@ -89,7 +89,7 @@ where $K(\cdot)$ is the modified Bessel function of the second kind, $Q(x) = (x-
 
 \newpage
 
-\section{Appendix D. Copula correlation matrix estimation with \textit{c}DCC dynamics} 
+\section{Copula correlation matrix estimation with \textit{c}DCC dynamics} 
 \label{app:copula_cdcc}
 This is a step-by-step description of the procedure used to find the copula correlation matrix $\{\hat{R_t}\}$ in the \textit{c}DCC case, and has been adapted from \textcite{Aielli2013}.
 \begin{enumerate}[(i)]
@@ -147,7 +147,7 @@ This is a step-by-step description of the procedure used to find the copula corr
 
 \newpage
 
-\section{Appendix E. Stationary bootstrap of copula parameter standard errors} \label{App:Appendix_bootstrap}
+\section{Stationary bootstrap of copula parameter standard errors} \label{App:Appendix_bootstrap}
 We rely on the multi-step maximum likelihood estimation of the copula model, which takes the standardized residuals of marginal distributions as given in the second step. The first estimation step introduces parameter uncertainty that is not taken into account by the conventional standard errors of the second estimation.\footnote{Here, our model deviates from~\textcite{ChristoffersenLanglois2013}, who use a semi-parametric model that uses the empirical density function, and find standard errors using the analytical approach in~\textcite{ChenFan2006}. However, those errors are not valid in a time-varying copula context, as the estimation of means and variances impact the asymptotic distributions of copula parameters~\autocite{Remillard2010}.} We use the stationary block bootstrap method of \textcite{PolitisRomano1994} with a block length of 45 weeks (approx. 1 year of data) to find reliable standard errors for copula parameters. The procedure is theoretically supported by \textcite{GonclavesWhite2004} and implemented as follows:
 \begin{enumerate}[(i)]
     \item Generate a block bootstrap version of the original weekly return data
@@ -160,7 +160,7 @@ We rely on the multi-step maximum likelihood estimation of the copula model, whi
 
 \newpage
 
-\section{Appendix F. Univariate diagnostic tests}
+\section{Univariate diagnostic tests}
 \label{app:univariate_diagnostics}
 
 \textbf{Autocorrelation test}

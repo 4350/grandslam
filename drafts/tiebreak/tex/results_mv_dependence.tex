@@ -1,12 +1,12 @@
 %!TEX root = ../main.tex
-\section{Multivariate dependence in univariate residuals} % (fold)
-\label{sec:multivariate_dependence}
+\subsection{Analysis of residuals of univariate modeling} % (fold)
+\label{subsec:multivariate_dependence}
 % explain the logic in what we are doing, that there might still be dependence in what looks like white noise residuals
 
 The copula methodology uses the residuals from the ARMA-GARCH models and attempts to explain the dependence that remains after sanitizing the data from effects that are predictable on the univariate level. Before estimating the copula, we proceed by examining the ARMA-GARCH residuals to better understand their dependence structure. First, we study tail dependence, i.e. how the dependence structure changes in bad and good times, by calculating threshold correlations. Second, we study time-variation in the dependence structure by computing rolling correlations of residuals.
 
-\subsection{Threshold correlations}
-\label{subsec:threshold_corr}
+\subsubsection{Threshold correlations}
+\label{subsubsec:threshold_corr}
 % method
 Threshold (or exceedance) correlations have previously been used to highlight the asymmetric dependence structure of i.a. country equity indices~\autocite{LonginSolnik2001}, portfolios by industry, size, value and momentum~\autocite{AngChen2002} and factor strategies~\autocite{ChristoffersenLanglois2013}. The following analysis is still new as it adds the factors investment (CMA) and profitability (RMW). We follow~\textcite{ChristoffersenLanglois2013} definition of threshold correlation
 \begin{align}
@@ -81,8 +81,8 @@ The second and third remarks lead us to believe that a copula model specified to
 
 Fourth, while all other asset pairs exhibit unconditional correlations of around zero or negative, the CMA - HML pair exhibits high and positive correlation of more than 0.60. Furthermore, the threshold correlation estimate is much closer to the unconditional correlation. While all other factor strategy pairs appear to be very good diversifiers, CMA and HML factors look quite similar.
 
-\subsection{Rolling correlation}
-\label{subsec:roll_corr}
+\subsubsection{Rolling correlation}
+\label{subsubsec:roll_corr}
 % method
 We compute rolling correlation estimates in order to investigate whether the factor strategies exhibit constant correlation over time. 
 \begin{align}
@@ -123,7 +123,7 @@ Second, by visual inspection, the correlations of a few asset pairs could be sus
 
 Third, the HML and CMA factors again stand out as different to other asset pairs. The unconditional correlation is much closer to the rolling estimates than for other factor pairs. However, while the correlation is quite high and constant for much of the early sample period, the lower correlations towards the end give reasons to think that they might in fact provide strong diversification benefits during certain times.
 
-\subsection{Takeaways from analysis of multivariate dependence}
+\subsubsection{Takeaways from analysis of multivariate dependence}
 Univariate residuals appear to be white noise series with no remaining autocorrelation or volatility clustering. However, there is important dependence between residuals of different strategies. First, threshold correlations show that there is tail dependence -- in times when factor pairs simultaneously realize in their best and worst percentiles, correlations are significantly different from the unconditional correlations. In fact, threshold correlations are substantially higher than the unconditional correlations, which indicates that diversification benefits are smaller than expected when factors simultaneously experience bad (or good) times. Second, rolling correlations show that correlations between series are highly time-varying and seem to exhibit persistence. A copula model that incorporates both tail dependence and time-varying dependence is likely to improve on the description of joint returns.
 
 Both analyses also show that the HML - CMA asset pair is quite different from the other pairs, exhibiting a much higher and more stable dependence. Differently put, they look quite similar as opposed to any other factor pair, and the merit of including both in factor portfolios seems more unclear.
