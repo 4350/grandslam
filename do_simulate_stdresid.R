@@ -13,7 +13,7 @@ load_all('australian')
 load_all('wimbledon')
 
 load('data/derived/garch/model_GARCH_chosen.RData')
-load('data/derived/copula/legacy/oos_constant_filtered.RData')
+load('data/derived/copula/full_constant_filtered.RData')
 
 set.seed(1675)
 N_RANDOM <- 250000
@@ -33,7 +33,11 @@ simulate_stdresid <- function(name, copula) {
   save(stdresid, file = filename)
 }
 
-registerDoParallel(cores = 7)
+cl <- makeCluster(spec = detectCores() - 1)
+clusterEvalQ(cl, library(devtools))
+clusterEvalQ(cl, load_all('australian'))
+clusterEvalQ(cl, load_all('wimbledon'))
+registerDoParallel(cl)
 simulate_stdresid('full_constant_norm', constant_copula_filtered$norm)
 simulate_stdresid('full_constant_std', constant_copula_filtered$std)
 simulate_stdresid('full_constant_ghst', constant_copula_filtered$ghst)
