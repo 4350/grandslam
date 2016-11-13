@@ -3,7 +3,10 @@
 \section{Conditional Diversification Benefit} % (fold)
 \label{sec:conditional_diversification_benefit}
 
-This section studies a new measure of diversification in a portfolio called \emph{conditional diversification benefit} (CDB), which is developed by \textcite{ChristoffersenErrunzaJacobLanglois2012}. CDB is based on the portfolio expected shortfall (ES), i.e. the expected loss in case the return materializes below a certain percentile, and therefore concerns the properties of the tail of the portfolio distribution. Thus, it is able to capture higher-order moments and non-linear dependence not reflected in the covariance matrix of returns. In this context, it has the additional benefit of being independent of the level of expected return, and therefore constitutes an additional dimension to diversification in a mean-variance setting, which only concerns means and covariances. In this section, all distributions of portfolio returns are simulated from our Student's \textit{t} dynamic copula model.
+This section studies a new measure of diversification in a portfolio called \emph{conditional diversification benefit} (CDB), which is developed by \textcite{ChristoffersenErrunzaJacobLanglois2012}. CDB is based on the portfolio expected shortfall (ES), i.e. the expected loss in case the return materializes below a certain percentile, and therefore concerns the properties of the tail of the portfolio distribution. As already described, if factors are not multivariate normal, the covariance matrix used in mean-variance optimization is not a full description of the dependency between factors. Factor returns are not normal, and therefore higher moments influence the tail behavior of their returns. These considerations are important for any portfolio looking to manage risk by diversifying across factors.
+For a portfolio manager looking to manage risk by diversifying across factors, such considerations are important
+
+In this section, all distributions of portfolio returns are simulated from our Student's \textit{t} dynamic copula model.
 
 We begin by describing the construction and intuition of CDB and subsequently present the CDB over time for different five- and six-factor asset universes, including and excluding HML and CMA.
 
@@ -17,25 +20,32 @@ where $F_{i,t}^{-1}(q)$ is the inverse CDF of simple returns $r_{i,t}$ at $q$ (e
 
 The expected shortfall represents the expected loss when returns realize below the Value-at-Risk of the portfolio. Depending on the distribution at hand, the expected shortfall can be closer or further to the Value-at-Risk. Intuitively, if assets offer little diversification, then no combination of assets will reduce total portfolio risk; and ES will be high. 
 
-For a portfolio of assets with weights $w$, the portfolio's ES as a function of weights: $\text{ES}_t^q(w)$, has an upper bound equal to the weighted average of each asset's ES, corresponding to the case of no diversification~\autocite{Artzner1999}:
+For a portfolio of assets with weights $w_t$, the portfolio's ES as a function of weights: $\text{ES}_t^q(w_t)$, has an upper bound equal to the weighted average of each asset's ES, corresponding to the case of no diversification~\autocite{Artzner1999}:
 \begin{align}
-  \overline{\text{ES}}_t^q(w) = \sum_{i=1}^N w_i \text{ES}_{i,t}^q(r_{i,t})
+  \overline{\text{ES}}_t^q(w_t) = \sum_{i=1}^N w_{i,t} \text{ES}_{i,t}^q(r_{i,t})
 \end{align}
-A lower bound on portfolio ES is instead given by the portfolio's Value-at-Risk ($-F_{t}^{-1}(w, q)$), which corresponds to the case of perfect diversification:
+A lower bound on portfolio ES is instead given by the portfolio's Value-at-Risk ($-F_{t}^{-1}(w_t, q)$), which corresponds to the case of perfect diversification:
 \begin{align}
-  \underline{\text{ES}}_t^q(w) = -F_{t}^{-1}(w, q)
+  \underline{\text{ES}}_t^q(w_t) = -F_{t}^{-1}(w_t, q)
 \end{align}
 CDB is defined as the portfolio's ES scaled by its lower and upper bounds:
 \begin{align}
-  \text{CDB}_t^q(w) = \frac{\overline{\text{ES}}_t^q(w) - \text{ES}_t^q(w)}{\overline{\text{ES}}_t^q(w) - \underline{\text{ES}}_t^q(w)}
+  \text{CDB}_t^q(w_t) = \frac{\overline{\text{ES}}_t^q(w_t) - \text{ES}_t^q(w_t)}{\overline{\text{ES}}_t^q(w_t) - \underline{\text{ES}}_t^q(w_t)}
 \end{align}
-The intuition behind the statistic is best understood by focusing on the second term of the numerator and the denominator: when diversification benefits are high, the expected shortfall of a portfolio $\text{ES}_t^q(w)$ in the numerator is relatively close to the Value-at-Risk, i.e. the lower bound: $\underline{\text{ES}}_t^q(w)$ in the denominator, which makes the ratio close to one. 
+The intuition behind the statistic is best understood by focusing on the second term of the numerator and the denominator: when diversification benefits are high, the expected shortfall of a portfolio $\text{ES}_t^q(w_t)$ in the numerator is relatively close to the Value-at-Risk, i.e. the lower bound: $\underline{\text{ES}}_t^q(w_t)$ in the denominator, which makes the ratio close to one. 
 
-Focusing instead on the numerator only: when diversification benefits are low, the expected shortfall $\text{ES}_t^q(w)$ is hardly different from its upper bound: $\overline{\text{ES}}_t^q(w)$, and the ratio is close to zero.
+Focusing instead on the numerator only: when diversification benefits are low, the expected shortfall $\text{ES}_t^q(w_t)$ is hardly different from its upper bound: $\overline{\text{ES}}_t^q(w_t)$, and the ratio is close to zero.
 
-In summary, CDB is a number between zero and one where one represents perfect diversification, and zero no diversification.
+In summary, CDB is a number between zero and one where one represents perfect diversification, and zero no diversification. CDB is a measure of diversification only -- the level of expected return across factors does not enter the equation.
 
-Each week, we construct portfolios that maximize the 5\% CDB (where the Value-at-Risk cut-off is 5\%) of portfolios with respect to portfolio weights, under the same conditions as for the mean-variance exercise (all weights sum to one; all weights positive).\footnote{Results for other levels of CDB are qualitatively similar.} Such a portfolio corresponds to the maximum degree of diversification available while being fully invested across factors. The ES is based on the simulated return distributions in each period, as modeled by the dynamic Student's \textit{t} copula.
+A closed formula for CDB of a portfolio does not exist if returns are not normal. We use the same simulated returns as in the previous section to form the return distribution of factors each week, and combine them into portfolios subject to the same conditions as for the mean-variance exercise (all weights sum to one; all weights positive). We then run a maximization algorithm for CDB, finding the combination of weights that give the highest possible diversification:
+\begin{align*}
+  \arg\!\max_{w_t} \text{CDB}_t^q(w_t)
+    && \text{s.t.} \sum_{i=1}^N w_{i,t} = 1 \\
+    && w_{i,t} \ge 0 \,\, \forall i
+\end{align*}
+
+The ES is based on the simulated return distributions in each period, as modeled by the dynamic Student's \textit{t} copula. We present results based on a Value-at-Risk cut-off of 5\% -- results based on lower values (e.g. 1\%) are qualitatively similar.
 
 \subsection{CDB results for different asset universes}
 % Picture different between 5-factor and 6-factor
