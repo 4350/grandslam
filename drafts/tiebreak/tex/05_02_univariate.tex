@@ -3,38 +3,38 @@
 \subsection{Univariate Modeling of Returns} % (fold)
 \label{sub:univariate_modeling_of_returns}
 
-We proceed by estimating models of each factor's return series and attempt to capture the effects of non-normality, autocorrelation and volatility clustering that were established in \autoref{sec:data}. By estimating ARMA-GARCH, we can characterize and filter these effects. Furthermore, we can incorporate the effects in conditional forecasts. In this section, we describe the general structure of our models, our systematic model selection approach and the estimation results.
+We proceed by estimating models of each factor's return series and attempt to capture the effects of non-normality, autocorrelation and volatility clustering that were established in \autoref{sec:data}. From a modeling perspective, these effects suggest that the conditional density of each factor's return series $f_{i,t}(r_{i,t+1})$ are not time-varying. By estimating ARMA-GARCH, we can characterize and filter these effects. Furthermore, we can incorporate the effects in conditional forecasts. After filtering, we are left with the \emph{standardized returns} of each factor, $z_{i,t}$, which are assumed to be independent over time, i.e. described by constant density functions $f_i(z_{i,t})$.
 
 \subsubsection{General univariate model: ARMA-GJR-GARCH}
 
 The ARMA-GARCH is a broad model family designed to eliminate predictable components of financial return series, originally introduced by~\textcite{Bollerslev1986}. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). Shocks in financial return series are often not homoskedastic, and the heteroskedasticy tends to exhibit serial correlation. We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1). The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when positive and negative return shocks have different impact on future volatility~\autocite{Black1976}.
 
-We estimate conditional mean equations \emph{up to} ARMA(3, 3):
+We estimate conditional mean equations for each factor \emph{up to} ARMA(3, 3):
 \begin{align}
-  r_t &=
-    \phi_0 +
-    \sum^p \phi_p r_{t - p} +
-    \sum^q \theta_q \varepsilon_{t - q} + 
-    \varepsilon_t
+  r_{i,t} &=
+    \phi_{i,0} +
+    \sum^p \phi_{i,p} r_{i,t - p} +
+    \sum^q \theta_{i,q} \varepsilon_{i,t - q} + 
+    \varepsilon_{i,t}
     \label{eq:garch_mean}
 \end{align}
-where $r_t$ are log returns. The conditional volatility evolves according to the GJR-GARCH specification:
+where $r_{i,t}$ are weekly returns of each factor. The conditional volatility evolves according to the GJR-GARCH specification:
 \begin{align}
-  \varepsilon_t &= \sigma_t z_t \\
-  \sigma_t^2 &=
-    \omega +
-    (\alpha + \eta I_{\varepsilon_{t-1} \leq 0}) \varepsilon_{t - 1}^2 +
-    \beta \sigma^2_{t - 1}
+  \varepsilon_{i,t} &= \sigma_{i,t} z_{i,t} \\
+  \sigma_{i,t}^2 &=
+    \omega_i +
+    (\alpha_i + \eta_i I_{\varepsilon_{i,t-1} \leq 0}) \varepsilon_{i,t - 1}^2 +
+    \beta_{i} \sigma^2_{i,t - 1}
     \label{eq:garch_garch}
 \end{align}
-where $I$ is an indicator function that is equal to one when $\varepsilon_{t-1} \leq 0$. A positive $\eta$ captures the leverage effect by increasing the current period's volatility if the previous period's residual $\varepsilon$ was below zero. A significant $\eta$ thus introduces asymmetric volatility in the model. For the market factor, it is expected that $\eta$ is positive, reflecting the leverage effect in the market itself and no impact from the short risk-free component. However, for the other factors, which are constructed as all-equity zero-cost long-short portfolios, the direction of $\eta$ is less obvious~\autocite{ChristoffersenLanglois2013}. If there are leverage effects for stocks in general, negative shocks will lead to more volatility than positive shocks in a portfolio of stocks. But in a zero-cost portfolio, the leverage effects of the long positions in stocks could be eliminated by the short positions in other firms. The level of the leverage effect in a zero-cost portfolio therefore depends on the relative strength of leverage effects in the long and short components.
+where $I$ is an indicator function that is equal to one when $\varepsilon_{i,t-1} \leq 0$. A positive $\eta_i$ captures the leverage effect by increasing the current period's volatility if the previous period's residual $\varepsilon_{i,t-1}$ was below zero. A significant $\eta_i$ thus introduces asymmetric volatility in the model. For the market factor, it is expected that $\eta_i$ is positive, reflecting the leverage effect in the market itself and no impact from the short risk-free component. However, for the other factors, which are constructed as all-equity zero-cost long-short portfolios, the direction of $\eta_i$ is less obvious~\autocite{ChristoffersenLanglois2013}. If there are leverage effects for stocks in general, negative shocks will lead to more volatility than positive shocks in a portfolio of stocks. But in a zero-cost portfolio, the leverage effects of the long positions in stocks could be eliminated by the short positions in other firms. The level of the leverage effect in a zero-cost portfolio therefore depends on the relative strength of leverage effects in the long and short components.
 
 % XXX In the estimation, we also use variance targeting as proposed by~\textcite{EngleMezrich1995}, which is shown makes optimization faster and sometimes more certain to reach the global maximum. This means that $\omega$ is not estimated in the maximum likelihood setting, but instead set to 1 minus the persistence of the process times the sample mean of squared residuals, where the persistence is $\alpha + \beta$ for the GARCH.\footnote{Note that in the case of the GJR-GARCH for the Mkt-RF factor, the persistence is $\alpha + \beta + \eta \kappa$ where $\kappa$ is the probability that standardized residuals $z_t$ are below zero.}
-The ARMA-GARCH models are estimated on each series using maximum likelihood estimation, taking an assumed conditional distribution of standardized returns $\{z_t\}$ as given. We evaluate models where the standardized residuals series $\{z_t\}$ are assumed to follow one of the following distributions: Standard normal, Student's \textit{t} with $\nu$ degrees of freedom and skewed Student's \textit{t} with $\nu$ degrees of freedom and skewness $\gamma$. The Student's t distribution allows for greater kurtosis (fatter tails) than the standard normal distribution, while skewed Student's \textit{t} also allows for additional asymmetry in the model's behavior beyond that introduced by the leverage effect~\autocite{ChristoffersenErrunzaJacobLanglois2012}.
+The ARMA-GARCH models are estimated on each series using maximum likelihood estimation, with assumed distributions of standardized returns $z_{i,t}$. We evaluate models where the standardized returns are assumed to follow one of the following distributions: Standard normal, Student's \textit{t} with $\nu$ degrees of freedom and skewed Student's \textit{t} with $\nu$ degrees of freedom and skewness $\gamma$. The Student's t distribution allows for greater kurtosis (fatter tails) than the standard normal distribution, while skewed Student's \textit{t} also allows for additional asymmetry in the model's behavior beyond that introduced by the leverage effect~\autocite{ChristoffersenErrunzaJacobLanglois2012}. Details about the skewed Student's t distribution, which we also use in our copula model, can be found in~\autoref{app:ghstmv}
 
 \subsubsection{Factor specific model selection process}
 
-Our selection process is as follows: For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta$ fixed to zero (in which case we obtain the basic GARCH(1,~1) model). We then compute the Bayesian Information Criterion~\autocite[BIC]{Schwarz1978} for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
+Our selection process is as follows: For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta_i$ fixed to zero (in which case we obtain the basic GARCH(1,~1) model). We then compute the Bayesian Information Criterion~\autocite[BIC]{Schwarz1978} for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
 
 First, the candidate models are checked for remaining serial correlation and ARCH effects. Second, we examine whether there are significant leverage effects that warrant the use of a GJR-GARCH instead of a standard GARCH. Third, we use QQ-plots to control for misspecification in the residual process, and to find a suitable distribution for the standardized residuals $z_t$.
 
@@ -42,13 +42,13 @@ In a well-specified model, we expect there to be no significant serial correlati
 
 \subsubsection{Model selection and estimation results}
 
-The result of our selection and estimation procedure are presented in~\autoref{tab:garch_estimation}. The Mkt-RF factor is the only model that requires a GJR-GARCH $\eta \neq 0$, while the remaining models are all standard GARCH (1, 1). The minimization of BIC leads to ARMA(0, 0) for Mkt-RF, ARMA(1, 0) for Mom and CMA and ARMA(1, 1) for the remaining factors HML, SMB, RMW. 
+The result of our selection and estimation procedure are presented in~\autoref{tab:garch_estimation}. The Mkt-RF factor is the only model that requires a GJR-GARCH $\eta_i \neq 0$, while the remaining models are all standard GARCH (1, 1). The minimization of BIC leads to ARMA(0, 0) for Mkt-RF, ARMA(1, 0) for Mom and CMA and ARMA(1, 1) for the remaining factors HML, SMB, RMW. 
 
 \input{tex/tables/garch_estimation}
 
 Based on these ARMA-GARCH specifications, the Ljung-Box and LM tests indicate no remaining serial correlation or ARCH effects, as all p-values are greater than our 5\% cut-off point. However, some p-values are quite close to the limit, including the Mkt-RF factor's Ljung-Box tests and the longer Ljung-Box tests of RMW and CMA.
 
-The lack of significant sign bias in the GARCH specifications for all models except Mkt-RF is interesting, but in line with the argument that any leverage effects could cancel out in a zero-cost long-short equity portfolio; the Mkt-RF is the only factor that is net-long equities and also exhibited the expected negative sign bias as a GARCH model. We note that the sign bias of Mkt-RF has been eliminated in the GJR-GARCH model. Notably, all factors exhibit high values of $\alpha$ and $\beta$ indicating highly persistent variance, suggesting there is an opportunity for ``timing volatility''.
+The lack of significant sign bias in the GARCH specifications for all models except Mkt-RF is interesting, but in line with the argument that any leverage effects could cancel out in a zero-cost long-short equity portfolio; the Mkt-RF is the only factor that is net-long equities and also exhibited the expected negative sign bias as a GARCH model. We note that the sign bias of Mkt-RF has been eliminated in the GJR-GARCH model. Notably, all factors exhibit high values of $\alpha_i$ and $\beta_i$ indicating highly persistent variance, suggesting there is an opportunity for ``timing volatility''.
 
 
 Looking at~\autoref{fig:garch_qq}, the candidate specifications under normal and Student's \textit{t} distributed innovations all display misaligned QQ-plots. The empirical distributions deviate from the 45 degree theoretical lines, especially in the more extreme quantiles. This indicates asymmetry in the residual series. In unreported results, we have controlled that the misspecification of normal and Student's \textit{t} residuals is persistent even if GJR-GARCH models are fitted for all factors -- leverage effects cannot explain the misspecification. By comparison, the QQ-plot with skewed Student's \textit{t} innovations seems to fit the data well. We proceed with skewed Student's \textit{t} residual distributions.
@@ -79,6 +79,6 @@ Looking at~\autoref{fig:garch_qq}, the candidate specifications under normal and
 
 % We note that the Mkt-RF factor is, according to our model selection procedure, best fitted by a ARMA(0, 0) mean equation, indicating no predictive power of 1-week lagged returns. Also, in the variance equation, we note that the relatively low $\alpha = 0.037$ sensitivity to shocks is increased considerably by $\eta = 0.181$ in the case of a \emph{negative} shock. Furthermore, the Mom factor stands out with a much higher estimate of $\alpha$ (0.186) than any of the other series (all around 0.10) and a lower $\beta$ (0.793). This means that volatility in the momentum factor is more sensitive than other factor strategies to return shocks and less predictable by past volatility alone. We also note that the Mkt-RF and Mom factors exhibit relatively higher unconditional volatilities (of 0.022 and 0.018) than do other factors (around 0.010).
 
-For both the value-related and non-value related factors, many of the estimates of $\gamma$, the skewness of the skewed Student's \textit{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates for SMB and Mom. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots indicate misspecification for models with both the normal and Student's \textit{t} innovations.
+For both the value-related and non-value related factors, many of the estimates of $\gamma_i$, the skewness of the skewed Student's \textit{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates for SMB and Mom. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots indicate misspecification for models with both the normal and Student's \textit{t} innovations.
 
 % subsection univariate_modeling_of_returns (end)
