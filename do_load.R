@@ -10,7 +10,7 @@ library(dplyr)
 rm(list = ls())
 
 to.weekly <- function(df) {
-  log.return <- function(r) log(r / 100 + 1)
+  gross.return <- function(r) (r / 100 + 1)
   
   df %>%
     mutate(
@@ -21,7 +21,7 @@ to.weekly <- function(df) {
     ) %>%
     
     # Get Weekly log total returns
-    group_by(Date) %>% dplyr::summarise_each(funs(sum(log.return(.))))
+    group_by(Date) %>% dplyr::summarise_each(funs(prod(gross.return(.)) - 1))
 }
 
 df <-
