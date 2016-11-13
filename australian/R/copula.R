@@ -301,7 +301,7 @@ copula_Upsilon <- function(theta, X) {
     qdiag[t, ] <-
       (1 - alpha - beta) +
       beta * qdiag[t - 1, ] +
-      alpha * (shocks[t - 1, ] / qdiag[t - 1, ]) ^ 2
+      alpha * (shocks[t - 1, ] * sqrt(qdiag[t - 1, ])) ^ 2
 
     shocks_std[t, ] <- shocks[t, ] * sqrt(qdiag[t, ])
   }
