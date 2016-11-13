@@ -1,51 +1,67 @@
-%!TEX root = tables.tex
+%!TEX root = ../main.tex
 
 \section{Conditional Diversification Benefit} % (fold)
 \label{sec:conditional_diversification_benefit}
 
-% What is CDB? Why? Non-normality, higher moments
-The following description is based on~\textcite{ChristoffersenErrunzaJacobLanglois2012}, who have developed a measure of diversification in a portfolio called \emph{conditional diversification benefit} (CDB). CDB is based on the portfolio expected shortfall (ES), and therefore the full portfolio distribution.\footnote{We report results based on the distributions of our symmetric dynamic copula model.} Thus, it is able to capture higher-order moments and non-linear dependence not reflected in the covariance matrix of returns. In this context, it has the additional benefit of not being dependent on levels of expected return. ES is defined as the expected loss in some bottom percentile $q$
+This section studies a new measure of diversification in a portfolio called \emph{conditional diversification benefit} (CDB), which is developed by \textcite{ChristoffersenErrunzaJacobLanglois2012}. CDB is based on the portfolio expected shortfall (ES), i.e. the expected loss in case the return materializes below a certain percentile, and therefore concerns the properties of the tail of the portfolio distribution. Thus, it is able to capture higher-order moments and non-linear dependence not reflected in the covariance matrix of returns. In this context, it has the additional benefit of being independent of the level of expected return, and therefore constitutes an additional dimension to diversification in a mean-variance setting, which only concerns means and covariances. In this section, all distributions of portfolio returns are simulated from our Student's \textit{t} dynamic copula model.
+
+We begin by describing the construction and intuition of CDB and subsequently present the CDB over time for different five- and six-factor asset universes, including and excluding HML and CMA.
+
+\subsection{Formula and interpretation of the CDB statistic}
+
+Define ES as the expected loss in some bottom percentile $q$
 \begin{align}
     \text{ES}_{i,t}^q(r_{i,t}) = -\mathbb{E}[r_{i,t} | r_{i,t} \leq F_{i,t}^{-1}(q)]
 \end{align}
 where $F_{i,t}^{-1}(q)$ is the inverse CDF of simple returns $r_{i,t}$ at $q$ (equivalent to the $q\%$ Value-at-Risk). 
 
-Intuitively, if assets offer little diversification, then no combination of assets will reduce total portfolio risk; and ES will be high. For a portfolio of assets with weights $w$, the portfolio's ES as a function of weights, $\text{ES}_t^q(w)$ has an upper bound equal to the weighted average of asset ES, corresponding to no diversification~\autocite{Artzner1999}:
+The expected shortfall represents the expected loss when returns realize below the Value-at-Risk of the portfolio. Depending on the distribution at hand, the expected shortfall can be closer or further to the Value-at-Risk. Intuitively, if assets offer little diversification, then no combination of assets will reduce total portfolio risk; and ES will be high. 
+
+For a portfolio of assets with weights $w$, the portfolio's ES as a function of weights: $\text{ES}_t^q(w)$, has an upper bound equal to the weighted average of each asset's ES, corresponding to the case of no diversification~\autocite{Artzner1999}:
 \begin{align}
   \overline{\text{ES}}_t^q(w) = \sum_{i=1}^N w_i \text{ES}_{i,t}^q(r_{i,t})
 \end{align}
-A lower bound on portfolio ES corresponds to the portfolio's Value-at-Risk ($-F_{t}^{-1}(w, q)$), corresponding to perfect diversification:
+A lower bound on portfolio ES is instead given by the portfolio's Value-at-Risk ($-F_{t}^{-1}(w, q)$), which corresponds to the case of perfect diversification:
 \begin{align}
   \underline{\text{ES}}_t^q(w) = -F_{t}^{-1}(w, q)
 \end{align}
-CDB is defined as portfolio ES scaled by these bounds:
+CDB is defined as the portfolio's ES scaled by its lower and upper bounds:
 \begin{align}
   \text{CDB}_t^q(w) = \frac{\overline{\text{ES}}_t^q(w) - \text{ES}_t^q(w)}{\overline{\text{ES}}_t^q(w) - \underline{\text{ES}}_t^q(w)}
 \end{align}
-CDB is a number between 0 and 1 where 1 represents perfect diversification, and 0 no diversification (we present CDB scaled by 100).
+The intuition behind the statistic is best understood by focusing on the second term of the numerator and the denominator: when diversification benefits are high, the expected shortfall of a portfolio $\text{ES}_t^q(w)$ in the numerator is relatively close to the Value-at-Risk, i.e. the lower bound: $\underline{\text{ES}}_t^q(w)$ in the denominator, which makes the ratio close to one. 
 
-Each week, we construct portfolios that maximize the 5\% CDB of portfolios with respect to portfolio weights, under the same conditions as for the mean-variance exercise (all weights sum to one; all weights positive).\footnote{Results for other levels of CDB are qualitatively similar.} Such a portfolio corresponds to the maximum degree of diversification available while being fully invested across factors. Expected shortfall is computed based on the simulated return distributions in each period, as modeled by the copula.
+Focusing instead on the numerator only: when diversification benefits are low, the expected shortfall $\text{ES}_t^q(w)$ is hardly different from its upper bound: $\overline{\text{ES}}_t^q(w)$, and the ratio is close to zero.
 
+In summary, CDB is a number between zero and one where one represents perfect diversification, and zero no diversification.
+
+Each week, we construct portfolios that maximize the 5\% CDB (where the Value-at-Risk cut-off is 5\%) of portfolios with respect to portfolio weights, under the same conditions as for the mean-variance exercise (all weights sum to one; all weights positive).\footnote{Results for other levels of CDB are qualitatively similar.} Such a portfolio corresponds to the maximum degree of diversification available while being fully invested across factors. The ES is based on the simulated return distributions in each period, as modeled by the dynamic Student's \textit{t} copula.
+
+\subsection{CDB results for different asset universes}
 % Picture different between 5-factor and 6-factor
-\autoref{fig:cdb} plots conditional diversification benefit measures of the six different strategies, based on the symmetric dynamic copula model. We have smoothed the plots to quarterly moving averages in order to make them easier to read. There are a number of interesting results emerging from this picture.
+\autoref{fig:cdb} plots conditional diversification benefit measures of the five- and six-factor asset universes, including and excluding HML and CMA. We have smoothed the plots using quarterly moving averages in order to make them easier to read. We proceed with a number of interesting results that emerge from this picture:
 
 \begin{figure}
-  \caption{5\% Conditional diversification benefit (CDB) from symmetric dynamic copula model for six different strategies, full sample (1963--2016). The line has been smoothed with a moving average on a quarterly window to make it easier to read.}
-  \includegraphics[width=\textwidth]{graphics/cdb_5F_6F.png}
+  \centering
+  \footnotesize
+  \renewcommand{\arraystretch}{1.2}
+  \caption{5\% Conditional diversification benefit (CDB) for six different asset universes, full sample (1963--2016). 
+  The line has been smoothed with a moving average on a quarterly window to make it easier to read.}
   \label{fig:cdb}
+  \includegraphics[scale = 1]{graphics/cdb_5F_6F.png}
 \end{figure}
 
 % CDB is very high; factor strategies are good diversifiers
-First, we note that regardless of whether Momentum is included or not, factor strategies appear to offer high levels of diversification. In absolute terms, all strategies sit close to or above $90$ for the majority of the studied time period. The differences between strategies are small with a high degree of overlap; given the uncertainty in estimates, the interpretation of differences must be interpreted conservatively.
+First, we note that regardless of whether momentum is included or not, factor strategies appear to offer high levels of diversification. In absolute terms, all strategies sit close to or above $0.90$ for the majority of the studied time period. [Why is this high. We need to relate it to something] The differences between strategies are small with a high degree of overlap; given the uncertainty in estimates, the small differences must be interpreted conservatively.
 
 % Dips
-Second, there are notable ``dips'' in the diversification benefit measures. When we turn to look at these dips, representing times when diversification is relatively hard to come by, we see that they roughly coincide in both the five and six factor models.
+Second, there are notable dips in the diversification benefit measure. The dips represent times when diversification is relatively hard to come by, and roughly coincide in the five- and six-factor models.
 
 % HML is a better diversifier on average
 % CMA better when diversification is hard to come by
-Third, in comparing the diversification benefits offered by substituting CMA for HML and vice versa, a complicated picture appears. Looking at the six factor portfolio, the strategy where HML is excluded has a lower level of diversification benefit on most weeks compared to where CMA is excluded. This pattern appears reversed at critical times, however. When the full six factor CDB is low -- before 1965, around 1978, 2007 and 2011 -- the maximum diversification benefit of an HML strategy is in all cases except 2011 below that of the CMA strategy. HML thus appears to be the better diversifier in ``normal'' times, however, when diversification is hard to come by, CMA outperforms it. Excluding Momentum, the status of HML as a superior diversifier in normal times is much less clear; while its underperformance is even more noticeable when diversification potential is lower.
+Third, a complicated picture appears when comparing the diversification benefits offered by substituting HML for CMA, and vice versa. Looking at the six factor portfolio, the strategy where HML is excluded has a lower level of diversification benefit on most weeks compared to where CMA is excluded. This pattern appears reversed at critical times, however: When the full six factor CDB is low -- before 1965, around 1978, 2007 and 2011 -- the maximum diversification benefit of an HML strategy is in all cases except 2011 below that of the CMA strategy. HML thus appears to be the better diversifier in normal times, however, when diversification is hard to come by, CMA outperforms it. Excluding Momentum, the status of HML as a superior diversifier in normal times is much less clear; while its underperformance is even more noticeable when diversification potential is lower.
 
-\autoref{tab:cdb_table} displays CDB summary statistics and the results of paired t-tests of the differences between strategies. This table tells the same story as the graph. In a five-factor setting, there is no significant difference in the expected diversification benefit from swapping CMA for HML, however, HML is a significantly better diversifier in a six-factor setting. The difference, although significant when taking the model as given, is however small.
+\autoref{tab:cdb_table} displays CDB summary statistics and the results of paired t-tests of the differences between strategies. This table tells the same story as the graph. In a five-factor setting, there is no significant difference in the expected diversification benefit from swapping CMA for HML, however, HML is a significantly better diversifier in a six-factor setting. Although the difference is significant, it is small and does not account for the uncertainty in the estimation of the model that is the basis for the portfolio return distribution.
 
 \input{tex/tables/cdb_table}
 

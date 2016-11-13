@@ -45,21 +45,16 @@ Due to the restrictions, the standard analytical solution to the mean-variance p
 where $w_t$ is the set of weights, $\mu_{t+1}$ is the conditional one-step-ahead expected excess factor return, $\gamma$ is the risk aversion, $\Sigma_{t+1}$ is the conditional one-step-ahead variance-covariance matrix, and $\mathbf{1}_N$ is a vector of ones. Note that in the case of sample means and covariances, $\mu$ and $\Sigma$ are constant and given by the sample estimators. 
 
 \subsection{Optimal weights according to copula and sample inputs}
-In \autoref{fig:mv_optimal_5} we present the optimized weights over time in the five-factor universe (see \autoref{fig:asset_universes} for the exact compositions of each asset universe). The left hand column presents weights of factors when we consider the inclusion and exclusion of HML, while the right hand column presents weights of factors when CMA is included and excluded. The static lines represent the weights based on sample estimators of the mean-variance inputs, while the dynamic weights are based on one-week-ahead forecasts from the copula model. All weights have been smoothed as 1-year moving averages for viewing purposes. 
+In \autoref{fig:mv_optimal_5} we present the optimized weights over time in the five-factor universe (see \autoref{fig:asset_universes} for the exact compositions of each asset universe). The left hand column presents weights of factors when we consider the inclusion and exclusion of HML, while the right hand column presents weights of factors when CMA is included and excluded. The static lines represent the weights based on sample estimators of the mean-variance inputs, while the dynamic weights are based on one-week-ahead forecasts from the copula model. All weights have been smoothed as 1-year moving averages in order to make them easier to read. 
 
 \begin{figure}[htbp]
-  \caption{Mean-variance optimal weights in the five-factor universe}
-  \label{fig:mv_optimal_5}
-  %\toprule
   \centering
-  \begin{minipage}{\textwidth}
-  \includegraphics[scale = 1]{graphics/Weights_5F_EXCL_HML_5F.png}
-  \includegraphics[scale = 1]{graphics/Weights_5F_EXCL_CMA_5F.png} \\
-  %\bottomrule
-  \vspace{3mm}
   \footnotesize
-  Mean-variance optimal weights in the five-factor universe, smoothed as 1-year moving averages. Left hand panel including and excluding HML, right hand including and excluding CMA. Based on one-week-ahead forecasts from the copula model 1963-2016.
-  \end{minipage}
+  \renewcommand{\arraystretch}{1.2}
+  \caption{Mean-variance optimal weights in the five-factor universe. Smoothed as 1-year moving averages. Left hand panel including and excluding HML, right hand including and excluding CMA. Based on one-week-ahead forecasts from the copula model 1963-2016.}
+  \label{fig:mv_optimal_5}
+  \includegraphics[scale = 1]{graphics/Weights_5F_EXCL_HML_5F.png}
+  \includegraphics[scale = 1]{graphics/Weights_5F_EXCL_CMA_5F.png}
 \end{figure}
 
 We begin by examining the left column of plots in \autoref{fig:mv_optimal_5} that includes and excludes HML. First, we note that the weight of HML is not zero when introduced in the investible universe. This appears to be the case for both the sample estimate of means and covariances, as well as the dynamic estimates from the copula model. Both inputs suggest that HML does in fact improve the tangency portfolio, as the optimal portfolio has a positive weight on the factor. 
@@ -71,30 +66,21 @@ Second, we note that the dynamic weight of HML seems to be highly similar to the
 The above results are similar when we repeat the mean-variance optimizations in the six-factor-model universe excluding HML and CMA, see \autoref{fig:mv_optimal_6} and \autoref{tab:mv_realized_insample_6F}. [maybe we could say something more or drop] [in either case, we might split the first graph (5F universe) into two, for easier viewing, and keep the second grpah (6F universe) as one] [i also think we should remove the top half of the tables below, that include performance measures, and only list average weights with fewer decimals]
 
 \begin{figure}[htbp]
-  \caption{Mean-variance optimal weights in the six-factor universe}
-  \label{fig:mv_optimal_6}
-  %\toprule
   \centering
-  \begin{minipage}{\textwidth}
-  \includegraphics[scale = 1]{graphics/Weights_6F_EXCL_HML_6F.png}
-  \includegraphics[scale = 1]{graphics/Weights_6F_EXCL_CMA_6F.png} \\
-  %\bottomrule
-  \vspace{3mm}
   \footnotesize
-  Mean-variance optimal weights in the six-factor universe, smoothed as 1-year moving averages. Left hand panel including and excluding HML, right hand including and excluding CMA. Based on one-week-ahead forecasts from the copula model 1963-2016.
-  \end{minipage}
+  \renewcommand{\arraystretch}{1.2}
+  \caption{Mean-variance optimal weights in the six-factor universe. Smoothed as 1-year moving averages. Left hand panel including and excluding HML, right hand including and excluding CMA. Based on one-week-ahead forecasts from the copula model 1963-2016.}
+  \label{fig:mv_optimal_6}
+  \includegraphics[scale = 1]{graphics/Weights_6F_EXCL_HML_6F.png}
+  \includegraphics[scale = 1]{graphics/Weights_6F_EXCL_CMA_6F.png}
 \end{figure}
 
 \begin{table}
   \centering
-  \caption{Realized portfolio performance and average weights: Five-factor model}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.2}
+  \caption{Realized portfolio performance and average weights: Five-factor model. Based on sample inputs as well as dynamic copula model inputs, in-sample (1963--2016). All measures expressed in percentages on an annual basis, where applicable.}
   \label{tab:mv_realized_insample_5F}
-  \begin{tabularx}{\textwidth}{X}
-  \\[-1.8ex]\toprule
-  \\[-1.8ex] 
-  \footnotesize Realized return and risk measures and average weights of mean-variance portfolios in the five-factor universe. Based on sample inputs as well as dynamic copula model inputs, in-sample (1963--2016). All measures expressed in percentages on an annual basis, where applicable.
-\end{tabularx}
-
   \begin{tabularx}{\textwidth}{@{} l ddd X ddd @{}}
     \toprule
 
@@ -133,13 +119,10 @@ The above results are similar when we repeat the mean-variance optimizations in 
 
 \begin{table}
   \centering
-  \caption{Realized portfolio performance and average weights: Five-factor model}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.2}
+  \caption{Realized portfolio performance and average weights: Six-factor model. Based on sample inputs as well as dynamic copula model inputs, in-sample (1963--2016). All measures expressed in percentages on an annual basis, where applicable.}
   \label{tab:mv_realized_insample_6F}
-  \begin{tabularx}{\textwidth}{X}
-  \\[-1.8ex]\toprule
-  \\[-1.8ex] 
-  \footnotesize Realized return and risk measures and average weights of mean-variance portfolios in the five-factor universe. Based on sample inputs as well as dynamic copula model inputs, in-sample (1963--2016). All measures expressed in percentages on an annual basis, where applicable.
-\end{tabularx}
   \begin{tabularx}{\textwidth}{@{} l ddd X ddd @{}}
     \toprule
 
