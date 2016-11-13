@@ -5,40 +5,35 @@
 
 \subsubsection{Copula Model Specification}
 
-We now turn to modeling the dependency between factors using a copula model. The joint behavior of returns at each point in time is described by their conditional joint density function $f_t(r_{1, t+1}, \ldots, r_{N, t+1})$. Assuming returns are multivariate normally distributed, this would correspond to the multivariate normal density function which is fully parametrised by the mean, volatility and correlation matrix. But neither factor returns $r_{i,t}$, or standardized returns $z_{i,t}$, appear to be normally distributed and thus display patterns of dependency not reflected by a multivariate normal distribution.
+We now turn to modeling the dependency between factors using a copula model. 
+Each week, the joint behavior of returns $R_{t+1}$ in the next week is modeled by a joint density function $f_t(R_{t+1})$. Assuming returns are multivariate normally distributed, this would correspond to the multivariate normal density function, fully parametrised by means, volatility and correlation matrix. But neither factor returns $R_t$, nor the standardized returns $z_t$ are normally distributed.
 
-Copulas are a parsimonious way of modeling dependency between non-normal returns. Following~\textcite{ChristoffersenErrunzaJacobLanglois2012}, who builds on~\textcite{Patton2006,Sklar1959}, we can decompose the conditional joint density function into the product of a joint copula function $c_t$ of uniform variables $u_{i,t}$ and the marginal univariate distributions $f_{i,t}(r_{i, t+1})$:
+Copulas are a convenient way of modeling dependency between non-normal returns. Following~\textcite{ChristoffersenErrunzaJacobLanglois2012}, who builds on~\textcite{Patton2006} and~\textcite{Sklar1959}, we decompose the joint density function into the product of a joint copula function $c_t$ of uniform variables $U_{t+1}$ and the marginal univariate distributions $f_{i,t}(r_{i, t+1})$:
 \begin{align}
-  f_t(r_{1, t+1}, \ldots, r_{N, t+1}) &=
-    c_t(u_{1, t+1}, \ldots, u_{N, t+1}) \prod^N_{i = 1}
-    f_{i,t}(r_{i, t + 1})
+  f_t(R_{t+1}) &=
+    c_t(U_{t+1}) \prod^N_{i = 1} f_{i,t}(r_{i, t + 1})
 \end{align}
-The uniforms $u_{i, t+1}$ are related to the returns by the probability integral transform (PIT):
-\begin{align}
-  u_{i, t+1} = F_{i,t}(r_{i, t+1}) =
-    \int_{-\infty}^{r_{i, t + 1}} f_{i,t}(r_{i, t+1})
-\end{align}
-In a ARMA-GARCH copula model, the univariate ARMA-GARCH processes describe the conditional densities $f_{i,t}(r_{i, t+1})$, while the copula $c_t$ is a model of the joint behavior of their probability integral transforms. $c_t$ can be modeled, and estimated, separately from the marginal densities. This is key to imposing a more sophisticated dependency structure on the returns.
+The marginal densities, $f_{i,t}(r_{i, t + 1})$, are modeled by ARMA-GARCH processes while the copula $c_t$ is a model of the joint behavior of their probability integral transforms. $c_t$ can be modeled, and estimated, separately from the marginal densities. This is key to imposing a more sophisticated dependency structure on the returns.
 
-In the most general case, we use a multivariate skewed Student's t \emph{dynamic asymmetric copula} model introduced by~\textcite{ChristoffersenErrunzaJacobLanglois2012}. The joint distribution is parametrised by a single degrees of freedom parameter $\nu_c$, $N$ skewness parameters $\gamma_{c,i}$ and a (time-varying) correlation matrix $\Psi_{t}$ (details about the joint density function $c_t$ are in~\autoref{app:ghstmv}):
+After ARMA-GARCH filtering, the marginal densities of returns are modeled by the constant density functions of standardized returns. The vector of uniforms are therefore related to returns by the probability integral transform (PIT) of standardized returns:
 \begin{align}
-  c_t(u_{1, t+1}, \ldots, u_{N, t+1}) = t_{\nu_c,\gamma_{c,1},\ldots,\gamma_{c,N},\Psi_t}(z_{1, t+1}^*, \ldots, z_{N, t+1}^*)
+  u_{i, t+1} = \int_{-\infty}^{z_{i,t+1}} f_{i}(z_{i,t+1})
 \end{align}
-$t_{\nu_c,\gamma_{c,1},\ldots,\gamma_{c,N},\Psi_t}$ is the copula's joint density function of \emph{copula shocks} $\{z_t^*\}$ which are constructed from the uniforms by the copula's inverse distribution functions $F_{\nu_c,\gamma_i}$:
-\begin{align}
-  z_{i, t+1}^* = F_{\nu_c,\gamma_i}^{-1}(u_{i, t+1})
-\end{align}
-As~\textcite{ChristoffersenErrunzaJacobLanglois2012}, we note that $F^{-1}_{\nu_c,\gamma_i}$ does \emph{not} describe the distribution of standardized residuals ${z_t}$ but of copula residuals ${z_t^*}$.
+In the most general case, we use a multivariate skewed Student's t \emph{dynamic asymmetric copula} model introduced by~\textcite{ChristoffersenErrunzaJacobLanglois2012}. The joint distribution is parametrised by a single degrees of freedom parameter $\nu_c$, an $N$ vector of skewness parameters $\gamma_{c}$ and a (time-varying) correlation matrix $\Psi_{t}$. We describe the details of the copula distribution in~\autoref{app:ghstmv}.
 
-The normal and Student's t copula are nested in this model, as when $\gamma_{c,i}$, we obtain a multivariate Student's t distribution, and if additionally $\nu_c = \infty$, we obtain the multivariate standard normal distribution. Furthermore, the copula is made dynamic by evolving the correlation matrix $\Psi_t$ according to an underlying \emph{c}DCC process $Q_t$~\autocites[cf.]{Engle2002,Aielli2013}. Using the notation from~\textcite{ChristoffersenLanglois2013}:\footnote{The difference between ${z_t^*}$ and ${\bar{z}_t^*}$ is due to the \emph{corrected} DCC model; details in the appendix.}
+The normal and Student's t copula are nested in this model, as when $\gamma_{c,i} = 0$, we obtain a multivariate Student's t distribution, and if additionally $\nu_c = \infty$, we obtain the multivariate standard normal distribution.
+
+The copula is made dynamic by evolving the correlation matrix $\Psi_t$ according to an underlying \emph{c}DCC process $Q_t$~\autocites[cf.]{Engle2002,Aielli2013}. Using the notation from~\textcite{ChristoffersenLanglois2013}:\footnote{The difference between ${z_t^*}$ and ${\bar{z}_t^*}$ is due to the \emph{corrected} DCC model; details in the appendix.}
 \begin{align}
   Q_t &= (1 - \alpha - \beta) Q
     + \beta Q_{t - 1}
     + \alpha \bar{z}_{t - 1}^* \bar{z}_{t - 1}^{*\top}
+  \label{eq:copula_cdcc}
 \end{align}
 where $Q_t$ is normalized to the correlation matrix
 \begin{align}
   \Psi_t = Q_t^{-1/2} Q_t Q_t^{-1/2}
+  \label{eq:copula_cdcc_psi}
 \end{align}
 The $Q_t$ process is comprised of three components that are weighted according to $\alpha, \beta$: (1) a time-invariant component $Q$, (2) an innovation component from copula shocks $\bar{z}_{t-1}^{*} \bar{z}_{t-1}^{*\top}$ and (3) an autoregressive component of order one $Q_{t-1}$. In order for the the correlation matrix $\Psi_t$ to be positive definite, $Q_t$ has to be positive definite, which is ascertained by requiring that $\alpha \geq 0$, $\beta \geq 0$ and $(\alpha + \beta) < 1$. The model nests a constant copula by forcing $\alpha = \beta = 0$.
 
@@ -46,7 +41,7 @@ The $Q_t$ process is comprised of three components that are weighted according t
 % XXX cDCC correction for copula shocks
 The parameters of the copula model -- the distribution parameters of the multivariate skewed Student's t distribution and the dynamics parameters of the \emph{c}DCC -- are estimated by maximizing the log-likelihood:
 \begin{align}
-  \arg\!\max_{\nu_c, \gamma_{ic}, \alpha, \beta} \sum_{t = 1}^T \ln c_t(u_{1, t+1}, \ldots, u_{N, t+1}; \nu_c, \gamma_{ic}, \alpha, \beta)
+  \arg\!\max_{\nu_c, \gamma_{ic}, \alpha, \beta} \sum_{t = 1}^T \ln c_t(U_t; \nu_c, \gamma_{ic}, \alpha, \beta)
 \end{align}
 This estimation takes the uniform residuals from each GARCH model as given. The process of copula estimation with \emph{c}DCC dynamics is quite involved. A detailed description can be found~\autoref{app:copula_cdcc}.
 
