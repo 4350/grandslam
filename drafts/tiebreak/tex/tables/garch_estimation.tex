@@ -1,0 +1,59 @@
+%!TEX root = ../../main.tex
+
+\begin{table}[!ht]
+  \centering
+  \scriptsize
+  \renewcommand{\arraystretch}{1.2}
+
+  \caption{Parameter estimates from ARMA-GARCH models of weekly returns. Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. Sample: 1963-07-05--2016-07-01 (2766 obs). $\gamma$ and $\nu$ are the skewness and degree of freedom parameters of the skewed Student's \textit{t} innovations. $\eta$ is fixed at zero, as the sign bias test showed no significant misspecification of the GARCH for the HML, RMW and CMA factors. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993}, see appendix for details.}
+  \begin{tabularx}{\textwidth}{@{}l X dddddd @{}}
+    \toprule
+    &&
+      \multicolumn{1}{c}{Mkt-RF} &
+      \multicolumn{1}{c}{SMB} &
+      \multicolumn{1}{c}{Mom} &
+      \multicolumn{1}{c}{HML} &
+      \multicolumn{1}{c}{RMW} &
+      \multicolumn{1}{c}{CMA} \\
+    \midrule
+    $\mu$ (\%) && 0.096^{***} & 0.026 & 0.128^{***} & 0.058^{***} & 0.052^{***} & 0.037^{***} \\
+               && (0.032) & (0.033) & (0.032)& (0.019) & (0.015) & (0.012) \\
+               \\
+    $\phi_1$   &&         & 0.772^{***} & 0.129^{***} & 0.722^{***} & 0.583^{***} & 0.112^{***}\\
+               &&         & (0.046) & (0.027) & (0.077) & (0.183) & (0.019) \\
+               \\
+    $\theta_1$ &&         & -0.652^{***} & -0.608^{***} & -0.460^{**} & \\
+               &&         & (0.056) & (0.085) & (0.201)  & \\
+               \\
+    $\alpha$   && 0.037^{**} & 0.115^{***} & 0.186^{***} & 0.109^{***} & 0.076^{***} & 0.088^{***} \\
+               && (0.015) & (0.023) & (0.003) & (0.004) & (0.002) & (0.002) \\
+               \\
+    $\beta$    && 0.844^{***} & 0.841^{***} & 0.793^{***} & 0.873^{***} & 0.915^{***} & 0.899^{***} \\
+               && (0.006) & (0.035) & (0.004) & (0.004) & (0.001) & (0.001) \\
+               \\
+    $\eta$     && 0.181^{***} &  & \\
+               && (0.023) &  & & \\
+               \\
+    $\gamma$   && -2.482^{**} & -0.864 & -2.547 & 0.491 & 0.132 & 0.368 \\
+               && (1.020) & (1.755) & (4.985) & (0.377) & (0.355) & (0.453) \\
+               \\
+    $\nu$      && 12.170^{***} & 11.801 & 13.822 & 10.349^{***} & 11.079^{**} & 11.223^{***}\\
+               && (3.072) & (15.791) & (17.436) & (2.900) & (5.531) & (3.618) \\
+               \\
+    $\omega$   && 0.016 & 0.006 & 0.007 & 0.003 & 0.001 & 0.001 \\
+               && \\
+    \midrule
+    LLH && 7051 & 8568 & 7941 & 8790 & 9874 & 9577 \\
+    Unconditional volatility && 0.022 & 0.010 & 0.017 & 0.010 & 0.010 & 0.010 \\
+    Variance Persistence   && 0.966 & 0.957 & 0.979 & 0.982 & 0.992 & 0.987 \\
+    Ljung-Box [5] p-value  && 0.108 & 0.307 & 0.830 & 1.000 & 1.000 & 0.209 \\
+    Ljung-Box [10] p-value && 0.080 & 0.734 & 0.712 & 0.978 & 0.051 & 0.084 \\
+    ARCH-LM [5] p-value    && 0.804 & 0.650 & 0.060 & 0.094 & 0.778 & 0.821 \\
+    ARCH-LM [10] p-value   && 0.897 & 0.892 & 0.172 & 0.324 & 0.934 & 0.939 \\
+    Sign bias [-] p-value  && 0.899 & 0.443 & 0.717 & 0.119 & 0.197 & 0.505 \\
+    Sign bias [+] p-value  && 0.182 & 0.106 & 0.224 & 0.357 & 0.644 & 0.061 \\
+    \bottomrule
+  \end{tabularx}
+
+  \label{tab:garch_estimation}
+\end{table}
