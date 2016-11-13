@@ -303,7 +303,7 @@ copula_Upsilon <- function(theta, X) {
       beta * qdiag[t - 1, ] +
       alpha * (shocks[t - 1, ] / qdiag[t - 1, ]) ^ 2
 
-    shocks_std[t, ] <- shocks[t, ] / sqrt(qdiag[t, ])
+    shocks_std[t, ] <- shocks[t, ] * sqrt(qdiag[t, ])
   }
 
   # Drop the initial observation
@@ -405,7 +405,7 @@ copula_Upsilon <- function(theta, X) {
   # Initiate dynamics with the end of the series (a model of higher order
   # might support Q_T being an array like preresiduals for rugarch)
   shocks[1, ] <- shocks_T
-  shocks_std[1, ] <- .copula_shocks_standardize(spec, shocks[1, ]) / sqrt(diag(Q_T))
+  shocks_std[1, ] <- .copula_shocks_standardize(spec, shocks[1, ]) * sqrt(diag(Q_T))
   Q[,, 1] <- Q_T
   Correlation[,, 1] <- .copula_Correlation(array(Q[,, 1], dim = c(N, N, 1)))
 
@@ -421,7 +421,7 @@ copula_Upsilon <- function(theta, X) {
     Correlation[,, t] <- .copula_Correlation(array(Q[,, t], c(N, N, 1)))
 
     shocks[t, ] <- .copula_rghyp(1, spec, Correlation[,, t])
-    shocks_std[t, ] <- .copula_shocks_standardize(spec, shocks[t, ]) / sqrt(diag(Q[,, t]))
+    shocks_std[t, ] <- .copula_shocks_standardize(spec, shocks[t, ]) * sqrt(diag(Q[,, t]))
   }
 
   rbind(shocks[-1, ])
