@@ -16,6 +16,7 @@ We estimate conditional mean equations \emph{up to} ARMA(3, 3):
     \sum^p \phi_p r_{t - p} +
     \sum^q \theta_q \varepsilon_{t - q} + 
     \varepsilon_t
+    \label{eq:garch_mean}
 \end{align}
 where $r_t$ are log returns. The conditional volatility evolves according to the GJR-GARCH specification:
 \begin{align}
@@ -24,6 +25,7 @@ where $r_t$ are log returns. The conditional volatility evolves according to the
     \omega +
     (\alpha + \eta I_{\varepsilon_{t-1} \leq 0}) \varepsilon_{t - 1}^2 +
     \beta \sigma^2_{t - 1}
+    \label{eq:garch_garch}
 \end{align}
 where $I$ is an indicator function that is equal to one when $\varepsilon_{t-1} \leq 0$. A positive $\eta$ captures the leverage effect by increasing the current period's volatility if the previous period's residual $\varepsilon$ was below zero. A significant $\eta$ thus introduces asymmetric volatility in the model. For the market factor, it is expected that $\eta$ is positive, reflecting the leverage effect in the market itself and no impact from the short risk-free component. However, for the other factors, which are constructed as all-equity zero-cost long-short portfolios, the direction of $\eta$ is less obvious~\autocite{ChristoffersenLanglois2013}. If there are leverage effects for stocks in general, negative shocks will lead to more volatility than positive shocks in a portfolio of stocks. But in a zero-cost portfolio, the leverage effects of the long positions in stocks could be eliminated by the short positions in other firms. The level of the leverage effect in a zero-cost portfolio therefore depends on the relative strength of leverage effects in the long and short components.
 
@@ -54,17 +56,17 @@ Looking at~\autoref{fig:garch_qq}, the candidate specifications under normal and
 \begin{figure}[!pt]
   \centering
 
-  \begin{subfigure}{0.8\textwidth}
+  \begin{subfigure}{0.70\textwidth}
     \includegraphics[width=\textwidth]{graphics/qq_norm.png}
     \caption{Normal}
   \end{subfigure}
   \\
-  \begin{subfigure}{0.8\textwidth}
+  \begin{subfigure}{0.70\textwidth}
     \includegraphics[width=\textwidth]{graphics/qq_std.png}
     \caption{Students't}
   \end{subfigure}
   \\
-  \begin{subfigure}{0.8\textwidth}
+  \begin{subfigure}{0.70\textwidth}
     \includegraphics[width=\textwidth]{graphics/qq_ghst.png}
     \caption{Skewed Student's t}
   \end{subfigure}
