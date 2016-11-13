@@ -126,8 +126,6 @@ summary.plots <- function(df, outlabel, factor) {
 #' @export
 #' 
 summary.cumretplots <- function(df, outlabel) {
-  # Make simple returns
-  df[,2:ncol(df)] <- exp(df[,2:ncol(df)])-1
   # Long format for plot
   df <- gather(df, "factor", "ret", 2:ncol(df))
   df$factor <- factor(df$factor, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
