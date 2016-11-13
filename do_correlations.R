@@ -17,6 +17,7 @@ library(gridExtra)
 library(extrafont)
 library(zoo)
 library(scales)
+library(gtable)
 library(devtools)
 library(mvtnorm)
 
@@ -208,7 +209,7 @@ plotdf.scatter.res <- do_scatter_df(df.stdres)
 # Quick fix to append standard correlations to graphs
 df.labels.ret <- .append_standard_corr(plotdf.ret, df.estim)
 df.labels.res <- .append_standard_corr(plotdf.res, df.stdres)
-
+  
 # Reorder variables
 plotdf.res$order <- factor(plotdf.res$order, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 plotdf.res$order2 <- factor(plotdf.res$order2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
@@ -244,31 +245,54 @@ threshold2 <- grid.arrange(
 ggsave('output/thresholdCorrelations/threshold2.png', threshold2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
 # And draw for appendix part
-appendix_threshold1 <- grid.arrange(
-  .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'HML'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'CMA'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'RMW'),
-  ncol = 2,
-  nrow = 3,
-  as.table = FALSE
-)
-ggsave('output/thresholdCorrelations/appendix_threshold1.png', appendix_threshold1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
-appendix_threshold2 <- grid.arrange(
-  .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'HML', ROWFACTORS = 'CMA'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'HML', ROWFACTORS = 'RMW'),
-  .plot_th_corr_incl_ret(COLFACTORS = 'CMA', ROWFACTORS = 'RMW'),
-  ncol = 2,
-  nrow = 3,
-  as.table = FALSE
-)
-ggsave('output/thresholdCorrelations/appendix_threshold2.png', appendix_threshold2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+# First legend
+g_appendix_legend <- .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML')+theme(legend.position = 'bottom')+
+  scale_colour_manual(labels = c("ARMA-GARCH residual series","Return series"), values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
+
+appendix_legend = gtable_filter(ggplotGrob(g_appendix_legend), "guide-box") 
+
+# Then graphs
+
+appendix_threshold1 <- 
+  grid.arrange(grid.arrange(
+    .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
+    .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
+    .plot_th_corr_incl_ret(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
+    .plot_th_corr_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'HML'),
+    .plot_th_corr_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'CMA'),
+    .plot_th_corr_incl_ret(COLFACTORS = 'Mom', ROWFACTORS = 'RMW'),
+    ncol = 2,
+    nrow = 3,
+    as.table = FALSE
+  ),
+  appendix_legend,
+  nrow = 2,
+  heights = c(13,1)
+  )
+  
+ggsave('output/thresholdCorrelations/appendix_threshold_1.png', appendix_threshold1, width = 14, height = 18, limitsize = FALSE, units = 'cm')
+
+appendix_threshold2 <- 
+  grid.arrange(
+    grid.arrange(
+      .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
+      .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
+      .plot_th_corr_incl_ret(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
+      .plot_th_corr_incl_ret(COLFACTORS = 'HML', ROWFACTORS = 'CMA'),
+      .plot_th_corr_incl_ret(COLFACTORS = 'HML', ROWFACTORS = 'RMW'),
+      .plot_th_corr_incl_ret(COLFACTORS = 'CMA', ROWFACTORS = 'RMW'),
+      ncol = 2,
+      nrow = 3,
+      as.table = FALSE
+    ),
+    appendix_legend,
+    nrow = 2,
+    heights = c(13,1)
+  )
+  
+    
+ggsave('output/thresholdCorrelations/appendix_threshold_2.png', appendix_threshold2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
 # Threshold correlation with scatter to  explain before main results, for MKT-HML pair ------------------------------
 # One function for scatter with residuals and one for scatter with returns, axes differ etc...
@@ -560,34 +584,52 @@ models <- bind_rows(models, models_empirical) %>% select(-ub, -lb)
 models$factor1 <- factor(models$factor1, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 models$factor2 <- factor(models$factor2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
+# Save legend
+g_simulated_legend <- .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML')+theme(legend.position = 'bottom')+
+  scale_colour_manual(labels = c("Empirical distribution","Skewed Student's t","Normal","Student's t copula"), values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
+
+simulated_legend = gtable_filter(ggplotGrob(g_simulated_legend), "guide-box") 
 
 # Plot simulated graphs
 
-threshold_simulated1 <- grid.arrange(
-  .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
-  .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
-  .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
-  .plot_th_corr_simulated(COLFACTORS = 'Mom', ROWFACTORS = 'HML'),
-  .plot_th_corr_simulated(COLFACTORS = 'Mom', ROWFACTORS = 'CMA'),
-  .plot_th_corr_simulated(COLFACTORS = 'Mom', ROWFACTORS = 'RMW'),
-  ncol = 2,
-  nrow = 3,
-  as.table = FALSE
-)
-ggsave('output/thresholdCorrelations/threshold_simulated1.png', threshold_simulated1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+threshold_simulated1 <- 
+  grid.arrange(
+    grid.arrange(
+      .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML'),
+      .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'CMA'),
+      .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'RMW'),
+      .plot_th_corr_simulated(COLFACTORS = 'Mom', ROWFACTORS = 'HML'),
+      .plot_th_corr_simulated(COLFACTORS = 'Mom', ROWFACTORS = 'CMA'),
+      .plot_th_corr_simulated(COLFACTORS = 'Mom', ROWFACTORS = 'RMW'),
+      ncol = 2,
+      nrow = 3,
+      as.table = FALSE
+    ),
+    simulated_legend,
+    nrow = 2,
+    heights = c(13,1)
+  )
+  
+ggsave('output/thresholdCorrelations/threshold_simulated_1.png', threshold_simulated1, width = 14, height = 18, limitsize = FALSE, units = 'cm')
 
-threshold_simulated2 <- grid.arrange(
-  .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
-  .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
-  .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
-  .plot_th_corr_simulated(COLFACTORS = 'HML', ROWFACTORS = 'CMA'),
-  .plot_th_corr_simulated(COLFACTORS = 'HML', ROWFACTORS = 'RMW'),
-  .plot_th_corr_simulated(COLFACTORS = 'CMA', ROWFACTORS = 'RMW'),
-  ncol = 2,
-  nrow = 3,
-  as.table = FALSE
-)
-ggsave('output/thresholdCorrelations/threshold_simulated2.png', threshold_simulated2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+threshold_simulated2 <- 
+  grid.arrange(
+    grid.arrange(
+      .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
+      .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'CMA'),
+      .plot_th_corr_simulated(COLFACTORS = 'SMB', ROWFACTORS = 'RMW'),
+      .plot_th_corr_simulated(COLFACTORS = 'HML', ROWFACTORS = 'CMA'),
+      .plot_th_corr_simulated(COLFACTORS = 'HML', ROWFACTORS = 'RMW'),
+      .plot_th_corr_simulated(COLFACTORS = 'CMA', ROWFACTORS = 'RMW'),
+      ncol = 2,
+      nrow = 3,
+      as.table = FALSE
+    ),
+    simulated_legend,
+    nrow = 2,
+    heights = c(13,1)
+  )
+ggsave('output/thresholdCorrelations/threshold_simulated_2.png', threshold_simulated2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
 
 
 #  ------------------------------------------------------------------------

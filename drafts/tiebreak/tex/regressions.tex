@@ -29,48 +29,44 @@ As in the five-factor model, we also note differences in some of the other facto
 Although we employ weekly data, our results are qualitatively similar to the results in \textcite{FF2015} as well as in \textcite{Asness2015}. The alpha of HML is only recognized in a model including momentum. This finding indicates that the insignificant alpha of HML in the five-factor model might be due to the omission of an important control variable, Momentum, that is included in the six-factor-model. This does suggest that HML is not dead, when including Momentum.
 
 \begin{table}[!htbp] \centering 
-  \caption{Zero-cost portfolio regressions -- Five and six factor models} 
+  \centering
+  \footnotesize
+  \renewcommand{\arraystretch}{1.2}
+  \caption{Zero-cost portfolio regressions -- Five and six factor models \\ \quad \\
+  Zero-cost portfolio regressions on zero-cost equity factor portfolios, following the analysis in \textcite{FF2015} and \textcite{Asness2015}. Heteroskedasticy and autocorrelation robust standard errors in parentheses, following \textcite{NeweyWest1987}. Alpha to be interpreted as abnormal return (Jensen's alpha). Based on weekly returns 1963--2016. Note: $^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01}
   \label{fig:abnormal} 
-\begin{tabularx}{\textwidth}{X}
-\\[-1.8ex]\toprule
-\\[-1.8ex] 
-\footnotesize Zero-cost portfolio regressions on zero-cost equity factor portfolios, following the analysis in \textcite{FF2015} and \textcite{Asness2015}. Heteroskedasticy and autocorrelation robust standard errors in parentheses, following \textcite{NeweyWest1987}. Alpha to be interpreted as abnormal return (Jensen's alpha). Weekly log returns 1963-2016
-\end{tabularx}
-\begin{tabularx}{\textwidth}{@{\extracolsep{0pt}}lD{.}{.}{-4} D{.}{.}{-4} D{.}{.}{-4} D{.}{.}{-4} } 
-\\[-1.8ex]\midrule 
-\\[-1.8ex] 
-  & \multicolumn{4}{c}{\textit{LHS variable:}} \\ 
-\cline{2-5}
-\\ 
-& \multicolumn{2}{c}{\textit{5 factor model}} & \multicolumn{2}{c}{\textit{6 factor model}} 
-\\[-1.8ex] & \multicolumn{4}{c}{ } \\ 
- \\[-1.8ex] & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\
-\\[-1.8ex] & \multicolumn{1}{c}{HML} & \multicolumn{1}{c}{CMA} & \multicolumn{1}{c}{HML} & \multicolumn{1}{c}{CMA}\\
-\hline \\[-1.8ex] 
- Alpha & 0.0002 & 0.0006^{***} & 0.0005^{**} & 0.0004^{***} \\ 
-  & (0.0002) & (0.0001) & (0.0002) & (0.0001) \\ 
-  & & & & \\ 
- Mkt.RF & -0.0180 & -0.1103^{***} & -0.0320 & -0.0964^{***} \\ 
-  & (0.0342) & (0.0187) & (0.0261) & (0.0138) \\ 
-  & & & & \\ 
- SMB & 0.0010 & -0.0314 & 0.0079 & -0.0330^{*} \\ 
-  & (0.0297) & (0.0194) & (0.0261) & (0.0179) \\ 
-  & & & & \\ 
- HML &  & 0.3897^{***} &  & 0.4248^{***} \\ 
-  &  & (0.0421) &  & (0.0323) \\ 
-  & & & & \\ 
- CMA & 0.8526^{***} &  & 0.8673^{***} &  \\ 
-  & (0.0441) &  & (0.0436) &  \\ 
-  & & & & \\ 
- RMW & -0.0198 & -0.0942^{**} & 0.0100 & -0.1021^{**} \\ 
-  & (0.0931) & (0.0446) & (0.0684) & (0.0404) \\ 
-  & & & & \\ 
- Mom &  &  & -0.1814^{***} & 0.0868^{***} \\ 
-  &  &  & (0.0440) & (0.0197) \\ 
-  & & & & \\ 
-\hline \\[-1.8ex] 
-R-squared & \multicolumn{1}{c}{39\%} & \multicolumn{1}{c}{46\%} & \multicolumn{1}{c}{47\%} & \multicolumn{1}{c}{49\%} \\ 
-\bottomrule \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{4}{c}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}}X D{.}{.}{-4} D{.}{.}{-4} d D{.}{.}{-4} D{.}{.}{-4} } 
+\toprule
+  & \multicolumn{5}{c}{\textit{LHS variable:}} \\ 
+\cmidrule{2-6} 
+& \multicolumn{2}{c}{\textit{5 factor model}} & & \multicolumn{2}{c}{\textit{6 factor model}} \\ 
+\cmidrule{2-3} \cmidrule{5-6}
+ & \multicolumn{1}{c}{(1)} & \multicolumn{1}{c}{(2)} & & \multicolumn{1}{c}{(3)} & \multicolumn{1}{c}{(4)}\\
+ & \multicolumn{1}{c}{HML} & \multicolumn{1}{c}{CMA} & & \multicolumn{1}{c}{HML} & \multicolumn{1}{c}{CMA}\\
+\midrule \\ 
+ \text{Alpha} & 0.0002 & 0.0006^{***} & & 0.0005^{**} & 0.0004^{***} \\ 
+  & (0.0002) & (0.0001) & & (0.0002) & (0.0001) \\ 
+  & & & & & \\ 
+ \text{Mkt.RF} & -0.0180 & -0.1103^{***} & & -0.0320 & -0.0964^{***} \\ 
+  & (0.0342) & (0.0187) & & (0.0261) & (0.0138) \\ 
+  & & & & & \\ 
+ \text{SMB} & 0.0010 & -0.0314 & & 0.0079 & -0.0330^{*} \\ 
+  & (0.0297) & (0.0194) & & (0.0261) & (0.0179) \\ 
+  & & & & & \\ 
+ \text{HML} &  & 0.3897^{***} &  & & 0.4248^{***} \\ 
+  &  & (0.0421) & & & (0.0323) \\ 
+  & & & & & \\ 
+ \text{CMA} & 0.8526^{***} & &  & 0.8673^{***} &  \\ 
+  & (0.0441) & &  & (0.0436) &  \\ 
+  & & & & & \\ 
+ \text{RMW} & -0.0198 & -0.0942^{**} & & 0.0100 & -0.1021^{**} \\ 
+  & (0.0931) & (0.0446) & & (0.0684) & (0.0404) \\ 
+  & & & & & \\ 
+ \text{Mom} &  &  & & -0.1814^{***} & 0.0868^{***} \\ 
+  &  &  & & (0.0440) & (0.0197) \\ 
+  & & & & & \\ 
+\midrule
+R-squared & \multicolumn{1}{c}{39\%} & \multicolumn{1}{c}{46\%} & & \multicolumn{1}{c}{47\%} & \multicolumn{1}{c}{49\%} \\ 
+\bottomrule
 \end{tabularx} 
 \end{table}
