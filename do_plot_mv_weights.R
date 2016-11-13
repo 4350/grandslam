@@ -15,8 +15,8 @@ library(extrafont)
 load_all('wimbledon')
 
 MODEL = 'results_full_dynamic_std_10000'
-MODEL_NAME_1 = '6F_EXCL_CMA'
-MODEL_NAME_2 = '6F'
+MODEL_NAME_1 = '5F_EXCL_CMA'
+MODEL_NAME_2 = '5F'
 
 load(sprintf('data/derived/mv/%s_%s.RData', MODEL, MODEL_NAME_1))
 results1 <- results
@@ -68,7 +68,7 @@ ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
     theme(legend.key.size = unit(0.75, 'lines'))+
     scale_colour_Publication()+
     coord_cartesian(ylim = c(0, 0.60))+  
-    scale_y_continuous(labels = scales::percent)+
+    scale_y_continuous(labels = scales::percent, breaks = c(0, 0.30, 0.60))+
     ylab('Smoothed weight (1-year moving average)')
 
 
