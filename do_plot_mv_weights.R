@@ -15,7 +15,7 @@ library(extrafont)
 load_all('wimbledon')
 
 MODEL = 'results_full_dynamic_std_10000'
-MODEL_NAME_1 = '6F_EXCL_HML'
+MODEL_NAME_1 = '6F_EXCL_CMA'
 MODEL_NAME_2 = '6F'
 
 load(sprintf('data/derived/mv/%s_%s.RData', MODEL, MODEL_NAME_1))
@@ -23,6 +23,14 @@ results1 <- results
 
 load(sprintf('data/derived/mv/%s_%s.RData', MODEL, MODEL_NAME_2))
 results2 <- results
+
+SAMPLE_MODEL = 'results_full_sample'
+
+load(sprintf('data/derived/mv/%s_%s.RData', SAMPLE_MODEL, MODEL_NAME_1))
+sample_results1 <- results
+
+load(sprintf('data/derived/mv/%s_%s.RData', SAMPLE_MODEL, MODEL_NAME_2))
+sample_results2 <- results
 
 rm(results)
 
@@ -35,39 +43,37 @@ load('data/derived/weekly-estim.RData')
 # weightplot  -----------------------------------------------------------------
 
 tutti <- bind_rows(results1 = gather(data.frame(Date = df.estim$Date[2:2766], results1$weights), 'Factor', 'Weight', -1),
-                   results2 = gather(data.frame(Date = df.estim$Date[2:2766], results2$weights), 'Factor', 'Weight', -1), 
+                   results2 = gather(data.frame(Date = df.estim$Date[2:2766], results2$weights), 'Factor', 'Weight', -1),
+                   sample_results1 = gather(data.frame(Date = df.estim$Date[2:2766], sample_results1$weights), 'Factor', 'Weight', -1),
+                   sample_results2 = gather(data.frame(Date = df.estim$Date[2:2766], sample_results2$weights), 'Factor', 'Weight', -1),
                    .id = 'Model'
                    )
 tutti$Factor <- factor(tutti$Factor, levels = c('HML','CMA','Mkt.RF','SMB','RMW', 'Mom'))
 tutti$Model[tutti$Model == 'results1'] = MODEL_NAME_1
 tutti$Model[tutti$Model == 'results2'] = MODEL_NAME_2
+tutti$Model[tutti$Model == 'sample_results1'] = sprintf('Sample %s', MODEL_NAME_1)
+tutti$Model[tutti$Model == 'sample_results2'] = sprintf('Sample %s', MODEL_NAME_2)
 
-tutti <- tutti %>% group_by(Model, Factor) %>% mutate(ma = rollapply(Weight, 52, mean, align = 'right', fill = NA))
+tutti <- tutti %>% 
+  group_by(Model, Factor) %>% 
+  mutate(ma = rollapply(Weight, 52, mean, align = 'right', fill = NA))
 
-g <- grid.arrange(
-  ggplot(tutti, aes(x = Date, y = Weight, color = Model)) +
+ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
     facet_grid(Factor ~ ., switch = 'y') +
     geom_line()+
     theme_Publication()+
     theme(strip.background = element_blank())+
-    theme(legend.position = 'none')+
-    scale_colour_Publication(),
-  
-  ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
-    facet_grid(Factor ~ ., switch = 'y') +
-    geom_line()+
-    theme_Publication()+
-    theme(strip.background = element_blank())+
-    theme(legend.position = 'none')+
+    theme(panel.margin = unit(1, "lines"))+
+    theme(legend.direction = 'vertical')+
+    theme(legend.key.size = unit(0.75, 'lines'))+
     scale_colour_Publication()+
+    coord_cartesian(ylim = c(0, 0.60))+  
+    scale_y_continuous(labels = scales::percent)+
     ylab('Smoothed weight (1-year moving average)')
-    ,
-  ncol =2, nrow = 1
-)
+
 
 ggsave(sprintf('output/mv/Weights_%s_%s.png', MODEL_NAME_1, MODEL_NAME_2),
-       g,
-       width = 14,
-       height = 12,
+       width = 6.5,
+       height = 15,
        units = 'cm',
        limitsize = FALSE)
