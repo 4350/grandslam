@@ -43,9 +43,12 @@ PAIRS <- list(
   c('Mom', 'HML'),
   c('Mom', 'RMW'),
   c('Mom', 'CMA'),
-  c('CMA', 'HML'),
-  c('RMW', 'HML'),
-  c('RMW', 'CMA')
+  c('SMB', 'HML'),
+  c('SMB', 'RMW'),
+  c('SMB', 'CMA'),
+  c('HML', 'CMA'),
+  c('HML', 'RMW'),
+  c('CMA', 'RMW')
 )
 
 MODELS <- list(
