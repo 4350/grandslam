@@ -56,20 +56,25 @@ cdb_cdb$Strategy <- factor(
 
 g <- ggplot(cdb_cdb, aes(x = Week, y = CDB, color = Strategy)) +
   geom_line() +
-  facet_grid(Factors ~ .) +
+  facet_grid(Factors ~ ., switch = 'y') +
   coord_cartesian(ylim = c(0.70, 1.00)) +
   scale_colour_Publication() +
-  theme_Publication()
+  theme_Publication()+
+  theme(panel.margin = unit(1, "lines"))+
+  theme(legend.key.size = unit(0.75, 'lines'))+
+  theme(strip.background = element_blank())+
+  xlab('Date')
+  
 
 g
 
 ggsave(
   'output/cdb/cdb_5F_6F.png',
   g,
-  width = 21.0,
-  height = 21,
+  width = 14.0,
+  height = 18,
   units = 'cm',
-  dpi = 144
+  limitsize = FALSE
 )
 
 # Means and hypothesis testing ----
