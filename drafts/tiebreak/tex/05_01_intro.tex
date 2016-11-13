@@ -1,0 +1,39 @@
+%!TEX root = ../main.tex
+
+\subsection{Dynamic Dependency Modeling}
+\label{sub:05_01_intro}
+
+% Dependency structure interesting
+We proceed to analyzing the dependency structure of the six factors under the dynamic copula model introduced in~\textcite{ChristoffersenLanglois2013}. In this section, we present the motivation for, development and estimation results of the full copula model. In subsequent sections, we use the fully estimated model for in and out of sample dynamic factor allocation, as well as for measuring the dynamic diversification possibilities across factors.
+
+% How model? What is copula?
+The model is based on combining univariate ARMA-GARCH models of each factor with a separate model (the copula) of the dependency structure for the residuals. Under normally distributed returns, this approach is similar to the \emph{dynamic conditonal correlation} (DCC) approach of~\textcite{Engle2002} (and its correction \emph{c}DCC by~\textcite{Aielli2013}) to fit an autoregressive process for the correlation matrix to the ARMA-GARCH residuals. The copula model of~\textcite{ChristoffersenLanglois2013} is still based around a \emph{c}DCC process but fitted to a transformation of residuals which allows for more sophisticated tail dependency not reflected in the correlation matrix, including asymmetries. We develop the details of the copula model in~\autoref{sub:05_04_copula}.
+
+% How two-stage? Why two-stage?
+As the univariate series are modeled separately from the dependency structure, we can treat and estimate the models in isolation. For the same reason, however, it is key that the univariate models are well-specified so that the dependency model is ``unpolluted''. Our estimation procedure is based on multi-stage maxmimum likelihood (MSML) or ``inference functions for margins''~\autocite{Joe1997}. Separating the modeling and estimation in two steps is key to modeling features of the univariate series (serial correlation, volatility clustering and leverage effects) and joint behaviour in higher dimensions~\autocite{Patton2006}.
+
+% Arguably just teasing results
+First, we fit parsimonious ARMA-GARCH models to the factor return series, for different distributional assumptions. We find that assuming a normal distribution for the residuals is inappropriate and that returns are better modeled by the skewed Student's t distribution. Second, we find that the residuals are not independent and that their dependence varies over time which leads us to fit a copula model to them.
+
+%%%%
+
+% The ARMA-GARCH family of models has become the norm of modeling univariate financial return series, beginning with \textcite{Bollerslev1986}. These models use lagged autoregressive and moving average variables to capture serial correlation and volatility clustering in return data. Volatility clustering is often also referred to as autoregressive conditional heteroskedasticity (ARCH) effects, due to the persistence in magnitude of return shocks.
+
+% Dimensionality of MGARCH
+% The straightforward extension of univariate GARCH models to multiple return series has, however, proven difficult. Unrestricted multivariate GARCH (MGARCH) models, modeling the conditional covariance matrix directly, become impossible to estimate as the number of covariances grows exponentially with the number of series~\autocite{WhyMGARCHSucks}. It thus becomes necessary to restrict the parameter space, where the BEKK model is a common example~\autocite{BEKKModel}.
+
+% Separate modeling of variance and correlation
+% A parsimonious solution to the dimensionality problem is to separate the modeling of return and variance dynamics (modeled using e.g. ARMA-GARCH) from that of the conditional correlation dynamics. One such approach is encapsulated by the \emph{dynamic conditional correlation} (DCC) model originally proposed by~\autocite{Engle2002} (and its correction \emph{c}DCC by~\autocite{Aielli2013}). The separation allows for consistent (albeit inefficient) two-step estimation. First, univariate GARCH models are estimated on each series. Second, an autoregressive process for the correlation matrix is fitted to the standardized residuals $\varepsilon_t$ of those models. The separation makes large-scale estimation feasible.
+
+% Asymmetric cDCC and copula cDCC
+% DCC is a useful and tractable model for estimating time-varying correlations between return series. However, as it is a model of correlations only, it lacks flexibility in modeling the multivariate return distribution.\footnote{Introducing indicator variables for the strength of correlations is a potential improvement suggested by the [what does it mean] AGDCC model by~\autocite{Cappiello2006}.} Copula models have recently attracted much attention in the field of risk management, as they provide a flexible way to infer a multivariate probability distribution. Furthermore, copulae are flexible in the sense that they can capture tail dependence, i.e. when the dependence structure changes in extreme times. Copula models are most often estimated taking popular univariate models such as ARMA-GARCH models as a starting point, explaining the remaining dependence after univariate effects are sanitized. 
+
+% Roadmap for modeling. ARMA GARCH -> Control the multivariate dependency -> Copula
+
+% [Here, we really need to support and explain why returns are not used directly in the copula]
+% [Outline the route: 1) Model univariate as best as we can 2) Control and understand multivariate dependency in residuals from univariate modeling 3) Model copula]
+
+
+
+% Thereafter, in \autoref{sec:multivariate_dependence}, we analyze the dependence patterns in the residuals from these models, to better understand what type of copula specification that is needed. Based on findings of asymmetric tail dependence and time-varying correlations, and supported by the previous work of \textcite{ChristoffersenLanglois2013}, we decide on the \emph{dynamic asymmetric copula} (DAC), introduced in~\autocite{ChristoffersenErrunzaJacobLanglois2012}. The DAC copula specification centers around the dynamic correlation process \textit{c}DCC of \textcite{Aielli2013}, [but in contrast to fitting the \emph{c}DCC process to standardized residuals directly, the DAC fits a \emph{c}DCC model to a transformation of these shocks. The theoretical motivation behind this transformation is to jointly model returns with different marginal probability distributions (e.g. normal and skewed Student's t) in a single framework. This is important, as factor strategies will be shown to exhibit disparate marginal distributions.] The estimation and results of this model are presented in \autoref{sec:dac_copula}.
+
