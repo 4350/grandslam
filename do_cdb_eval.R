@@ -10,18 +10,20 @@ load_all('wimbledon')
 rm(list = ls())
 
 load('data/derived/weekly-estim.RData')
-MODEL_NAME <- 'full_dynamic_std_10000'
+MODEL_NAME <- 'constrOptim_q5_full_dynamic_std_10000'
 
 factor_models <- list(
   "5F" = list(
     '5F',
     '5F_EXCL_CMA',
-    '5F_EXCL_HML'
+    '5F_EXCL_HML',
+    '5F_EXCL_RMW'
   ),
   "6F" = list(
     '6F',
     '6F_EXCL_CMA',
-    '6F_EXCL_HML'
+    '6F_EXCL_HML',
+    '6F_EXCL_RMW'
   )
 )
 
@@ -30,7 +32,7 @@ get_cdb <- function(name) {
   cdb_results
 }
 
-SMOOTH <- 13
+SMOOTH <- 52
 
 cdb_cdb <- lapply(names(factor_models), function(factor_name) {
   factor_strategy_names <- factor_models[[factor_name]]
@@ -38,11 +40,11 @@ cdb_cdb <- lapply(names(factor_models), function(factor_name) {
     cdb_name <- sprintf('%s_%s', MODEL_NAME, name)
     data.frame(
       Week = df.estim$Date[(SMOOTH + 1):length(df.estim$Date)],
-      CDB = rollmeanr(get_cdb(cdb_name)$cdb, SMOOTH)
+      CDB = 100 * rollmeanr(get_cdb(cdb_name)$cdb, SMOOTH)
     )
   })
   
-  names(factor_cdb) <- c('ALL', 'EXCL_CMA', 'EXCL_HML')
+  names(factor_cdb) <- c('ALL', 'EXCL_CMA', 'EXCL_HML', 'EXCL_RMW')
   bind_rows(factor_cdb, .id = 'Strategy')
 })
 names(cdb_cdb) <- c('5 factors', '6 factors')
@@ -50,14 +52,14 @@ cdb_cdb <- bind_rows(cdb_cdb, .id = 'Factors')
 
 cdb_cdb$Strategy <- factor(
   cdb_cdb$Strategy,
-  c('ALL', 'EXCL_CMA', 'EXCL_HML'),
-  c('All', 'Excl. CMA', 'Excl. HML')
+  c('ALL', 'EXCL_CMA', 'EXCL_HML', 'EXCL_RMW'),
+  c('All', 'Excl. CMA', 'Excl. HML', 'Excl. RMW')
 )
 
 g <- ggplot(cdb_cdb, aes(x = Week, y = CDB, color = Strategy)) +
   geom_line() +
   facet_grid(Factors ~ ., switch = 'y') +
-  coord_cartesian(ylim = c(0.70, 1.00)) +
+  coord_cartesian(ylim = c(50, 100)) +
   scale_colour_Publication() +
   theme_Publication()+
   theme(panel.margin = unit(1, "lines"))+
@@ -69,7 +71,7 @@ g <- ggplot(cdb_cdb, aes(x = Week, y = CDB, color = Strategy)) +
 g
 
 ggsave(
-  'output/cdb/cdb_5F_6F.png',
+  sprintf('output/cdb/%s_cdb_5F_6F.png', MODEL_NAME),
   g,
   width = 14.0,
   height = 18,
