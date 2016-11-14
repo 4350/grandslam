@@ -11,7 +11,7 @@ rm(list = ls())
 load('data/derived/weekly-estim.RData')
 
 # Simplify returns
-df <- exp(df.estim[,-1]) - 1
+df <- df.estim[,-1]
 rm(df.estim)
 
 
