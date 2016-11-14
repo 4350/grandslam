@@ -55,23 +55,21 @@ load_all('wimbledon')
 #' 
 do_optimize_mv <- function(model_name, strategy, selectors, df.realized, df.mean = NULL) {
   
-  # Load distribution simulated data and change to simple returns
+  # Load distribution simulated data
   load(sprintf('data/derived/distributions/%s.RData', model_name))
-  distribution_simple <- exp(distribution) - 1
-  rm(distribution)
   
   # Simplify df.mean if inputted. Select selectors
   if(!is.null(df.mean)) {
-    df.mean <- exp(df.mean[,-1]) - 1
+    df.mean <- df.mean[,-1]
     df.mean <- df.mean[, selectors]
   }
   
   # Subset the data using selectors
-  colnames(distribution_simple) <- c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA')
-  distribution_simple <- distribution_simple[, selectors, ]
+  colnames(distribution) <- c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA')
+  distribution <- distribution[, selectors, ]
   
-  times <- 1:dim(distribution_simple)[3]
-  N <- ncol(distribution_simple)
+  times <- 1:dim(distribution)[3]
+  N <- ncol(distribution)
   
   T <- length(times)
   # Outputs
@@ -88,12 +86,12 @@ do_optimize_mv <- function(model_name, strategy, selectors, df.realized, df.mean
     if(!is.null(df.mean)) {
       mu_t <- colMeans(df.mean)
     } else {
-      mu_t <- colMeans(distribution_simple[,,t])
+      mu_t <- colMeans(distribution[,,t])
     }
     
     # Sigma always from copula distribution
     
-    sigma_t <- cov(distribution_simple[,,t])
+    sigma_t <- cov(distribution[,,t])
     
     # Run optimizer
     op <- optimize_mv_constrOptim(weights = rep(1/N,N), fn = sharpe_ratio_fn(mu_t, sigma_t))
@@ -110,8 +108,6 @@ do_optimize_mv <- function(model_name, strategy, selectors, df.realized, df.mean
   dates <- tail(df.realized[,'Date'], T)
   # Subset realized returns using selectors
   realized <- tail(df.realized[, selectors], T)
-  # Change daily returns to simple returns
-  realized <- exp(realized) - 1
   
   # Calculate the portfolios realized return
   portfolio_return <- rowSums(weights * realized)
@@ -175,7 +171,7 @@ optimize_mv_constrOptim <- function(weights, fn) {
 
 #' Calculates sharpe ratio
 #' 
-#' @param mu_t N length vector of expected excess returns (simple)
+#' @param mu_t N length vector of expected excess returns
 #' @param sigma_t NxN variance-covariance matrix
 #' 
 #' @return function for optimization, negative sharpe ratio
@@ -194,11 +190,9 @@ do_optimize_fixed <- function(model_name, strategy, selectors, df.sample, df.rea
   
   # Save the dates and then select
   dates <- df.realized[,'Date']
-  # Select returns and change daily returns to simple returns
+  # Select returns 
   df.realized <- df.realized[ , selectors]
   df.sample <- df.sample[ , selectors]
-  df.realized <- exp(df.realized) - 1
-  df.sample <- exp(df.sample) - 1
   
   N <- ncol(df.realized)
   T <- nrow(df.realized)
