@@ -3,14 +3,13 @@
 \section{Conditional Diversification Benefit} % (fold)
 \label{sec:conditional_diversification_benefit}
 
-This section studies a new measure of diversification in a portfolio called \emph{conditional diversification benefit} (CDB), which is developed by \textcite{ChristoffersenErrunzaJacobLanglois2012}. CDB is based on the portfolio expected shortfall (ES), i.e. the expected loss in case the return materializes below a certain percentile, and therefore concerns the properties of the tail of the portfolio distribution. As already described, if factors are not multivariate normal, the covariance matrix used in mean-variance optimization is not a full description of the dependency between factors. Factor returns are not normal, and therefore higher moments influence the tail behavior of their returns. These considerations are important for any portfolio looking to manage risk by diversifying across factors.
-For a portfolio manager looking to manage risk by diversifying across factors, such considerations are important
+This section studies a new measure of diversification in a portfolio called \emph{conditional diversification benefit} (CDB), which is developed by \textcite{ChristoffersenErrunzaJacobLanglois2012}. CDB is based on the portfolio expected shortfall (ES), i.e. the expected loss in case the return materializes below a certain percentile, and therefore concerns the properties of the tail of the portfolio distribution. 
 
-In this section, all distributions of portfolio returns are simulated from our Student's \textit{t} dynamic copula model.
-
-We begin by describing the construction and intuition of CDB and subsequently present the CDB over time for different five- and six-factor asset universes, including and excluding HML and CMA.
+We begin by describing the construction and intuition of CDB and subsequently present the results of two analyses using CDB: First, we use simulated distributions of portfolio returns form our Student's \textit{t} dynamic copula model to discuss the relative diversification benefits of HML, CMA and RMW. Second, we compare the diversification benefits of out-of-sample investing according to one of three strategies: (1) mean-variance weights, (2) diversification optimal weights and (3) equal weights.
 
 \subsection{Formula and interpretation of the CDB statistic}
+
+If factors are not multivariate normal, the covariance matrix used in mean-variance optimization is not a full description of the dependency between factors. Factor returns are not normal, and therefore higher moments influence the tail behavior of their returns. These considerations are important for any portfolio looking to manage risk by diversifying across factors. The CDB measure gives an easy-to-interpret measure of how well diversified the tail of the portfolio return distribution is, for given portfolio weights.
 
 Define ES as the expected loss in some bottom percentile $q$
 \begin{align}
@@ -36,20 +35,23 @@ The intuition behind the statistic is best understood by focusing on the second 
 
 Focusing instead on the numerator only: when diversification benefits are low, the expected shortfall $\text{ES}_t^q(w_t)$ is hardly different from its upper bound: $\overline{\text{ES}}_t^q(w_t)$, and the ratio is close to zero.
 
-In summary, CDB is a number between zero and one where one represents perfect diversification, and zero no diversification. CDB is a measure of diversification only -- the level of expected return across factors does not enter the equation.
+In summary, CDB is a number between zero and one where one represents perfect tail diversification, and zero no diversification. CDB is a pure measure of diversification -- the level of expected return across factors does not enter the equation.
 
-A closed formula for CDB of a portfolio does not exist if returns are not normal. We use the same simulated returns as in the previous section to form the return distribution of factors each week, and combine them into portfolios subject to the same conditions as for the mean-variance exercise (all weights sum to one; all weights positive). We then run a maximization algorithm for CDB, finding the combination of weights that give the highest possible diversification:
+\subsection{Relative diversification benefits of HML, CMA and RMW}
+
+We now consider the relative diversification benefit of HML, CMA and RMW. We study the evolution of optimal CDB over time for different five- and six-factor universes, and experiment with the exclusion of one of HML, CMA and RMW at a time. The intuition behind this exercise is to see how much diversification is lost if we can no longer invest in a given factor. Does excluding HML make the portfolio less diversified than excluding CMA? And what is the impact of the other new factor, RMW?
+
+To find the optimal CDB in each period, we choose weights that maximize CDB based on 1-week-ahead simulated forecasts of the joint return distribution from the copula model. As in the mean-variance section, we constrain the problem so that weights are not negative and sum to one:
 \begin{align*}
   \arg\!\max_{w_t} \text{CDB}_t^q(w_t)
     && \text{s.t.} \sum_{i=1}^N w_{i,t} = 1 \\
     && w_{i,t} \ge 0 \,\, \forall i
 \end{align*}
 
-The ES is based on the simulated return distributions in each period, as modeled by the dynamic Student's \textit{t} copula. We present results based on a Value-at-Risk cut-off of 5\% -- results based on lower values (e.g. 1\%) are qualitatively similar.
+Note that this analysis is completely dependent on having a conditional model of the full return distribution, as expected shortfall can not be observed directly. The ES that underlies the CDB calculation is based on the simulated return distributions in each period, as modeled by the dynamic Student's \textit{t} copula. We present results based on a Value-at-Risk cut-off of 5\%.\footnote{Results based on lower values (e.g. 1\%) are found to be qualitatively similar.} 
 
-\subsection{CDB results for different asset universes}
 % Picture different between 5-factor and 6-factor
-\autoref{fig:cdb} plots conditional diversification benefit measures of the five- and six-factor asset universes, including and excluding HML and CMA. We have smoothed the plots using quarterly moving averages in order to make them easier to read. We proceed with a number of interesting results that emerge from this picture:
+\autoref{fig:cdb} plots optimal conditional diversification benefit measures of the five- and six-factor asset universes, where we experiment by excluding HML, CMA and RMW one at a time. We have smoothed the plots using quarterly moving averages in order to make them easier to read. We proceed with a number of interesting results that emerge from this picture:
 
 \begin{figure}
   \centering
@@ -62,16 +64,18 @@ The ES is based on the simulated return distributions in each period, as modeled
 \end{figure}
 
 % CDB is very high; factor strategies are good diversifiers
-First, we note that regardless of whether momentum is included or not, factor strategies appear to offer high levels of diversification. In absolute terms, all strategies sit close to or above $0.90$ for the majority of the studied time period. [Why is this high. We need to relate it to something] The differences between strategies are small with a high degree of overlap; given the uncertainty in estimates, the small differences must be interpreted conservatively.
+First, we note that regardless of whether momentum is included or not, factor strategies appear to offer high levels of diversification. In absolute terms, all strategies fluctuate in the $0.80$ -- $0.95$ for the majority of the studied time period. 
 
 % Dips
-Second, there are notable dips in the diversification benefit measure. The dips represent times when diversification is relatively hard to come by, and roughly coincide in the five- and six-factor models.
+Second, there are notable dips in the diversification benefit measure. The dips represent times when diversification is relatively hard to come by, and roughly coincide in the five- and six-factor models. Interestingly, the periods of low diversification do not seem be stock market crises, as the CDB measure remains relatively high during the 1999-2000 bubble and the 2007-2009 recession.
 
 % HML is a better diversifier on average
 % CMA better when diversification is hard to come by
-Third, a complicated picture appears when comparing the diversification benefits offered by substituting HML for CMA, and vice versa. Looking at the six factor portfolio, the strategy where HML is excluded has a lower level of diversification benefit on most weeks compared to where CMA is excluded. This pattern appears reversed at critical times, however: When the full six factor CDB is low -- before 1965, around 1978, 2007 and 2011 -- the maximum diversification benefit of an HML strategy is in all cases except 2011 below that of the CMA strategy. HML thus appears to be the better diversifier in normal times, however, when diversification is hard to come by, CMA outperforms it. Excluding Momentum, the status of HML as a superior diversifier in normal times is much less clear; while its underperformance is even more noticeable when diversification potential is lower.
+Third, the level decreases in diversification benefit of removing HML or CMA seem quite small. Furthermore, this decrease is highly similar; At certain times, portfolios including HML are more diversified and vice versa, but no pattern emerges. However, we note that the exclusion of RMW is dramatically different. Without RMW, the level decrease is substantial and dips in CDB become much more pronounced and frequent. 
 
-\autoref{tab:cdb_table} displays CDB summary statistics and the results of paired t-tests of the differences between strategies. This table tells the same story as the graph. In a five-factor setting, there is no significant difference in the expected diversification benefit from swapping CMA for HML, however, HML is a significantly better diversifier in a six-factor setting. Although the difference is significant, it is small and does not account for the uncertainty in the estimation of the model that is the basis for the portfolio return distribution.
+[\autoref{tab:cdb_table} displays CDB summary statistics and the results of paired t-tests of the differences between strategies. This table tells the same story as the graph. Excluding RMW is significantly worse for diversification than excluding either HML or CMA. For HML and CMA, differences are small: In a five-factor setting [HML] is the significantly better diversifier, while in a six-factor setting [CMA] is. Although these differences are significant, we do not give much weight to them, as we have not accounted for the uncertainty in the estimation of the model that is the basis for the portfolio return distribution.]
+
+In summary, we find that the high similarity of HML and CMA indicates that tail diversification benefits are not dramatically improved by including both the factors, which is coherent with fact that they are closely related and overlap. This does not mean that both factors should not be considered, however, as it could improve the conventional risk-return tradeoff in a mean-variance setting. The RMW factor, on the other hand, is shown to be very important for diversification purposes and should be considered by all factor investors concerned with tail risk.
 
 \input{tex/tables/cdb_table}
 
@@ -82,3 +86,10 @@ Third, a complicated picture appears when comparing the diversification benefits
 % to be related to the tail dependency so mcuh...
 
 % subsection conditional_diversification_benefit (end)
+
+\subsection{Diversification benefit in out-of-sample investing}
+
+In an out-of-sample period covering one third of our available data, we now compare the diversification benefits under equal weights investing and mean-variance investing to the diversification benefits under the weights that give optimal CDB.
+
+[We find that out-of-sample, the diversification benefits under mean-variance investing are in fact worse than equal weights investing. This indicates that equal weights investing is more robust in terms of tail diversification than mean-variance investing, and can explain why investors choose this method.]
+
