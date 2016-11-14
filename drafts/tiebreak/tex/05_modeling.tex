@@ -3,10 +3,43 @@
 \section{Modeling of Factor Returns} % (fold)
 \label{sec:modeling_of_factor_returns}
 
-\input{tex/05_01_intro}
+% Why a model?
+This section presents our model for the joint behavior of returns. A multivariate model of returns allows us to make conditional forecasts of the distribution of returns one week ahead, which take into account the dependence between factors. The model is used in the mean-variance analysis, to provide dynamic inputs that can give us optimal weights over time. The model is also used in the analysis of diversification benefits, when we shift the focus to the tail risk of factor portfolios. First, we describe why we choose the copula model among different multivariate models. Second, we describe the building blocks of the model and analyze which specification best suits the dependence structure in the data. Last, we provide estimates and describe the model we retain for further use.
+
+\subsection{Choosing a multivariate model}
+% Why copula?
+The ARMA-GARCH family of models has become the norm of modeling univariate financial return series, beginning with \textcite{Bollerslev1986}. The straightforward extension of univariate GARCH models to multiple return series has, however, proven difficult. Unrestricted multivariate GARCH (MGARCH) models that model the conditional covariance matrix directly become impossible to estimate as the number of covariances grows exponentially with the number of series. It thus becomes necessary to restrict the parameter space, where the BEKK model is a common example~\autocite{BEKKModel}.
+
+% Separate modeling of variance and correlation
+A parsimonious solution to the dimensionality problem is to separate the modeling of return and volatility dynamics from the modeling of conditional correlations. The separation allows for consistent (albeit inefficient) two-step estimation, and makes large-scale estimation feasible. One such approach is the \emph{dynamic conditional correlation} (DCC) model originally proposed by~\autocite{Engle2002}. In the DCC model, univariate GARCH models are first estimated on each series. Then, an autoregressive process for the correlation matrix is fitted to the standardized residuals ${z_t}$ of those models. 
+
+% Asymmetric cDCC and copula cDCC
+DCC is a useful and tractable model for estimating time-varying correlations between return series. However, it is a model of correlations only and is not flexible enough to model the univariate components differently. More specifically, it is not constructed to generate tail dependence, which is the notion that correlation dynamics can be very different in extreme realizations. 
+
+% Enter the copula
+Copula models have recently attracted much attention in the field of risk management, as they provide a flexible way to infer a multivariate probability distribution. Copula models are, just like DCC models, based on two-step estimation and work well in large scale applications. Furthermore, copulae are flexible enough to generate tail dependence, which is shown to be an important feature of factor return data~\autocite{ChristoffersenLanglois2013}. 
+
+Copula models are most often constructed by estimating univariate models from the ARMA-GARCH family in the first step. The residuals from the ARMA-GARCH models are then used in the copula function that explains the multivariate dependence, including dynamic correlations and tail dependence.
+
+We choose to work with a copula model, as it can (1) estimate the joint distribution function in large scale applications, (2) model different univariate models for the different factors, and (3) incorporate both tail dependence and dynamic correlations. Next, we define and describe the copula model.
+
+\subsection{Definition of the copula model}
+This is section 05_04, but adapted so that ARMA-GARCH is explained when needed.
+\subsection{Univariate models}
+This describes the selection and estimation of the univariate models.
+\subsection{Analysis and choice of dependence structure}
+This is the work on residuals from the univariate models, and is what makes us believe that a certain dependence structure is right.
+\subsection{Copula estimation results}
+Here the main tables that show which model to prefer, discuss parameter estimates.
+\subsection{Robustness check of copula}
+Here simulated threshold correlations?
+\subsection{Model retained for further use}
+Here describe again the model we use in MV and CDB. E.g. dynamic std. If the reader doesn't follow anything of the first four subsections, she should at least be able to pick up what we use here.
+%
+\input{tex/05_04_copula}
 \input{tex/05_02_univariate}
 \input{tex/05_03_residuals}
-\input{tex/05_04_copula}
 \input{tex/05_05_copula_results}
+%what model do we retain (and why)
 
 % section modeling_of_factor_returns (end)
