@@ -1,0 +1,54 @@
+%!TEX root = ../main.tex
+
+\subsection{Definition of copula model} % (fold)
+\label{sub:definition_of_copula_model}
+
+Each week $t$, the conditional joint density of returns $R_{t+1} = \{r_{i,t+1},\ldots,r_{N,t+1}\}$ is described by a joint density function $f_t(R_{t+1})$. Assuming returns were normal, this density could be described by a multivariate normal distribution fully parametrised by expected returns and a covariance matrix. Also, assuming returns were independent over time, we could drop the $t$ and consider a single density function $f(R_t)$ for all weeks. However, factor returns are neither normal nor independent which leads us to consider modeling $f_t(R_{t+1})$ with a dynamic copula model.
+
+Following~\textcite{ChristoffersenErrunzaJacobLanglois2012}, who build on~\textcite{Patton2006} and~\textcite{Sklar1959}, we decompose the joint density function into the product of a joint copula function $c_t(U_{t+1})$ of uniformly distributed variables $U_{t+1} \sim U(0, 1)$ and marginal densities $f_{i,t}(r_{i,t+1})$:
+\begin{align}
+  f_t(R_{t+1}) =
+    c_t(U_{t+1}) \prod^N_{i=1} f_{i,t}(r_{i,t+1})
+  \label{eq:copula_sklar}
+\end{align}
+The elements of $U_{t+1} = \{u_{i,t+1},\ldots,u_{N,t+1}\}$ are related to the original returns by the probability integral transform, i.e the cumulative distribution of $r_{i,t+1}$:
+\begin{align}
+  u_{i,t+1} = F_{i,t}(r_{i,t+1}) = \int_{-\infty}^{r_{i,t+1}} f_{i,t}(r)dr
+\end{align}
+We implement the dynamic copula model of~\textcite{ChristoffersenLanglois2013}, which models $c_t(U_{t+1})$ with a multivariate skewed Student's t distribution. This distribution is parametrised by a single degrees of freedom parameter $\nu_c$, controlling the degree of dependency, a vector of $N$ skewness parameters $\gamma_c$, controlling the asymmetry in dependency, and a potentially time-varying correlation matrix $\Psi_{t}$. We describe the details of the skewed Student's t distribution, including the expanded form of $c_t$, in~\autoref{app:ghstmv}. The skewed Student's t distribution nests the Student's t distribution when all $\gamma_{i,c} = 0$ and the standard normal distribution when additionally $\nu_c = \infty$.
+
+The log-likelihood of the model is constructed from~\autoref{eq:copula_sklar}~\autocite[cf.]{ChristoffersenErrunzaJacobLanglois2012}:
+\begin{align}
+  L =
+    \sum_{t=1}^T \log(c_t(U_{t+1})) +
+    \sum_{t=1}^T \sum_{i=1}^N \log(f_{i,t}(r_{i,t+1}))
+\end{align}
+At this point, it is worth noting that the joint density $c_t(U_{t+1})$ need not be of the same family as the marginal densities $f_{i,t}(r_{i,t+1})$ -- nor are we restricted to modeling $f_{i,t}(r_{i,t+1})$ jointly for all factors. In fact, we do not. We model the marginal densities independently as ARMA-GARCH processes that capture features seen in the univariate series -- serial correlation, volatility clustering and leverage effects -- and then we estimate the copula model from the estimated marginal densities.
+
+This procedure is called multi-stage maximum log-likelihood (MSMLE) or inference functions for margins and greatly simplifies the estimation procedure while yielding relatively efficient estimates~\autocite{Patton2006,Joe1997}. The modeling and estimation of our ARMA-GARCH models is detailed in the upcoming subsection, whereas the remainder of this subsection describes how we make $\Psi_t$ and thus the dependence between factors dynamic.
+
+The copula is made dynamic by fitting a dynamic conditional correlation (DCC) process for $\Psi_t$ to copula residuals $z_{i,t+1}^*$~\autocite{Engle2002}. Using the notation from~\textcite{ChristoffersenLanglois2013}:
+\begin{align}
+  Q_t = (1 - \alpha - \beta) Q
+    + \beta Q_{t-1}
+    + \alpha \bar{z}_{t-1}^* \bar{z}_{t-1}^{*\top}
+\end{align}
+where $Q_t$ is normalized to the correlation matrix $\Psi_t$:
+\begin{align}
+  \Psi_t = Q_t^{-\frac{1}{2}} Q_t Q_t^{-\frac{1}{2}}
+\end{align}
+The $Q_t$ process is comprised of three components that are weighted according to $\alpha, \beta$: (1) a time-invariant component $Q$, (2) an innovation component from copula shocks $\bar{z}_{t-1}^{*} \bar{z}_{t-1}^{*\top}$ where $\bar{z}_{i,t+1}^* = z_{i,t+1}^* \sqrt{q_{ii,t}}$ is a correction by~\textcite{Aielli2013} and (3) an autoregressive component of order one $Q_{t-1}$. In order for the the correlation matrix $\Psi_t$ to be positive definite, $Q_t$ has to be positive definite, which is ascertained by requiring that $\alpha \geq 0$, $\beta \geq 0$ and $(\alpha + \beta) < 1$. The model nests a constant copula by forcing $\alpha = \beta = 0$. We have relegated the details of the estimation of this process to~\autoref{app:copula_cdcc}.
+
+% Gustaf: Här är det svårt -- jag har svårt att beskriva $z_t^*$ när konceptet
+% standardized returns är en del av ARMA-GARCH delen. Vet ej riktigt hur man
+% ska komma åt det. Ett sätt är att ta tjuren vid hornen och beskriva att 
+% f_{i,t}(r_{i,t+1}) = f_i(z_{i,t+1}) = 
+% f_i(\varepsilon_{i,t+1}/\sigma_{i,t+1}). men ja.
+ARMA-GARCH modeling allows us to filter time-varying effects, leaving independent \emph{standardized returns} (or standardized residuals) $z_{i,t}$ assumed to follow a constant distribution $f_i(z_{i,t})$. These residuals are first transformed into uniform variables $u_{i,t+1}$ by the probability integral transform of the densities above, and then made to follow the \emph{copula} distribution by the \emph{inverse} probability integral transform of the \emph{copula}:
+\begin{align}
+  z_{i,t+1}^* = F^{-1}_{\nu_c,\gamma_{i,c}}(F_{i}(z_{i,t+1}))
+\end{align}
+
+
+
+% subsection definition_of_copula_model (end)
