@@ -1,0 +1,28 @@
+%!TEX root = ../main.tex
+\subsection{Copula robustness check}
+
+This section provides a robustness check of how well the copula models can reproduce the threshold correlations found in ARMA-GARCH residuals. Note that to make this comparison valid, we use the constant copula specifications -- the dynamic version is the workhorse for all continued analysis in the mean-variance and diversification benefit sections.
+
+\subsubsection{Simulated threshold correlations}
+
+By simulating 250,000 weeks of shocks in the copula, and then transforming these shocks into standardized residuals for each of the factors, we can test the constant \textit{t} copula's ability to generate the threshold correlations in the ARMA-GARCH residuals. If the copula specification reasonably well captures tail dependence, the threshold correlations from the empirical and the copula specification should align. The results are presented in~\autoref{fig:threshold_simulated1}.
+
+\begin{figure}[!ht]
+  \centering
+  \caption{Threshold correlations of simulated constant copula standardized returns \\ \quad \\ Threshold correlations of simulated constant copula, with ARMA-GARCH standardized returns (95\% confidence bounds taking the ARMA-GARCH models as given). The simulated threshold correlations are based on 250,000 simulated returns each.}
+  \includegraphics[scale=1]{graphics/threshold_simulated_1.png}  
+  \label{fig:threshold_simulated1}
+\end{figure}
+\begin{figure}[!ht]
+  \ContinuedFloat
+  \centering
+  \caption{Threshold correlations of simulated copula standardized returns (cont.)}
+  \includegraphics[scale=1]{graphics/threshold_simulated_2.png}  
+\end{figure}
+
+First, we note that for most factors, the normal copula is the far away from generating threshold correlations that correspond to the empirical distribution around the median. This is highly expected, as the normal copula does not generate tail dependence, and highlights the need for the Student's \textit{t} based copula models. The symmetric \textit{t} and asymmetric \textit{t} copulae better capture the threshold correlations, as the fatter tails of the Student's \textit{t} distribution allows for tail dependence. For example, note how the normal copula generates negative threshold correlations for both the Mom--HML and RMW--HML asset pairs, while the Student's \textit{t} based copulae are much closer to the higher values in the data. On the other hand, the Student's \textit{t} based copulae sometimes seem to overshoot the empirical threshold correlation, as in the Mkt-RF--RMW asset pair.
+
+Second, we find that the skewed Student's \textit{t} generates some asymmetry around the mean, which can be seen most clearly for the Mom--RMW and RMW--HML asset pairs. The generated asymmetry does, however, appear to be too small to capture the features of the data.
+
+In conclusion, comparing threshold correlations from empirical data and simulated data shows that our copula approach captures some of the tail dependence. Although the Student's \textit{t} and skewed Student's \textit{t} results do not align perfectly with the data, they constiute clear improvements to the normal copula in modeling tail dependence. We do note that the copula seems to lack flexibility to simultaneously generate all the asymmetries in tail dependence. This is quite expected, as the Student's \textit{t} copula only has one degree of freedom parameter that controls the fatness of tails, and the skewed Student's \textit{t} copula only has one skewness parameter for each series. This imposes limits on how strongly the model can express fat tails or asymmetries between factors A and B and simultaneously express other fat tails or asymmetries (or lack thereof) between factors A and C. For a collection of six factors with heterogenous dependence, this is even harder. This is a clear limitation of the quite parsimonious copula approach, and will be discussed further in the concluding section. Although imperfect, the copula modeling of tail dependence could constitute a significant improvement to alternatives, especially in the field of risk management, where understanding of tail events is paramount.
+
