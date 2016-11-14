@@ -5,7 +5,7 @@
 
 The issue of how a factor portfolio should be allocated is highly relevant to portfolio managers. Common strategies include equal weights and mean-variance optimization. Based on abnormal return regressions and the work on mean-variance portfolios in \textcite{HubermanKandel1987}, \textcite{FF2015} conjecture that the HML factor will not improve the mean-variance tangency portfolio when added to a portfolio of Mkt-RF, SMB, RMW and CMA. Differently put, this is equivalent to HML having a zero weight in mean-variance optimization. Subject to a constraint of no negative weights, this section will examine what the mean-variance weights are, given different asset universes.
 
-We consider mean-variance optimization based on full-sample estimates of the means and covariance matrices of the six factors, as well as in a dynamic setting based on the conditional distributions of returns implied by our copula model. We consider portfolios with and without Momentum (five and six factor portfolios, respectively) and how portfolio weights change when replacing HML with CMA and vice versa. We also present realized returns and risk measures for different strategies.
+We consider mean-variance optimization based on full-sample estimates of the means and covariance matrices of the six factors, as well as in a dynamic setting based on the conditional distributions of returns implied by our copula model. We consider portfolios with and without momentum (five- and six-factor portfolios, respectively) and how portfolio weights change when replacing HML with CMA and vice versa.
 
 % \subsection{Implementation}
 
@@ -36,7 +36,7 @@ We consider mean-variance optimization based on full-sample estimates of the mea
 
 \subsection{Optimization problem with restrictions}
 
-Each week, we optimize for the maximum Sharpe ratio of a portfolio invested across factors. We impose two restrictions on our optimization problem. First, all factor weights must be positive. This reduces the problem with extreme weights, seen in the unconstrained optimization problem, and reflects a view that an investor will not ``bet against'' factors that have generated a history of positive premia. Second, factor weights must sum to unity, i.e. fully invested across factors. Together, these restrictions make the optimized weights more comparable to an equal-weights strategy and reflect the tangency weights subject to a constraint of no negative weights.
+Each week, we optimize for the maximum Sharpe ratio of a portfolio invested across factors. We impose two restrictions on our optimization problem. First, all factor weights must be positive. This reduces the problem with extreme weights, seen in the unconstrained optimization problem, and reflects a view that an investor will not bet against factors that have generated a history of positive premia. Second, factor weights must sum to unity, i.e. fully invested across factors. Together, these restrictions make the optimized weights more comparable to an equal-weights strategy and reflect the tangency weights subject to a constraint of no negative weights.
 
 % Following \textcite{ChristoffersenLanglois2013}, we impose two general restrictions on the portfolios: First, all factor weights must be positive, as the interpretation of a negative factor weight is the same as betting against a factor that has been shown to generate a history of return premia. In addition, this resolves the issue of extreme weights, a common issue in unconstrained portfolios. Second, factor weights must sum to 1, as we do not consider the case of levered portfolios. This second restriction deviates slightly from \textcite{ChristoffersenLanglois2013}, who allow some leverage to the total portfolio in their maximum CRRA utility exercise. Given these two restrictions, our mean-variance optimized weights are the tangency weights, subject to a constraint of no negative weights.
 
@@ -48,7 +48,7 @@ Due to the restrictions, the standard analytical solution to the mean-variance p
 \end{align*}
 where $w_t$ is the set of weights, $\mathbb{E}_t[r_{t+1}]$ is the conditional one-step-ahead expected factor return, $\gamma$ is the risk aversion, $\mathbb{E}_t[\Sigma_{t+1}]$ is the conditional one-step-ahead variance-covariance matrix. 
 
-Under the copula model, the conditional one-step ahead forecasts of factor returns and covariance matrix is estimated from simulated distributions. Each week, we simulate $10\,000$ returns from the estimated copula model and use those outcomes for the conditional distribution of factor returns. In the case of sample means and covariances, $\mathbb{E}_t[r_{t+1}]$ and $\mathbb{E}_t[\Sigma_{t+1}]$ are constant and equal to the full-sample estimates.
+Under the copula model, the conditional one-step ahead forecasts of factor returns and covariance matrix is estimated from simulated distributions. Each week, we simulate $10\,000$ returns from the estimated copula model and use those outcomes as the conditional distribution of factor returns. In the case of sample means and covariances, $\mathbb{E}_t[r_{t+1}]$ and $\mathbb{E}_t[\Sigma_{t+1}]$ are constant and equal to the full-sample estimates.
 
 \subsection{Optimal weights according to copula and sample inputs}
 In \autoref{fig:mv_optimal_5} we present the optimized weights over time in the five-factor universe. The left hand column presents weights of factors when we consider the inclusion and exclusion of HML, while the right hand column presents weights of factors when CMA is included and excluded. The static lines represent the weights based on sample estimators of the mean-variance inputs, while the dynamic weights are based on one-week-ahead forecasts from the copula model. All weights have been smoothed as 1-year moving averages in order to make them easier to read. 
@@ -69,7 +69,7 @@ Although we impose the additional restriction of no negative weights, this findi
 
 Second, we note that the dynamic weight of HML seems to be highly similar to the decrease in weight in CMA, while all the remaining factors seem to stay very close to their original weights when moving to the six-factor model. In other words, the weight that is attributed to HML is drawn nearly directly from the weight of CMA, in each period. Our interpretation is that in a five-factor excluding HML, CMA proxies for HML, which is why CMA absorbs nearly all the weight. HML also seems to proxy for CMA to a lesser extent, as shown by the right hand column of plots, which include and exclude CMA. When CMA is included, the weight of HML is significantly lowered, but so are the weights of SMB and RMW. The proxying behavior of HML and CMA is expected, as the factors are highly correlated and zero-cost portfolio regressions in this thesis (\autoref{fig:abnormal}), as well as in \textcite{FF2015} and \textcite{Asness2015}, indicate that the main explanatory variable for HML is CMA, and vice versa.
 
-The above results are similar when we repeat the mean-variance optimizations in the six-factor-model universe excluding HML and CMA, see \autoref{fig:mv_optimal_6} and \autoref{tab:mv_realized_insample_6F}. [maybe we could say something more or drop] [in either case, we might split the first graph (5F universe) into two, for easier viewing, and keep the second grpah (6F universe) as one] [i also think we should remove the top half of the tables below, that include performance measures, and only list average weights with fewer decimals]
+The above results are similar when we repeat the mean-variance optimizations in the six-factor-model universe excluding HML and CMA, see \autoref{fig:mv_optimal_6} and \autoref{tab:mv_realized_insample_6F}. Using both sample inputs and copula inputs, we find no reason to believe that mean-variance investing in the HML factor is dead or fully subsumed by the remaining factors.
 
 \begin{figure}[htbp]
   \centering
@@ -85,7 +85,7 @@ The above results are similar when we repeat the mean-variance optimizations in 
   \centering
   \footnotesize
   \renewcommand{\arraystretch}{1.2}
-  \caption{Realized portfolio performance and average weights: Five-factor model \\ \quad \\ Based on sample inputs as well as dynamic copula model inputs, in-sample (1963--2016). All measures expressed in percentages on an annual basis, where applicable.}
+  \caption{Average portfolio weights: Five-factor model \\ \quad \\ Based on sample inputs as well as dynamic copula model inputs, in-sample (1963--2016). All weights expressed in percentages.}
   \label{tab:mv_realized_insample_5F}
   \begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X ddd d ddd @{}}
     \toprule
@@ -106,20 +106,12 @@ The above results are similar when we repeat the mean-variance optimizations in 
       \multicolumn{1}{c}{excl. CMA} &
       \multicolumn{1}{c}{excl. HML} \\
     \midrule
-
-    \textbf{Realized} \\
-    Return & 6.334 & 7.160 & 6.453 && 3.713 & 3.718 & 3.676 \\
-    SD     & 4.006 & 4.817 & 4.370 && 2.934 & 3.464 & 2.936 \\
-    Skewness & 0.153 & -0.666 & -0.196 && 0.516 & 0.458 & 0.477 \\
-    SR & 1.582 & 1.486 & 1.477 && 1.265 & 1.073 & 1.252 \\
-    MDD & 10.190 & 14.150 & 10.044 && 14.575 & 23.503 & 12.433 \\
-    \midrule
     \textbf{Weights} \\
-    Mkt.RF & 11.653 & 13.583 & 12.565 && 13.615 & 13.842 & 13.661 \\
-    HML    & 18.490 & 26.617 &        && 6.231  & 26.691 &       \\
-    SMB    & 14.866 & 18.252 & 17.492 && 13.964 & 17.975 & 14.132 \\
-    RMW    & 37.193 & 41.549 & 38.066 && 32.956 & 41.492 & 33.210 \\
-    CMA    & 17.798 &        & 31.878 && 33.234 &        & 38.996 \\
+    Mkt.RF & 12.4 & 14.2 & 13.2 && 13.6 & 13.8 & 13.7 \\
+    HML    & 18.2 & 26.3 &        && 6.2  & 26.7 &       \\
+    SMB    & 15.0 & 18.3 & 17.4 && 14.0 & 18.0 & 14.1 \\
+    RMW    & 36.8 & 41.2 & 38.0 && 33.0 & 41.5 & 33.2 \\
+    CMA    & 17.6 &        & 31.4 && 33.2 &        & 39.0 \\
      \bottomrule
   \end{tabularx}
 \end{table}
@@ -149,22 +141,14 @@ The above results are similar when we repeat the mean-variance optimizations in 
       \multicolumn{1}{c}{excl. CMA} &
       \multicolumn{1}{c}{excl. HML} \\
     \midrule
-
-    \textbf{Realized} \\
-    Return & 6.900 & 8.023 & 7.244 && 4.316 & 4.555 & 4.144 \\
-    SD     & 3.975 & 4.456 & 4.375 && 2.990 & 3.351 & 2.995 \\
-    Skewness & -1.586 & -1.153 & -1.460 && 0.004 & -0.216 & 0.129 \\
-    SR & 1.736 & 1.801 & 1.656 && 1.443 & 1.359 & 1.384 \\
-    MDD & 9.756 & 10.761 & 9.926 && 9.427 & 12.322 & 8.975 \\
-    \midrule
     \textbf{Weights} \\
-    Mkt.RF & 8.906  & 9.669  & 9.059  && 13.201 & 13.164 & 13.357 \\
-    HML    & 17.517 & 24.371 &        && 13.221 & 26.956 &        \\
-    SMB    & 13.165 & 15.605 & 15.214 && 12.019 & 13.432 & 12.671 \\
-    RMW    & 30.980 & 33.669 & 31.087 && 27.650 & 30.211 & 29.044 \\
-    CMA    & 15.579 &        & 28.447 && 22.193 &        & 35.188 \\
-    Mom    & 13.853 & 16.685 & 16.194 && 11.715 & 16.238 & 9.740  \\
-
+    Mkt.RF & 9.8  & 10.4  & 9.9  && 13.2 & 13.2 & 13.4 \\
+    HML    & 17.6 & 24.1 &        && 13.2 & 27.0 &        \\
+    SMB    & 13.4 & 15.6 & 15.3 && 12.0 & 13.4 & 12.7 \\
+    RMW    & 30.6 & 33.3 & 31.4 && 27.7 & 30.2 & 29.0 \\
+    CMA    & 14.6 &        & 27.5 && 22.2 &        & 35.2 \\
+    Mom    & 13.9 & 16.6 & 15.9 && 11.7 & 16.2 & 9.7  \\
     \bottomrule
   \end{tabularx}
 \end{table}
+
