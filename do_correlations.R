@@ -523,11 +523,11 @@ ggsave('output/thresholdCorrelations/appendix_threshold_2.png', appendix_thresho
 # Do graph with residuals and returns
 .plot_th_corr_scatter(plotdf = plotdf.res, plotdf.scatter = plotdf.scatter.res, df.labels.res,
                       COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
-                      14, 7)
+                      16, 9)
 
 .plot_th_corr_scatter_ret(plotdf = plotdf.ret, plotdf.scatter = plotdf.scatter.ret, df.labels.ret,
                           COLFACTORS = c('Mkt.RF'), ROWFACTORS = c('HML'), sprintf('%s_MKT_HML', ID),
-                          14, 7)
+                          16, 9)
 
 # Threshold correlations simulated - for comparing compula performance to real world ----------------------------------------
 
