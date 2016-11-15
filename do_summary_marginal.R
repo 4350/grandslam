@@ -95,7 +95,7 @@ g <- ggplot(plot_df,
   theme(legend.position = 'none')+
   scale_y_continuous(labels = scales::percent)
 
-ggsave('output/MarginalStats/qq_returns.png', g, device = 'png', width = 14, height = 10, units = 'cm', limitsize = F)
+ggsave('output/MarginalStats/qq_returns.png', g, device = 'png', width = 16, height = 10, units = 'cm', limitsize = F)
   
 
 # Corr matrix data --------------------------------------------------------

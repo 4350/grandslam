@@ -164,7 +164,7 @@ summary.cumretplots <- function(df, outlabel) {
     scale_colour_Publication()
   
   # Save out
-  ggsave(filename = 'output/cumretPlot.png', out.cumret, 'png', dpi = 300, width = 14, height = 6, units = "cm", limitsize = F)
-  ggsave(filename = 'output/cumretStdPlot.png', out.cumstdret, 'png', dpi = 300, width = 14, height = 6, units = "cm", limitsize = F)
+  ggsave(filename = 'output/cumretPlot.png', out.cumret, 'png', dpi = 300, width = 16, height = 8, units = "cm", limitsize = F)
+  ggsave(filename = 'output/cumretStdPlot.png', out.cumstdret, 'png', dpi = 300, width = 16, height = 8, units = "cm", limitsize = F)
   
 }

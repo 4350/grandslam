@@ -229,7 +229,7 @@ threshold1 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/threshold1.png', threshold1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold1.png', threshold1, width = 16, height = 17, limitsize = FALSE, units = 'cm')
 
 threshold2 <- grid.arrange(
   .plot_th_corr(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
@@ -242,7 +242,7 @@ threshold2 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/threshold2.png', threshold2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold2.png', threshold2, width = 16, height = 17, limitsize = FALSE, units = 'cm')
 
 # And draw for appendix part
 
@@ -271,7 +271,7 @@ appendix_threshold1 <-
   heights = c(13,1)
   )
   
-ggsave('output/thresholdCorrelations/appendix_threshold_1.png', appendix_threshold1, width = 14, height = 18, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/appendix_threshold_1.png', appendix_threshold1, width = 16, height = 18, limitsize = FALSE, units = 'cm')
 
 appendix_threshold2 <- 
   grid.arrange(
@@ -292,7 +292,7 @@ appendix_threshold2 <-
   )
   
     
-ggsave('output/thresholdCorrelations/appendix_threshold_2.png', appendix_threshold2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/appendix_threshold_2.png', appendix_threshold2, width = 16, height = 17, limitsize = FALSE, units = 'cm')
 
 # Threshold correlation with scatter to  explain before main results, for MKT-HML pair ------------------------------
 # One function for scatter with residuals and one for scatter with returns, axes differ etc...
@@ -581,12 +581,13 @@ models_empirical <- plotdf.res %>%
   mutate(model = 'empirical')
 
 models <- bind_rows(models, models_empirical) %>% select(-ub, -lb)
+models$model <- factor(models$model, levels = c('empirical','norm','std','ghst'))
 models$factor1 <- factor(models$factor1, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 models$factor2 <- factor(models$factor2, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
 
 # Save legend
 g_simulated_legend <- .plot_th_corr_simulated(COLFACTORS = 'Mkt.RF', ROWFACTORS = 'HML')+theme(legend.position = 'bottom')+
-  scale_colour_manual(labels = c("Empirical distribution","Skewed Student's t","Normal","Student's t copula"), values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
+  scale_colour_manual(labels = c("Empirical distribution","Normal","Symmetric t","Asymmetric t"), values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
 
 simulated_legend = gtable_filter(ggplotGrob(g_simulated_legend), "guide-box") 
 
@@ -610,7 +611,7 @@ threshold_simulated1 <-
     heights = c(13,1)
   )
   
-ggsave('output/thresholdCorrelations/threshold_simulated_1.png', threshold_simulated1, width = 14, height = 18, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold_simulated_1.png', threshold_simulated1, width = 16, height = 18, limitsize = FALSE, units = 'cm')
 
 threshold_simulated2 <- 
   grid.arrange(
@@ -629,7 +630,7 @@ threshold_simulated2 <-
     nrow = 2,
     heights = c(13,1)
   )
-ggsave('output/thresholdCorrelations/threshold_simulated_2.png', threshold_simulated2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold_simulated_2.png', threshold_simulated2, width = 16, height = 17, limitsize = FALSE, units = 'cm')
 
 
 #  ------------------------------------------------------------------------
@@ -750,7 +751,7 @@ rolling1 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/rollingCorrelations/rolling1.png', rolling1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/rollingCorrelations/rolling1.png', rolling1, width = 16, height = 17, limitsize = FALSE, units = 'cm')
 
 
 rolling2 <- grid.arrange(
@@ -764,7 +765,7 @@ rolling2 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/rollingCorrelations/rolling2.png', rolling2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/rollingCorrelations/rolling2.png', rolling2, width = 16, height = 17, limitsize = FALSE, units = 'cm')
 
 
 appendix_rolling1 <- grid.arrange(
@@ -778,7 +779,7 @@ appendix_rolling1 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/rollingCorrelations/appendix_rolling1.png', appendix_rolling1, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/rollingCorrelations/appendix_rolling1.png', appendix_rolling1, width = 16, height = 17, limitsize = FALSE, units = 'cm')
 
 
 appendix_rolling2 <- grid.arrange(
@@ -792,4 +793,4 @@ appendix_rolling2 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/rollingCorrelations/appendix_rolling2.png', appendix_rolling2, width = 14, height = 17, limitsize = FALSE, units = 'cm')
+ggsave('output/rollingCorrelations/appendix_rolling2.png', appendix_rolling2, width = 16, height = 17, limitsize = FALSE, units = 'cm')
