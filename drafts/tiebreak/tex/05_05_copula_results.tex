@@ -1,27 +1,23 @@
 %!TEX root = ../main.tex
+\subsection{Copula specification and estimation results}
+Given the results of the dependence structure of residuals, we now discuss the best choice of copula model and present estimation results of the six competing copula specifications.
 
-\subsection{Copula Dependency Measures} % (fold)
-\label{sub:copula_dependency_measures}
+\subsubsection{Interpreting and choosing copula specification}
 
-By simulating 250000 weeks of shocks in the copula, and then transforming these shocks into standardized residuals for each of the factors, we can test copula's ability to generate the threshold correlations in the data. The results are given in~\autoref{fig:threshold_simulated1}. Again, we use the standardized returns of ARMA-GARCH models. We display patterns from constant copula models, as the dynamic models vary over time.
+The interpretation of the copula parameterization is closely associated to the structure of multivariate dependence. By different restrictions on the parameters in the DAC model, we are able to activate or deactivate certain features of the copula: First, the degree of freedom parameter $nu_c$ is to be interpreted as a the measure of tail dependency. When $nu \neq 0$, the lower and upper tails of the joint distribution are fatter than in the normal case, which is coherent with the evidence from threshold correlations. Second, the skewness parameters $\gamma_{c,i}$ are to be interpreted as the extent of asymmetry in the correlation structure. When $\gamma \neq 0$, there is asymmetry in correlations, which is also coherent with the earlier threshold correlation analysis. Third, the $\alpha$ and $\beta$ parameters determine whether the copula generates time-varying correlations. If $\alpha \neq 0$ and $\beta \neq 0$, the copula is dynamic, which is consistent with the findings of the rolling correlation analysis. An overview of the six copula models is given in \autoref{fig:conceptual}.
 
 \begin{figure}[!ht]
   \centering
-  \caption{Threshold correlations of simulated constant copula standardized returns \\ \quad \\ Threshold correlations of simulated constant copula, with ARMA-GARCH standardized returns (95\% confidence bounds taking the ARMA-GARCH models as given). The simulated threshold correlations are based on 250,000 simulated returns each.}
-  \includegraphics[scale=1]{graphics/threshold_simulated_1.png}  
-  \label{fig:threshold_simulated1}
-\end{figure}
-\begin{figure}[!ht]
-  \ContinuedFloat
-  \centering
-  \caption{Threshold correlations of simulated copula standardized returns (cont.)}
-  \includegraphics[scale=1]{graphics/threshold_simulated_2.png}  
+  \footnotesize
+  \caption{Six copula specifications -- A conceptual matrix of parameterizations}
+  \includegraphics[scale=1]{graphics/conceptual_matrix.png}
+  \label{fig:conceptual}
 \end{figure}
 
-First, we note that for most factors, the normal copula is the farthest away from generating threshold correlations that correspond to the empirical distribution around the median. More specifically, it seems to underestimate the threshold correlation, i.e. not generate sufficient tail dependence. The Student's \textit{t} and skewed Student's \textit{t} copulae better capture the threshold correlations, as the fatter tails of the Student's \textit{t} distribution allows for tail dependence. For example, note how the normal copula generates negative threshold correlations for both the Mom - HML and RMW - HML asset pairs, while the Student's \textit{t} based copulae are much closer to the higher values in the data. On the other hand, the Student's \textit{t} based copulae sometimes seem to overshoot the empirical threshold correlation, as in the Mkt-RF - RMW asset pair.
+\subsubsection{Copula estimation results}
 
-Second, we find that the skewed Student's \textit{t} generates some asymmetry around the mean, which can be seen most clearly for the Mom - RMW and RMW - HML asset pairs. The generated asymmetry is not always strong enough to accurately describe the data.
+We estimate constant and dynamic normal, symmetric and asymmetric copula models on the full dataset of GARCH uniform residuals. Results are presented in~\autoref{tab:copula_estimation}. First, we examine the choice between a normal, symmetric \textit{t} or asymmetric \textit{t} copula. We note that $\nu_c$ is clearly significant and suggests a Student's \textit{t} model with tail dependence over the normal model. Second, we examine the asymmetric specification and find that few of the $\gamma_c$ estimates appear significant, indicating that the asymmetry is hard to capture or not consistent enough to merit modeling. This is supported by the relatively small improvement in log-likelihood by going from a symmetric to asymmetric copula and the fact that the BIC criterion prefers the symmetric model in the dynamic case. 
 
-In conclusion, comparing threshold correlations from empirical data and simulated data shows that our copula approach captures some of the tail dependence. Although the Student's \textit{t} and skewed Student's \textit{t} results do not align perfectly with the data, they constiute clear improvements to the normal copula. We do note that the copula seems to lack flexibility to simultaneously generate all the asymmetries in tail dependence. This is quite expected, as the Student's \textit{t} copula only has one degree of freedom parameter that controls the fatness of tails, and the skewed Student's \textit{t} copula only has one skewness parameter for each series. This imposes limits on how strongly the model can express fat tails or asymmetries between factors A and B and simultaneously express other fat tails or asymmetries (or lack thereof) between factors A and C. For a collection of six factors with heterogenous dependence, this is even harder. This is a clear limitation of the quite parsimonious copula approach, and will be discussed further in the concluding section. Although imperfect, the copula modeling of tail dependence could constitute a significant improvement to alternatives, especially in the field of risk management, where understanding of tail events is paramount.
+Second, we examine the choice between a constant and dynamic copula correlation matrix. There is a significant improvement in log-likelihood and BIC when moving from a constant to a dynamic copula, which suggests that time-varying dependence shown by rolling correlation is captured, which improves the model's fit. We also find a high persistence of the correlation process, as $\alpha + \beta$, is close to a unit root.
 
-% subsection copula_dependency_measures (end)
+In summary, we find that the dynamic symmetric Student's \textit{t} copula is the best specification, as it has the highest BIC, well defined parameters, and is strongly supported by the dependence pattern showcased by threshold and rolling correlation analyses. While the asymmetric Student's \textit{t} is an interesting model, we believe that the asymmetry patterns in data are too irregular to capture well in a copula model with only one asymmetry parameter for each series.
