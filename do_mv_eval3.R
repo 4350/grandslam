@@ -3,8 +3,8 @@ rm(list = ls())
 library(dplyr)
 library(PerformanceAnalytics)
 
-MODEL_NAME <- 'results_full_dynamic_std_10000'
-#MODEL_NAME <- 'results_full_sample'
+#MODEL_NAME <- 'results_full_dynamic_std_10000'
+MODEL_NAME <- 'results_full_sample'
 
 STRATEGIES <- list(
   '5F',
@@ -24,6 +24,7 @@ load_field <- function(field) {
   names(out) <- STRATEGIES
   out
 }
+
 
 # Summary statistics of realized returns ----
 returns <- load_field('portfolio_return')
@@ -52,4 +53,57 @@ wdf <- bind_rows(lapply(weights, function(weight) {
   100 * data.frame(t(data.frame(apply(weight, 2, mean))))
 }), .id = 'Strategy')
 
-stargazer::stargazer(wdf, summary = FALSE, type = 'text', digits = 3)
+stargazer::stargazer(t(wdf), summary = FALSE, type = 'text', digits = 3)
+
+# T-testing diffs  ------------------------------------------------------------------------
+
+t_test_factor <- function(strategy1, strategy2) {
+  
+  factors = c('Mkt.RF','SMB','Mom','HML','CMA','RMW')
+  
+  out.list <- lapply(factors, function(factor) {
+
+    load(sprintf('data/derived/mv/%s_%s.RData', MODEL_NAME, strategy1))
+    results1 <- results[['weights']]
+    load(sprintf('data/derived/mv/%s_%s.RData', MODEL_NAME, strategy2)) 
+    results2 <- results[['weights']]
+    
+    if(!(
+      factor %in% colnames(results1) && factor %in% colnames(results2)
+    )) {
+      list()
+    } else {
+      
+      weights1 <- results1[,factor] * 100
+      weights2 <- results2[,factor] * 100
+      
+      df <- data.frame(weights1, weights2)
+      colnames(df) <- c(strategy1, strategy2)
+      
+      test <- t.test(df[,strategy1], df[,strategy2], paired = T)
+      
+      list(
+        factor = factor,
+        strategy1 = strategy1,
+        strategy2 = strategy2,
+        statistic = round(test$statistic,2),
+        estimate = round(test$estimate,1),
+        se = round(test$estimate / test$statistic,4),
+        p = round(test$p.value,4)
+      )
+      
+    }
+  })
+  
+  out.list <- bind_rows(out.list)
+  
+  stargazer(out.list, summary = F, type = 'text', digits = 2, digits.extra = 0)
+  
+}
+
+t_test_factor('5F_EXCL_CMA', '5F')
+t_test_factor('5F_EXCL_HML', '5F')
+
+
+t_test_factor('6F_EXCL_CMA', '6F')
+t_test_factor('6F_EXCL_HML', '6F')
