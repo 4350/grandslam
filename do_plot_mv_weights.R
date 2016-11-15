@@ -15,8 +15,8 @@ library(extrafont)
 load_all('wimbledon')
 
 MODEL = 'results_full_dynamic_std_10000'
-MODEL_NAME_1 = '5F_EXCL_HML'
-MODEL_NAME_2 = '5F'
+MODEL_NAME_1 = '6F_EXCL_HML'
+MODEL_NAME_2 = '6F'
 
 load(sprintf('data/derived/mv/%s_%s.RData', MODEL, MODEL_NAME_1))
 results1 <- results
@@ -73,7 +73,7 @@ ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
 
 
 ggsave(sprintf('output/mv/Weights_%s_%s.png', MODEL_NAME_1, MODEL_NAME_2),
-       width = 8,
+       width = 7.9,
        height = 18,
        units = 'cm',
        limitsize = FALSE)
