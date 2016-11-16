@@ -108,7 +108,7 @@ ff_reg_interest <- function(df) {
   stargazer(out_list, order = c('Constant', factors), 
             align = TRUE,
             notes.align = 'c',
-            digits = 4,
+            digits = 2,
             digit.separator = ','
             )
   out_rsq

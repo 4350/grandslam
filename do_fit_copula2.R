@@ -9,7 +9,7 @@ rm(list = ls())
 
 # Gustaf: Create a cluster and pass instead. Remember to stopCluster() after
 # i.e.
-cl <- makeCluster(spec = detectCores() - 1)
+cl <- makeCluster(spec = detectCores())
 clusterEvalQ(cl, library(devtools))
 clusterEvalQ(cl, load_all('australian'))
 registerDoParallel(cl)

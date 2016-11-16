@@ -113,7 +113,10 @@ do_simulate <- function(name, copula) {
 
 # Run Simulations --------------------------------------------------------
 
-cl <- makeCluster()
+cl <- makeCluster(spec = detectCores()-1)
+clusterEvalQ(cl, library(devtools))
+clusterEvalQ(cl, load_all('wimbledon'))
+clusterEvalQ(cl, load_all('australian'))
 registerDoParallel(cl)
 
 load('data/derived/copula/oos_constant_filtered.RData')
