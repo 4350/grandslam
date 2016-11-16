@@ -1,7 +1,4 @@
-garch_path_t <- function(t, filtered_copula) {
-  # Get simulated stdresid for this ("next") period
-  stdresid_t <- .simulate_stdresid_t(t, filtered_copula)
-  
+garch_path_t <- function(t, stdresid_t) {
   foreach (i = seq_along(model.GARCH), .combine = 'cbind') %do% {
     path <- garch.path.it(i, t, specs, filtered_series, stdresid_t)
     t(path@path$seriesSim)
@@ -51,7 +48,19 @@ do_simulate <- function(name, copula) {
     t <- T_SEQ[t_i]
     
     tic(sprintf('%s: t = %d', name, t))
-    distribution[,, t_i] <- garch_path_t(t, copula)
+    
+    # Get simulated stdresid for this ("next") period
+    # We want to save this straight away because of all the memory
+    stdresid_t <- .simulate_stdresid_t(t, copula)
+    save(
+      stdresid_t,
+      file = file.path(
+        'data/derived/stdresid/dynamic/',
+        sprintf('%s_%d_%d.RData', name, N_RANDOM, t_i)
+      )
+    )
+    
+    distribution[,, t_i] <- garch_path_t(t, stdresid_t)
     toc()
   }
   
