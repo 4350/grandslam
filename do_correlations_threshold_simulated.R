@@ -24,9 +24,9 @@ threshold_correlations_pairs <- function(stdresid, pairs) {
   bind_rows(results)
 }
 
-threshold_correlations_models <- function(models, pairs) {
+threshold_correlations_models <- function(dynamic, models, pairs) {
   results <- lapply(models, function(model) {
-    load(sprintf('data/derived/stdresid/full_constant_%s.RData', model))
+    load(sprintf('data/derived/stdresid/full_%s_%s.RData', dynamic, model))
     threshold_correlations_pairs(stdresid, pairs)
   })
   
@@ -63,10 +63,10 @@ tic(sprintf(
   length(PAIRS),
   length(MODELS))
 )
-models <- threshold_correlations_models(MODELS, PAIRS)
+models <- threshold_correlations_models('dynamic', MODELS, PAIRS)
 toc()
 
-save(models, file = 'data/derived/correlations_threshold_copula.RData')
+save(models, file = 'data/derived/correlations_threshold_copula_dynamic.RData')
 
 # Plotting ---------------------------------------------------------------
 
