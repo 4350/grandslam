@@ -89,16 +89,20 @@ ff_reg_interest <- function(df) {
   out_list = list(
     HML_5F = ff_reg('HML', c('Mkt.RF','SMB','CMA','RMW'), df),
     CMA_5F = ff_reg('CMA', c('Mkt.RF','SMB','HML','RMW'), df),
+    RMW_5F = ff_reg('RMW', c('Mkt.RF','SMB','HML','CMA'), df),
     HML_6F = ff_reg('HML', c('Mkt.RF','SMB','CMA','RMW', 'Mom'), df),
-    CMA_6F = ff_reg('CMA', c('Mkt.RF','SMB','HML','RMW', 'Mom'), df)
+    CMA_6F = ff_reg('CMA', c('Mkt.RF','SMB','HML','RMW', 'Mom'), df),
+    RMW_6F = ff_reg('RMW', c('Mkt.RF','SMB','HML','CMA', 'Mom'), df)
   )
 
   # Rsquareds
   out_rsq = list(
     HML_5F = ff_reg_rsq('HML', c('Mkt.RF','SMB','CMA','RMW'), df),
     CMA_5F = ff_reg_rsq('CMA', c('Mkt.RF','SMB','HML','RMW'), df),
+    RMW_5F = ff_reg_rsq('RMW', c('Mkt.RF','SMB','HML','CMA'), df),
     HML_6F = ff_reg_rsq('HML', c('Mkt.RF','SMB','CMA','RMW', 'Mom'), df),
-    CMA_6F = ff_reg_rsq('CMA', c('Mkt.RF','SMB','HML','RMW', 'Mom'), df)
+    CMA_6F = ff_reg_rsq('CMA', c('Mkt.RF','SMB','HML','RMW', 'Mom'), df),
+    RMW_6F = ff_reg_rsq('RMW', c('Mkt.RF','SMB','HML','CMA', 'Mom'), df)
   )
   
   stargazer(out_list, order = c('Constant', factors), 
