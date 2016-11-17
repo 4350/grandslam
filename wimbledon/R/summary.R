@@ -142,8 +142,8 @@ summary.cumretplots <- function(df, outlabel) {
     ggplot(aes(x=Date, y=cumret, group=factor)) +
     geom_line(aes(color=factor))+
     #ggtitle('Cumulative returns to factor strategies')+
-    xlab('')+
-    ylab('Cumulative return')+
+    xlab('Year')+
+    ylab('Cumulative gross return')+
     theme(legend.position="bottom")+
     scale_x_date(date_breaks = "2 years", date_labels = "%y")+
     theme_Publication()+
@@ -155,8 +155,8 @@ summary.cumretplots <- function(df, outlabel) {
     ggplot(aes(x=Date, y=cumstdret, group=factor)) +
     geom_line(aes(color=factor))+
     #ggtitle('Cumulative returns to factor strategies (standardized 10% annual vol)')+
-    xlab('')+
-    ylab('Cumulative return')+
+    xlab('Year')+
+    ylab('Cumulative gross return')+
     theme(legend.position="bottom")+
     scale_x_date(date_breaks = "2 years", date_labels = "%y")+
     theme_Publication()+

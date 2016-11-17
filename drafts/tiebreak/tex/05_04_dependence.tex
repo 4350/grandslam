@@ -4,7 +4,7 @@
 
 In this subsection, we demonstrate that the standardized residuals ${z_t}$ from ARMA-GARCH models display both tail dependence, measured by threshold correlations, and time-varying correlations, measured by rolling correlations; features we will attempt to model in the copula model. In the context of modeling, we are interested in the standardized returns, rather than the returns themselves, as they are filtered of the variance dynamics present in the returns themselves~\autocite{ChristoffersenLanglois2013}.\footnote{The visual patterns for both threshold and rolling correlations are quite similar between returns and standardized returns; results are available in the appendix.}
 
-\subsubsection{Threshold Correlations}
+\subsubsection{Threshold correlations}
 
 Threshold (or exceedance) correlations have previously been used to highlight the asymmetric dependence structure of i.a. country equity indices~\autocite{LonginSolnik2001}, portfolios by industry, size, value and momentum~\autocite{AngChen2002} and factor strategies~\autocite{ChristoffersenLanglois2013}. The following analysis is still new as it adds the factors investment (CMA) and profitability (RMW). We follow~\textcite{ChristoffersenLanglois2013} definition of threshold correlation
 \begin{align}
@@ -14,12 +14,12 @@ Threshold (or exceedance) correlations have previously been used to highlight th
         Corr\Big(r_i, r_j \,|\, r_i \geq F_i^{-1}(p), r_j \geq F_j^{-1}(p)\Big)  & \text{for } p \geq 0.5
     \end{cases}
 \end{align}
-where $F_i^{-1}(p)$ the empirical quantile of $r_i$ at percentile $p$. Threshold correlations thus reflect how series correlate when both are realizing in their respective tails. This subsetting of data is illustrated in \autoref{fig:illustrate_threshold}. In the left hand plots, we see the scatter of ARMA-GARCH residuals of Mkt-RF and HML respectively, and how $p$, found on the $x$-axis of the right hand plot, determines the subset of data that is included in the correlation calculation. We note that the standard correlation, given by the dashed line in the right hand plot, is clearly negative, while threshold correlations in the first and third quadrants are significantly more positive, which shows that not taking threshold correlations into account provides a vaguer picture of the dependence structure when both factor series realize in their tails.
+where $F_i^{-1}(p)$ the empirical quantile of $r_i$ at percentile $p$. Threshold correlations thus reflect how series correlate when both are realizing in their respective tails. This subsetting of data is illustrated in \autoref{fig:illustrate_threshold}. In the left hand plots, we see the scatter of ARMA-GARCH residuals of Mkt.RF and HML respectively, and how $p$, found on the $x$-axis of the right hand plot, determines the subset of data that is included in the correlation calculation. We note that the standard correlation, given by the dashed line in the right hand plot, is clearly negative, while threshold correlations in the first and third quadrants are significantly more positive, which shows that not taking threshold correlations into account provides a vaguer picture of the dependence structure when both factor series realize in their tails.
 
 \begin{figure}[!ht]
   \centering
   \footnotesize
-  \caption{Illustration of threshold correlations on ARMA-GARCH residuals from the Mkt-RF--HML asset pair, with 95\% confidence bounds. The unconditional correlation is given by the dashed line. Based on weekly data 1963--2016.}
+  \caption{Illustration of threshold correlations on ARMA-GARCH residuals from the Mkt.RF--HML asset pair, with 95\% confidence bounds. The unconditional correlation is given by the dashed line. Based on weekly data 1963--2016.}
   \includegraphics[scale=1]{graphics/threshold_explain_res.png}
   \label{fig:illustrate_threshold}
 \end{figure}
@@ -42,17 +42,17 @@ where $F_i^{-1}(p)$ the empirical quantile of $r_i$ at percentile $p$. Threshold
   \caption{Threshold correlations of ARMA-GARCH standardized returns (cont.)}
 \end{figure}
 
-We now plot threshold correlations without the adjacent scatter graph. \autoref{fig:threshold1} displays threshold correlations for HML, CMA and RMW against eachother as well as against the the other factors Mkt-RF, SMB and Mom. We note that for most asset pairs, the threshold correlation is significantly different from the unconditional correlation coefficient, given by the dashed line.
+We now plot threshold correlations without the adjacent scatter graph. \autoref{fig:threshold1} displays threshold correlations for HML, CMA and RMW against eachother as well as against the the other factors Mkt.RF, SMB and Mom. We note that for most asset pairs, the threshold correlation is significantly different from the unconditional correlation coefficient, given by the dashed line.
 
-We also note that there is asymmetry around the median for some factor pairs, including the Mom--CMA, RMW--HML, RMW--CMA, and to a lesser extent Mkt-RF--RMW asset pairs. For example, in the Mom-CMA asset pair, the threshold correlation jumps up for the first percentile below the median, indicating that the correlation is higher when both realize below the median than when both realize above the median. This type of asymmetric property, where downside (below the median) correlation is higher than upside correlation is unwanted, as it reflects a poorer diversification in bad times. The opposite type of asymmetry can be seen in for the HML--RMW and CMA--RMW asset pairs -- when these factors simultaneously realize above the meadian, they are significantly more correlated. This, however, presents no diversification problem.
+We also note that there is asymmetry around the median for some factor pairs, including the Mom--CMA, RMW--HML, RMW--CMA, and to a lesser extent Mkt.RF--RMW asset pairs. For example, in the Mom-CMA asset pair, the threshold correlation jumps up for the first percentile below the median, indicating that the correlation is higher when both realize below the median than when both realize above the median. This type of asymmetric property, where downside (below the median) correlation is higher than upside correlation is unwanted, as it reflects a poorer diversification in bad times. The opposite type of asymmetry can be seen in for the HML--RMW and CMA--RMW asset pairs -- when these factors simultaneously realize above the meadian, they are significantly more correlated. This, however, presents no diversification problem.
 
-Although estimated with substantial uncertainty, the threshold correlation do not seem to be constant as $p$ approaches either zero or one. For example, the Mkt-RF--HML asset pair seems to have a downward pattern, where correlation is the most positive in the lowest percentiles of residuals and the most negative in the highest percentile of residuals. In fact, this pattern is also unwanted from a diversification perspective, as series tend to coincide more in extreme negative events. 
+Although estimated with substantial uncertainty, the threshold correlation do not seem to be constant as $p$ approaches either zero or one. For example, the Mkt.RF--HML asset pair seems to have a downward pattern, where correlation is the most positive in the lowest percentiles of residuals and the most negative in the highest percentile of residuals. In fact, this pattern is also unwanted from a diversification perspective, as series tend to coincide more in extreme negative events. 
 
 As do the original return series, all residual factor pairs exhibit unconditional correlation of near or below zero, except for the CMA--HML pair which exhibits a correlation in excess of $0.60$. Additionally, the threshold correlation estimate is much closer to this unconditional correlation -- suggesting that the tails of this pair is similar to the average.
 
 While the patterns in threshold correlations are interesting, we are careful not to draw conclusions regarding diversification benefit based on solitary threshold correlation graphs -- what is interesting is the total pattern, and our key point is that there seems to be tail dependence that should not be ignored in the copula specification. Tail dependence is only possible in the Student's \textit{t} copulas.
 
-\subsubsection{Rolling Correlations}
+\subsubsection{Rolling correlations}
 
 We compute rolling 52-week correlations between the standardized returns of our ARMA-GARCH models according to the formula: 
 \begin{align}
