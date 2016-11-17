@@ -93,13 +93,17 @@ cdb <- data.frame(cdb)
 pairs <- list(
   list(cdb$X5F.5F, cdb$X5F.5F_EXCL_CMA),
   list(cdb$X5F.5F, cdb$X5F.5F_EXCL_HML),
-  list(cdb$X5F.5F_EXCL_CMA, cdb$X5F.5F_EXCL_HML),
+  list(cdb$X5F.5F, cdb$X5F.5F_EXCL_RMW),
+  
   
   list(cdb$X6F.6F, cdb$X6F.6F_EXCL_CMA),
   list(cdb$X6F.6F, cdb$X6F.6F_EXCL_HML),
-  list(cdb$X6F.6F_EXCL_CMA, cdb$X6F.6F_EXCL_HML),
+  list(cdb$X6F.6F, cdb$X6F.6F_EXCL_RMW),
+  # list(cdb$X6F.6F_EXCL_CMA, cdb$X6F.6F_EXCL_HML),
   
-  list(cdb$X6F.6F, cdb$X5F.5F)
+  list(cdb$X5F.5F_EXCL_CMA, cdb$X5F.5F_EXCL_HML),
+  list(cdb$X5F.6F_EXCL_CMA, cdb$X5F.6F_EXCL_HML)
+  # list(cdb$X6F.6F, cdb$X5F.5F)
 )
 
 tested <- bind_rows(lapply(pairs, function(pair) {
@@ -112,5 +116,5 @@ tested <- bind_rows(lapply(pairs, function(pair) {
   )
 }))
 
-stargazer::stargazer(100 * cdb, type = 'text')
-stargazer::stargazer(data.frame(tested), type = 'text', summary = F, digits = 3, digits.extra = 0)
+stargazer::stargazer(100 * cdb, type = 'text', digits = 2)
+stargazer::stargazer(data.frame(tested), type = 'text', summary = F, digits = 2, digits.extra = 0)
