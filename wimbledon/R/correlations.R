@@ -199,7 +199,7 @@ roll_corr <- function(df, df.date = NULL, window) {
   # Get some size of data
   N <- ncol(df)
   T <- nrow(df)
-  nCorrs <- dim(df.estim)[1]-window+1
+  nCorrs <- T - window + 1
   
   # Check if dates are specified or whether to use numbers
   if(is.null(df.date)) {
