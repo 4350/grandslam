@@ -611,7 +611,7 @@ threshold_simulated1 <-
     heights = c(19,2)
   )
   
-ggsave('output/thresholdCorrelations/threshold_simulated_1.png', threshold_simulated1, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold_simulated_1.png', threshold_simulated1, width = 16, height = 20, limitsize = FALSE, units = 'cm')
 
 threshold_simulated2 <- 
   grid.arrange(
@@ -630,7 +630,7 @@ threshold_simulated2 <-
     nrow = 2,
     heights = c(19,2)
   )
-ggsave('output/thresholdCorrelations/threshold_simulated_2.png', threshold_simulated2, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold_simulated_2.png', threshold_simulated2, width = 16, height = 20, limitsize = FALSE, units = 'cm')
 
 
 #  ------------------------------------------------------------------------
@@ -751,7 +751,7 @@ rolling1 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/rollingCorrelations/rolling1.png', rolling1, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/rollingCorrelations/rolling1.png', rolling1, width = 16, height = 20, limitsize = FALSE, units = 'cm')
 
 
 rolling2 <- grid.arrange(
@@ -765,7 +765,7 @@ rolling2 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/rollingCorrelations/rolling2.png', rolling2, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/rollingCorrelations/rolling2.png', rolling2, width = 16, height = 20, limitsize = FALSE, units = 'cm')
 
 
 appendix_rolling1 <- grid.arrange(
@@ -779,7 +779,7 @@ appendix_rolling1 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/rollingCorrelations/appendix_rolling1.png', appendix_rolling1, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/rollingCorrelations/appendix_rolling1.png', appendix_rolling1, width = 16, height = 20, limitsize = FALSE, units = 'cm')
 
 
 appendix_rolling2 <- grid.arrange(
@@ -793,4 +793,4 @@ appendix_rolling2 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/rollingCorrelations/appendix_rolling2.png', appendix_rolling2, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/rollingCorrelations/appendix_rolling2.png', appendix_rolling2, width = 16, height = 20, limitsize = FALSE, units = 'cm')

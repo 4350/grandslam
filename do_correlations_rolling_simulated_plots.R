@@ -128,7 +128,7 @@ ggsave(
   'output/rollingCorrelations/rolling_simulated1.png',
   g1,
   width = 16,
-  height = 21,
+  height = 20,
   limitsize = FALSE,
   units = 'cm'
 )
@@ -158,7 +158,7 @@ ggsave(
   'output/rollingCorrelations/rolling_simulated2.png',
   g2,
   width = 16,
-  height = 21,
+  height = 20,
   limitsize = FALSE,
   units = 'cm'
 )
