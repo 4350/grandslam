@@ -61,8 +61,16 @@ In \autoref{fig:mv_optimal_5} we present the optimized weights over time in the 
   \renewcommand{\arraystretch}{1.2}
   \caption{Mean-variance optimal weights in the five-factor universe \\ \quad \\ Smoothed as 1-year moving averages. Left hand panel including and excluding HML, right hand including and excluding CMA. Based on one-week-ahead forecasts from the copula model 1963--2016.}
   \label{fig:mv_optimal_5}
-  \includegraphics[scale = 1]{graphics/Weights_5F_EXCL_HML_5F.png}
-  \includegraphics[scale = 1]{graphics/Weights_5F_EXCL_CMA_5F.png}
+  
+  \begin{subfigure}{0.45\textwidth}
+    \includegraphics[width=\textwidth]{graphics/Weights_5F_EXCL_HML_5F.png}
+    \caption{Excluding HML}
+  \end{subfigure}
+  ~
+  \begin{subfigure}{0.45\textwidth}
+    \includegraphics[width=\textwidth]{graphics/Weights_5F_EXCL_CMA_5F.png}
+    \caption{Excluding CMA}
+  \end{subfigure}  
 \end{figure}
 
 We begin by examining the left column of plots in \autoref{fig:mv_optimal_5} that includes and excludes HML. First, we note that the weight of HML is not zero when introduced in the investible universe. This appears to be the case for both the sample estimate of means and covariances, as well as the dynamic estimates from the copula model. Both inputs suggest that HML does in fact improve the tangency portfolio, as the optimal portfolio has a positive weight on the factor. 
@@ -81,8 +89,16 @@ The above results are similar when we repeat the mean-variance optimizations in 
   \renewcommand{\arraystretch}{1.2}
   \caption{Mean-variance optimal weights in the six-factor universe \\ \quad \\ Smoothed as 1-year moving averages. Left hand panel including and excluding HML, right hand including and excluding CMA. Based on one-week-ahead forecasts from the copula model 1963--2016.}
   \label{fig:mv_optimal_6}
-  \includegraphics[scale = 1]{graphics/Weights_6F_EXCL_HML_6F.png}
-  \includegraphics[scale = 1]{graphics/Weights_6F_EXCL_CMA_6F.png}
+
+  \begin{subfigure}{0.45\textwidth}
+    \includegraphics[width=\textwidth]{graphics/Weights_6F_EXCL_HML_6F.png}
+    \caption{Excluding HML}
+  \end{subfigure}
+  ~
+  \begin{subfigure}{0.45\textwidth}
+    \includegraphics[width=\textwidth]{graphics/Weights_6F_EXCL_CMA_6F.png}
+    \caption{Excluding CMA}
+  \end{subfigure}
 \end{figure}
 
 \input{tex/tables/mv_weights_table}
