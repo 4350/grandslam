@@ -76,7 +76,7 @@ ggsave(
   sprintf('output/cdb/%s_cdb_5F_6F.png', MODEL_NAME),
   g,
   width = 14.0,
-  height = 21,
+  height = 20,
   units = 'cm',
   limitsize = FALSE
 )
