@@ -4,18 +4,18 @@
 \label{sub:univariate_models}
 
 ARMA-GARCH processes are used to model the marginal densities $f_i(r_{i,t+1})$
-by constructing equations for the conditional expectation of returns $\mathbb{E}_t[r_{i,t+1}]$ and volatilies $\sigma_{i,t}$ each week. This results in \emph{standardized returns} $z_{i,t}$ which are independent and assumed to follow a constant density so that:
+by constructing equations for the conditional expectation of returns $\mathbb{E}_t[r_{i,t+1}]$ and volatilies $\sigma_{i,t}$ each week. This results in \emph{standardized residuals} $z_{i,t}$ which are independent and assumed to follow a constant density so that:
 \begin{align}
   f_{i,t+1}(r_{i,t+1}) = f_i(z_{i,t+1}) = f_i(\frac{r_{i,t+1} - \mathbb{E}_t[r_{i,t+1}]}{\sigma_{i,t}})
 \end{align}
-The standardized returns.
+The standardized residuals.
 
 % Gustaf: Här är det svårt -- jag har svårt att beskriva $z_t^*$ när konceptet
-% standardized returns är en del av ARMA-GARCH delen. Vet ej riktigt hur man
+% standardized residuals är en del av ARMA-GARCH delen. Vet ej riktigt hur man
 % ska komma åt det. Ett sätt är att ta tjuren vid hornen och beskriva att 
 % f_{i,t}(r_{i,t+1}) = f_i(z_{i,t+1}) = 
 % f_i(\varepsilon_{i,t+1}/\sigma_{i,t+1}). men ja.
-ARMA-GARCH modeling allows us to filter time-varying effects, leaving independent \emph{standardized returns} (or standardized residuals) $z_{i,t}$ assumed to follow a constant distribution $f_i(z_{i,t})$. These residuals are first transformed into uniform variables $u_{i,t+1}$ by the probability integral transform of the densities above, and then made to follow the \emph{copula} distribution by the \emph{inverse} probability integral transform of the \emph{copula}:
+ARMA-GARCH modeling allows us to filter time-varying effects, leaving independent \emph{standardized residuals} (or standardized residuals) $z_{i,t}$ assumed to follow a constant distribution $f_i(z_{i,t})$. These residuals are first transformed into uniform variables $u_{i,t+1}$ by the probability integral transform of the densities above, and then made to follow the \emph{copula} distribution by the \emph{inverse} probability integral transform of the \emph{copula}:
 \begin{align}
   z_{i,t+1}^* = F^{-1}_{\nu_c,\gamma_{i,c}}(F_{i}(z_{i,t+1}))
 \end{align}

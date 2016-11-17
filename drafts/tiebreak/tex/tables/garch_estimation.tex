@@ -6,7 +6,7 @@
   \renewcommand{\arraystretch}{1.2}
 
   \caption{Parameter estimates from ARMA-GARCH models in~\autoref{eq:garch_mean}and \autoref{eq:garch_garch} of weekly returns.\\ \quad \\
-  Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. Sample: 1963-07-05--2016-07-01 (2766 obs). $\gamma$ and $\nu$ are the skewness and degree of freedom parameters of the skewed Student's \textit{t} innovations. $\eta$ is fixed at zero, as the sign bias test showed no significant misspecification of the GARCH for the HML, RMW and CMA factors. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. \emph{UV} is the estimate of unconditional volatility; \emph{VP} is the estimate of variance persistence. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993}, see appendix for details. Note: $^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01}
+  Heteroskedasticity robust standard errors in parentheses, following \textcite{White1982}. Sample: 1963-07-05--2016-07-01 (2766 weekly obs). $\gamma$ and $\nu$ are the skewness and degree of freedom parameters of the skewed Student's \textit{t} innovations. $\eta$ is fixed at zero, as the sign bias test showed no significant misspecification of the GARCH for the HML, RMW and CMA factors. $\omega$ is set using variance targeting, following \textcite{EngleMezrich1995}. \emph{UV} is the estimate of unconditional volatility; \emph{VP} is the estimate of variance persistence. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993}, see appendix for details. Note: $^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01}
   \begin{tabularx}{\textwidth}{@{}l X dddddd @{}}
     \toprule
     &&
@@ -44,7 +44,7 @@
     $\omega\,\,(\text{permil}) $   && 0.016 & 0.006 & 0.007 & 0.003 & 0.001 & 0.001 \\
                && \\
     \midrule
-    LLH  && \multicolumn{1}{c}{7,051} & \multicolumn{1}{c}{8,567} & \multicolumn{1}{c}{7,941} & \multicolumn{1}{c}{8,788} & \multicolumn{1}{c}{9,574} & \multicolumn{1}{c}{9,872} \\
+    LLH  && \multicolumn{1}{r}{7,051} & \multicolumn{1}{r}{8,567} & \multicolumn{1}{r}{7,941} & \multicolumn{1}{r}{8,788} & \multicolumn{1}{r}{9,574} & \multicolumn{1}{r}{9,872} \\
     UV   && 0.022 & 0.010 & 0.017 & 0.010 & 0.010 & 0.010 \\
     VP   && 0.968 & 0.957 & 0.979 & 0.982 & 0.987 & 0.992 \\
     \midrule

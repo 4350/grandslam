@@ -9,7 +9,7 @@ For each week, compute uniform residuals by applying the probability integral tr
 \begin{align}
   u_{i, t+1} = \int_{-\infty}^{z_{i,t+1}} f_{i}(z_{i,t+1})
 \end{align}
-Note that while the distributions of returns is time-varying due to GARCH dynamics, the distribution of standardized returns is assumed constant, and in the case of skewed Student's t is parametrised by the shape $\nu_i$ and skewness parameter $\gamma_i$ (estimated as part of the GARCH models).
+Note that while the distributions of returns is time-varying due to GARCH dynamics, the distribution of standardized residuals is assumed constant, and in the case of skewed Student's t is parametrised by the shape $\nu_i$ and skewness parameter $\gamma_i$ (estimated as part of the GARCH models).
 
 Transform the uniform residuals into copula residuals $z_{i,t+1}^*$ by applying the inverse cumulative distribution function of the copula to them:
 \begin{align}

@@ -6,7 +6,7 @@
 \subsubsection{Copula Model Specification}
 
 We now turn to modeling the dependency between factors using a copula model. 
-Each week, the joint behavior of returns $R_{t+1}$ in the next week is modeled by a joint density function $f_t(R_{t+1})$. Assuming returns are multivariate normally distributed, this would correspond to the multivariate normal density function, fully parametrised by means, volatility and correlation matrix. But neither factor returns $R_t$, nor the standardized returns $z_t$ are normally distributed.
+Each week, the joint behavior of returns $R_{t+1}$ in the next week is modeled by a joint density function $f_t(R_{t+1})$. Assuming returns are multivariate normally distributed, this would correspond to the multivariate normal density function, fully parametrised by means, volatility and correlation matrix. But neither factor returns $R_t$, nor the standardized residuals $z_t$ are normally distributed.
 
 Copulas are a convenient way of modeling dependency between non-normal returns. Following~\textcite{ChristoffersenErrunzaJacobLanglois2012}, who builds on~\textcite{Patton2006} and~\textcite{Sklar1959}, we decompose the joint density function into the product of a joint copula function $c_t$ of uniform variables $U_{t+1}$ and the marginal univariate distributions $f_{i,t}(r_{i, t+1})$:
 \begin{align}
@@ -15,7 +15,7 @@ Copulas are a convenient way of modeling dependency between non-normal returns. 
 \end{align}
 The marginal densities, $f_{i,t}(r_{i, t + 1})$, are modeled by ARMA-GARCH processes while the copula $c_t$ is a model of the joint behavior of their probability integral transforms. $c_t$ can be modeled, and estimated, separately from the marginal densities. This is key to imposing a more sophisticated dependency structure on the returns.
 
-After ARMA-GARCH filtering, the marginal densities of returns are modeled by the constant density functions of standardized returns. The vector of uniforms are therefore related to returns by the probability integral transform (PIT) of standardized returns:
+After ARMA-GARCH filtering, the marginal densities of returns are modeled by the constant density functions of standardized residuals. The vector of uniforms are therefore related to returns by the probability integral transform (PIT) of standardized residuals:
 \begin{align}
   u_{i, t+1} = \int_{-\infty}^{z_{i,t+1}} f_{i}(z_{i,t+1})
 \end{align}
