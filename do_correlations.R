@@ -229,7 +229,7 @@ threshold1 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/threshold1.png', threshold1, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold1.png', threshold1, width = 16, height = 20, limitsize = FALSE, units = 'cm')
 
 threshold2 <- grid.arrange(
   .plot_th_corr(COLFACTORS = 'SMB', ROWFACTORS = 'HML'),
@@ -242,7 +242,7 @@ threshold2 <- grid.arrange(
   nrow = 3,
   as.table = FALSE
 )
-ggsave('output/thresholdCorrelations/threshold2.png', threshold2, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/threshold2.png', threshold2, width = 16, height = 20, limitsize = FALSE, units = 'cm')
 
 # And draw for appendix part
 
@@ -271,7 +271,7 @@ appendix_threshold1 <-
   heights = c(19,2)
   )
   
-ggsave('output/thresholdCorrelations/appendix_threshold_1.png', appendix_threshold1, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/appendix_threshold_1.png', appendix_threshold1, width = 16, height = 20, limitsize = FALSE, units = 'cm')
 
 appendix_threshold2 <- 
   grid.arrange(
@@ -292,7 +292,7 @@ appendix_threshold2 <-
   )
   
     
-ggsave('output/thresholdCorrelations/appendix_threshold_2.png', appendix_threshold2, width = 16, height = 21, limitsize = FALSE, units = 'cm')
+ggsave('output/thresholdCorrelations/appendix_threshold_2.png', appendix_threshold2, width = 16, height = 20, limitsize = FALSE, units = 'cm')
 
 # Threshold correlation with scatter to  explain before main results, for MKT-HML pair ------------------------------
 # One function for scatter with residuals and one for scatter with returns, axes differ etc...
