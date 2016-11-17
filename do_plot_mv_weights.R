@@ -15,8 +15,8 @@ library(extrafont)
 load_all('wimbledon')
 
 MODEL = 'results_full_dynamic_std_10000'
-MODEL_NAME_1 = '6F_EXCL_HML'
-MODEL_NAME_2 = '6F'
+MODEL_NAME_1 = '5F_EXCL_HML'
+MODEL_NAME_2 = '5F'
 
 load(sprintf('data/derived/mv/%s_%s.RData', MODEL, MODEL_NAME_1))
 results1 <- results
@@ -58,13 +58,14 @@ tutti <- tutti %>%
   group_by(Model, Factor) %>% 
   mutate(ma = rollapply(Weight, 52, mean, align = 'right', fill = NA))
 
-ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
+g <- ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
     facet_grid(Factor ~ ., switch = 'y') +
     geom_line()+
     theme_Publication()+
     theme(strip.background = element_blank())+
     theme(panel.margin = unit(1, "lines"))+
     theme(legend.direction = 'vertical')+
+    theme(legend.position = 'none')+
     theme(legend.key.size = unit(0.75, 'lines'))+
     scale_colour_Publication()+
     coord_cartesian(ylim = c(0, 0.60))+  
@@ -72,8 +73,27 @@ ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
     ylab('Smoothed weight (1-year moving average)')
 
 
+# And draw for appendix part
+
+# First legend
+g_legend <- g+theme(legend.position = 'bottom')+
+  scale_colour_manual(labels = c("Five-factor (model)","Five-factor excl. HML (model)","Five-factor (sample)", "Five-factor excl. HML (sample)"), values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
+
+g_legend = gtable_filter(ggplotGrob(g_legend), "guide-box") 
+
+# Then graphs
+
+g <- 
+  grid.arrange(
+    g,
+    g_legend,
+    nrow = 2,
+    heights = c(19,2)
+  )
+
 ggsave(sprintf('output/mv/Weights_%s_%s.png', MODEL_NAME_1, MODEL_NAME_2),
+       g,
        width = 7.9,
-       height = 18,
+       height = 21,
        units = 'cm',
        limitsize = FALSE)
