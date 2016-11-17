@@ -15,8 +15,8 @@ library(extrafont)
 load_all('wimbledon')
 
 MODEL = 'results_full_dynamic_std_10000'
-MODEL_NAME_1 = '5F_EXCL_HML'
-MODEL_NAME_2 = '5F'
+MODEL_NAME_1 = '6F_EXCL_HML'
+MODEL_NAME_2 = '6F'
 
 load(sprintf('data/derived/mv/%s_%s.RData', MODEL, MODEL_NAME_1))
 results1 <- results
@@ -77,7 +77,7 @@ g <- ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
 
 # First legend
 g_legend <- g+theme(legend.position = 'bottom')+
-  scale_colour_manual(labels = c("Five-factor (model)","Five-factor excl. HML (model)","Five-factor (sample)", "Five-factor excl. HML (sample)"), values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
+  scale_colour_manual(labels = c("Six-factor (model)","Six-factor excl. HML (model)","Six-factor (sample)", "Six-factor excl. HML (sample)"), values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
 
 g_legend = gtable_filter(ggplotGrob(g_legend), "guide-box") 
 
@@ -94,6 +94,6 @@ g <-
 ggsave(sprintf('output/mv/Weights_%s_%s.png', MODEL_NAME_1, MODEL_NAME_2),
        g,
        width = 7.9,
-       height = 21,
+       height = 20,
        units = 'cm',
        limitsize = FALSE)
