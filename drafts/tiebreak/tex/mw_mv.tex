@@ -3,7 +3,7 @@
 \section{Mean-variance optimization}
 \label{sec:mean_variance}
 
-The issue of how a factor portfolio should be allocated is highly relevant to portfolio managers. Commonly, strategies are based on mean-variance optimization, but several managers also advocate simple strategies such as equal weights and risk parity [sources]. Based on abnormal return regressions and the work on mean-variance portfolios in \textcite{HubermanKandel1987}, \textcite{FF2015} conjecture that the HML factor will not improve the mean-variance tangency portfolio when added to a portfolio of Mkt-RF, SMB, RMW and CMA. Differently put, this is equivalent to HML having a zero weight in mean-variance optimization. Subject to a constraint of no negative weights, this section will examine what the mean-variance weights are, given different asset universes.
+The issue of how a factor portfolio should be allocated is highly relevant to portfolio managers. Commonly, strategies are based on mean-variance optimization, but several managers also advocate simple strategies such as equal weights and risk parity [sources]. Based on abnormal return regressions and the work on mean-variance portfolios in \textcite{HubermanKandel1987}, \textcite{FF2015} conjecture that the HML factor will not improve the mean-variance tangency portfolio when added to a portfolio of Mkt.RF, SMB, RMW and CMA. Differently put, this is equivalent to HML having a zero weight in mean-variance optimization. Subject to a constraint of no negative weights, this section will examine what the mean-variance weights are, given different asset universes.
 
 We consider mean-variance optimization based on in-sample sample estimates of the means and covariance matrices of the six factors, as well as in a dynamic in-sample setting based on the conditional distributions of returns implied by our copula model. We consider portfolios with and without momentum (five- and six-factor portfolios, respectively) and how portfolio weights change when replacing HML with CMA and vice versa.
 
@@ -23,13 +23,13 @@ We consider mean-variance optimization based on in-sample sample estimates of th
 % \end{tabularx}
 % \begin{tabularx}{\textwidth}{@{\extracolsep{0pt}}l c c c c c c } 
 % \\[-1.8ex]\midrule 
-%  Five-factor model 				& Mkt-RF & SMB & HML & CMA & RMW &	 	\\
-%  Five-factor model (excl. HML) 	& Mkt-RF & SMB & 	 & CMA & RMW &	 	\\
-%  Five-factor model (excl. CMA) 	& Mkt-RF & SMB & HML & 	   & RMW &	 	\\
+%  Five-factor model 				& Mkt.RF & SMB & HML & CMA & RMW &	 	\\
+%  Five-factor model (excl. HML) 	& Mkt.RF & SMB & 	 & CMA & RMW &	 	\\
+%  Five-factor model (excl. CMA) 	& Mkt.RF & SMB & HML & 	   & RMW &	 	\\
 %  \hline
-%  Six-factor model 				& Mkt-RF & SMB & HML & CMA & RMW &	Mom 	\\
-%  Six-factor model (excl. HML) 	& Mkt-RF & SMB & 	 & CMA & RMW &	Mom 	\\
-%  Six-factor model (excl. CMA) 	& Mkt-RF & SMB & HML & 	   & RMW &	Mom 	\\
+%  Six-factor model 				& Mkt.RF & SMB & HML & CMA & RMW &	Mom 	\\
+%  Six-factor model (excl. HML) 	& Mkt.RF & SMB & 	 & CMA & RMW &	Mom 	\\
+%  Six-factor model (excl. CMA) 	& Mkt.RF & SMB & HML & 	   & RMW &	Mom 	\\
 % \bottomrule \\[-1.8ex] 
 % \end{tabularx} 
 % \end{table}
