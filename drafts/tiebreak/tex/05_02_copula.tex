@@ -18,8 +18,8 @@ The copula function $c_t(U_{t+1})$ is a multivariate skewed Student's \emph{t} d
 The log-likelihood of the model is constructed from~\autoref{eq:copula_sklar}:
 \begin{align}
   L =
-    \sum_{t=1}^T \log(c_t(U_{t+1})) +
-    \sum_{t=1}^T \sum_{i=1}^N \log(f_{i,t}(r_{i,t+1}))
+    \underbrace{\sum_{t=1}^T \log(c_t(U_{t+1}))}_\text{Copula} +
+    \underbrace{\sum_{t=1}^T \sum_{i=1}^N \log(f_{i,t}(r_{i,t+1}))}_\text{Marginals}
 \end{align}
 At this point, it is worth noting that the joint density $c_t(U_{t+1})$ need not be of the same family as the marginal densities $f_{i,t}(r_{i,t+1})$ -- nor are we restricted to modeling $f_{i,t}(r_{i,t+1})$ jointly for all factors. In fact, we take advantage of this flexibility and choose to model the marginal densities independently as ARMA-GARCH processes, which allows us to capture a number of predictable features in the univariate series -- serial correlation, volatility clustering and leverage effects. The marginal models are estimated independently by maximizing the likelihood(s) of the second term, and then the copula is estimated by maximizing the first -- using the residuals of the marginal models.
 
