@@ -38,14 +38,14 @@ The ARMA-GARCH models are estimated independently on each series using maximum l
 
 Our selection process is as follows.
 
-\begin{enumerate}{(i)}
+\begin{enumerate}[(i)]
   \item For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta_i$ fixed to zero (in which case we obtain the basic GARCH(1,~1) model).
   \item We then compute the Bayesian Information Criterion~\autocite[BIC]{Schwarz1978} for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
 \end{enumerate}
 
 For the candidate models
 
-\begin{enumerate}{(i)}
+\begin{enumerate}[(i)]
   \item We check for remaining serial correlation and ARCH effects.
   \item We examine whether a sign bias test concludes that there are significant leverage effects that warrant the use of a GJR-GARCH instead of a standard GARCH.
   \item We use QQ-plots to control for misspecification in the residual process, and to find a suitable distribution for the standardized residuals $z_t$.
