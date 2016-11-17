@@ -1,0 +1,32 @@
+\begin{table}[!ht]
+  \centering
+  \scriptsize
+  \renewcommand{\arraystretch}{1.2}
+
+  \caption{Conceptual matrix of parameterizations -- Six copula specifications}
+  \begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} c c c c X c X c @{}}
+    \toprule
+  				&			& &	\textbf{Normal}	&	&	\textbf{Student's \textit{t}}	&	&	\textbf{Asymmetric Student's \textit{t}} \\
+  				\\
+  				&			& & 	$\nu = \infty$	&	&	$\nu > 0$	& 	&	$\nu > 0$ \\
+  				&			& & 	$\gamma = 0$	&	&	$\gamma = 0$	& 	&	$\gamma \neq 0$ \\
+          \\
+    \cmidrule{4-8}
+    \\
+     \textbf{Constant} &  & & \text{Constant normal copula} & & \text{Constant symmetric \textit{t} copula} & & \text{Constant asymmetric \textit{t} copula} \\
+     \\
+    	&	$\alpha = 0$  &		&	\textit{Constant correlations but} & & \textit{Constant correlations and} & & \textit{Constant correlations and} \\
+       & $\beta = 0$ & & \textit{no tail dependence} & & \textit{symmetric tail dependence} & & \textit{asymmetric tail dependence} \\
+    \\
+    \cmidrule{4-8}
+    \\
+     \textbf{Dynamic} &  & & \text{Dynamic normal copula} & & \text{Dynamic symmetric \textit{t} copula} & & \text{Dynamic asymmetric \textit{t} copula} \\
+     \\
+      & $\alpha > 0$  &   & \textit{Dynamic correlations but} & & \textit{Dynamic correlations and} & & \textit{Dynamic correlations and} \\
+       & $\beta > 0$ & & \textit{no tail dependence} & & \textit{symmetric tail dependence} & & \textit{asymmetric tail dependence} \\
+    \\
+    \bottomrule
+  \end{tabularx}
+
+  \label{tab:conceptual}	
+\end{table}
