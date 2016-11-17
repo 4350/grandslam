@@ -100,11 +100,35 @@ g1 <- plot_pairs(
     c('Mom', 'RMW')
   )
 )
+
+
+# First legend
+fakedata <- data.frame(x1 = 1:100, y1 = 1:100, z = c(rep('aa', 50), rep('bb',50)))
+
+g_legend <- 
+  ggplot(fakedata, aes(x = x1, y = y1, color = z))+
+    geom_line(data = fakedata)+
+    scale_colour_Publication()+
+    theme_Publication()+
+    scale_colour_manual(labels = c("ARMA-GARCH std. residual series","Copula std. residual series"), values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
+plot(g_legend)  
+g_legend = gtable_filter(ggplotGrob(g_legend), "guide-box") 
+
+# Then graphs
+
+g1 <- 
+  grid.arrange(
+    g1,
+    g_legend,
+    nrow = 2,
+    heights = c(19,2)
+  )
+
 ggsave(
   'output/rollingCorrelations/rolling_simulated1.png',
   g1,
   width = 16,
-  height = 17,
+  height = 21,
   limitsize = FALSE,
   units = 'cm'
 )
@@ -120,11 +144,21 @@ g2 <- plot_pairs(
     c('CMA', 'RMW')
   )
 )
+
+
+g2 <- 
+  grid.arrange(
+    g2,
+    g_legend,
+    nrow = 2,
+    heights = c(19,2)
+  )
+
 ggsave(
   'output/rollingCorrelations/rolling_simulated2.png',
   g2,
   width = 16,
-  height = 17,
+  height = 21,
   limitsize = FALSE,
   units = 'cm'
 )

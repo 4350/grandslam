@@ -47,7 +47,7 @@ cdb_cdb <- lapply(names(factor_models), function(factor_name) {
   names(factor_cdb) <- c('ALL', 'EXCL_CMA', 'EXCL_HML', 'EXCL_RMW')
   bind_rows(factor_cdb, .id = 'Strategy')
 })
-names(cdb_cdb) <- c('5 factors', '6 factors')
+names(cdb_cdb) <- c('Five-factor model', 'Six-factor model')
 cdb_cdb <- bind_rows(cdb_cdb, .id = 'Factors')
 
 cdb_cdb$Strategy <- factor(
@@ -58,14 +58,16 @@ cdb_cdb$Strategy <- factor(
 
 g <- ggplot(cdb_cdb, aes(x = Week, y = CDB, color = Strategy)) +
   geom_line() +
-  facet_grid(Factors ~ ., switch = 'y') +
+  facet_wrap( ~ Factors, nrow = 2, ncol = 1, scales = 'free') +
   coord_cartesian(ylim = c(50, 100)) +
   scale_colour_Publication() +
   theme_Publication()+
   theme(panel.margin = unit(1, "lines"))+
   theme(legend.key.size = unit(0.75, 'lines'))+
   theme(strip.background = element_blank())+
-  xlab('Date')
+  annotate("segment",x=cdb_cdb$Week[21712],xend=cdb_cdb$Week[1],y=Inf,yend=Inf,color="black",lwd=1)+
+  xlab('Year')+
+  ylab('CDB')
   
 
 g
@@ -74,7 +76,7 @@ ggsave(
   sprintf('output/cdb/%s_cdb_5F_6F.png', MODEL_NAME),
   g,
   width = 14.0,
-  height = 18,
+  height = 21,
   units = 'cm',
   limitsize = FALSE
 )
