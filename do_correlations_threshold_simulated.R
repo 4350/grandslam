@@ -1,52 +1,26 @@
-
 # Setup ------------------------------------------------------------------
 
 rm(list = ls())
 
 library(dplyr)
 library(tictoc)
-library(ggplot2)
+library(devtools)
+load_all('wimbledon')
 
-threshold_correlations_pairs <- function(stdresid, pairs) {
-  results <- lapply(pairs, function(pair) {
-    # qs really should be an argument to correlations.threshold
-    coef <- correlations.threshold(stdresid, pair[1], pair[2])['coef', ]
-    qs <- seq(0.10, 0.90, by=0.01)
-    
-    data.frame(
-      factor1 = pair[1],
-      factor2 = pair[2],
-      qs = qs,
-      coef = coef
-    )
-  })
-  
-  bind_rows(results)
-}
 
-threshold_correlations_models <- function(dynamic, models, pairs) {
-  results <- lapply(models, function(model) {
-    load(sprintf('data/derived/stdresid/full_%s_%s.RData', dynamic, model))
-    threshold_correlations_pairs(stdresid, pairs)
-  })
-  
-  names(results) <- models
-  
-  bind_rows(results, .id = 'model')
-}
 
-# Go go go ---------------------------------------------------------------
+# Setup function arguments ------------------------------------------------
 
 PAIRS <- list(
   c('Mkt.RF', 'HML'),
-  c('Mkt.RF', 'RMW'),
   c('Mkt.RF', 'CMA'),
+  c('Mkt.RF', 'RMW'),
   c('Mom', 'HML'),
-  c('Mom', 'RMW'),
   c('Mom', 'CMA'),
+  c('Mom', 'RMW'),
   c('SMB', 'HML'),
-  c('SMB', 'RMW'),
   c('SMB', 'CMA'),
+  c('SMB', 'RMW'),
   c('HML', 'CMA'),
   c('HML', 'RMW'),
   c('CMA', 'RMW')
@@ -58,18 +32,24 @@ MODELS <- list(
   'ghst'
 )
 
+QS <- seq(0.10, 0.90, 0.01)
+
+DYNAMIC <- 'constant'
+
+
+# Do and save data set ----------------------------------------------------
+
 tic(sprintf(
-  'Threshold correlations for %d pairs, %d models',
+  'Threshold correlations for %d pairs, %d models, between %.2f and %.2f quantiles',
   length(PAIRS),
-  length(MODELS))
+  length(MODELS),
+  QS[1],
+  tail(QS,1)
+  )
 )
-models <- threshold_correlations_models('dynamic', MODELS, PAIRS)
+th_corr_simulated <- threshold_correlations_models(DYNAMIC, MODELS, PAIRS, QS)
 toc()
 
-save(models, file = 'data/derived/correlations_threshold_copula_dynamic.RData')
-
-# Plotting ---------------------------------------------------------------
-
-ggplot(models, aes(x = qs, y = coef, color = model)) +
-  geom_line() +
-  facet_grid(factor1 ~ factor2)
+save(th_corr_simulated, file = sprintf('data/derived/threshold/th_corr_%s_simulated.RData',
+                            DYNAMIC)
+     )
