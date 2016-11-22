@@ -1,0 +1,29 @@
+%!TEX program = xetex
+%!TEX output_directory = build
+%!TEX jobname = Master's Thesis
+
+\documentclass[final]{thesis}
+\addbibresource{bibliography.bib}
+
+\begin{document}
+
+\input{titlepage}
+\newpage
+
+\tableofcontents
+\pagebreak
+
+\input{parts/01_introduction}
+\input{parts/02_party}
+
+\printbibliography
+\pagebreak
+
+\begin{appendices}
+  \section{lol} % (fold)
+  \label{sec:lol}
+  
+  % section lol (end)
+\end{appendices}
+
+\end{document}

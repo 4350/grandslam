@@ -1,0 +1,57 @@
+%!TEX root = ../main.tex
+
+\section{Party} % (fold)
+\label{sec:party}
+
+A building block of the copula estimation are the univariate models. We proceed by estimating models of each factor's return series and attempt to capture predictable autocorrelation, volatility clustering and leverage effects. By fitting ARMA-GARCH models, we can filter these effects and reduce the time-varying densities $f_{i,t}(r_{i,t+1})$ to constant densities of \emph{standardized residuals} $f_{i}(z_{i,t+1})$
+
+\subsection{General univariate model: ARMA-GJR-GARCH}
+
+The ARMA-GARCH is a broad model family designed to eliminate predictable components of financial return series, and was originally introduced by~\textcite{Bollerslev1986}. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1). The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when positive and negative return shocks have different impact on future volatility~\autocite{Black1976}.
+
+We estimate conditional mean equations for each factor \emph{up to} ARMA(3, 3):
+\begin{align}
+  r_{i,t} &=
+    \phi_{i,0} +
+    \sum^p \phi_{i,p} r_{i,t - p} +
+    \sum^q \theta_{i,q} \varepsilon_{i,t - q} + 
+    \varepsilon_{i,t}
+    \label{eq:garch_mean}
+\end{align}
+where $r_{i,t}$ are weekly returns of each factor. The conditional volatility evolves according to the GJR-GARCH specification:
+\begin{align}
+  \varepsilon_{i,t} &= \sigma_{i,t} z_{i,t} \\
+  \sigma_{i,t}^2 &=
+    \omega_i +
+    (\alpha_i + \eta_i I_{\varepsilon_{i,t-1} \leq 0}) \varepsilon_{i,t - 1}^2 +
+    \beta_{i} \sigma^2_{i,t - 1}
+    \label{eq:garch_garch}
+\end{align}
+where $I$ is an indicator function that is equal to one when $\varepsilon_{i,t-1} \leq 0$. 
+
+\subsubsection{Sub sub sub}
+A positive $\eta_i$ captures the leverage effect by increasing the current period's volatility if the previous period's residual $\varepsilon_{i,t-1}$ was below zero. A significant $\eta_i$ thus introduces asymmetric volatility in the model. For the market factor, it is expected that $\eta_i$ is positive, reflecting the leverage effect in the market itself and no impact from the short risk-free component. However, for the other factors, which are constructed as all-equity zero-cost long-short portfolios, the direction of $\eta_i$ is less obvious~\autocite{ChristoffersenLanglois2013}. If there are leverage effects for stocks in general, negative shocks will lead to more volatility than positive shocks in a portfolio of stocks. But in a zero-cost portfolio, the leverage effects of the long positions in stocks could be eliminated by the short positions in other firms. The level of the leverage effect in a zero-cost portfolio therefore depends on the relative strength of leverage effects in the long and short components.
+
+% XXX In the estimation, we also use variance targeting as proposed by~\textcite{EngleMezrich1995}, which is shown makes optimization faster and sometimes more certain to reach the global maximum. This means that $\omega$ is not estimated in the maximum likelihood setting, but instead set to 1 minus the persistence of the process times the sample mean of squared residuals, where the persistence is $\alpha + \beta$ for the GARCH.\footnote{Note that in the case of the GJR-GARCH for the Mkt.RF factor, the persistence is $\alpha + \beta + \eta \kappa$ where $\kappa$ is the probability that standardized residuals $z_t$ are below zero.}
+The ARMA-GARCH models are estimated independently on each series using maximum likelihood estimation, with assumed distributions of standardized residuals $z_{i,t}$. Similar to the multivariate copula, we evaluate models where the standardized residuals are assumed to follow univariate skewed Student's \emph{t} distributions with $\nu_i$ degrees of freedom and skewness $\gamma_i$, nesting the Student's \emph{t} when $\gamma_i = 0$ and the standard normal when $\nu_i = \infty$. Allowing for the asymmetric Student's \emph{t} distribution allows for additional asymmetry not captured by the leverage effect~\autocite{ChristoffersenErrunzaJacobLanglois2012}.
+
+\subsection{Factor specific model selection process}
+
+Our selection process is as follows.
+
+\begin{enumerate}[(i)]
+  \item For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta_i$ fixed to zero (in which case we obtain the basic GARCH(1,~1) model).
+  \item We then compute the Bayesian Information Criterion~\autocite[BIC]{Schwarz1978} for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
+\end{enumerate}
+
+For the candidate models
+
+\begin{enumerate}[(i)]
+  \item We check for remaining serial correlation and ARCH effects.
+  \item We examine whether a sign bias test concludes that there are significant leverage effects that warrant the use of a GJR-GARCH instead of a standard GARCH.
+  \item We use QQ-plots to control for misspecification in the residual process, and to find a suitable distribution for the standardized residuals $z_t$.
+\end{enumerate}
+
+\input{tables/copula_estimates}
+
+In a well-specified model, we expect there to be no significant serial correlation, ARCH effects or leverage effects in the residuals. We employ weighted Ljung-Box, ARCH LM and sign bias tests that are detailed in \autoref{app:univariate_diagnostics}. Furthermore, the QQ-plots of the standardized residuals should show that their empirical distribution is comparable to the assumed theoretical distribution (be distributed around the 45 degree line).
