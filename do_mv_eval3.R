@@ -2,9 +2,10 @@ rm(list = ls())
 
 library(dplyr)
 library(PerformanceAnalytics)
+library(stargazer)
 
-#MODEL_NAME <- 'results_full_dynamic_std_10000'
-MODEL_NAME <- 'results_full_sample'
+MODEL_NAME <- 'results_full_dynamic_std_10000'
+#MODEL_NAME <- 'results_full_sample'
 
 STRATEGIES <- list(
   '5F',
