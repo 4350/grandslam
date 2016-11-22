@@ -6,7 +6,7 @@
 \subsubsection{Copula Model Specification}
 
 We now turn to modeling the dependency between factors using a copula model. 
-Each week, the joint behavior of returns $R_{t+1}$ in the next week is modeled by a joint density function $f_t(R_{t+1})$. Assuming returns are multivariate normally distributed, this would correspond to the multivariate normal density function, fully parametrised by means, volatility and correlation matrix. But neither factor returns $R_t$, nor the standardized residuals $z_t$ are normally distributed.
+Each week, the joint behavior of returns $R_{t+1}$ in the next week is modeled by a joint density function $f_t(R_{t+1})$. Assuming returns are multivariate normally distributed, this would correspond to the multivariate normal density function, fully parameterized by means, volatility and correlation matrix. But neither factor returns $R_t$, nor the standardized residuals $z_t$ are normally distributed.
 
 Copulas are a convenient way of modeling dependency between non-normal returns. Following~\textcite{ChristoffersenErrunzaJacobLanglois2012}, who builds on~\textcite{Patton2006} and~\textcite{Sklar1959}, we decompose the joint density function into the product of a joint copula function $c_t$ of uniform variables $U_{t+1}$ and the marginal univariate distributions $f_{i,t}(r_{i, t+1})$:
 \begin{align}
@@ -19,7 +19,7 @@ After ARMA-GARCH filtering, the marginal densities of returns are modeled by the
 \begin{align}
   u_{i, t+1} = \int_{-\infty}^{z_{i,t+1}} f_{i}(z_{i,t+1})
 \end{align}
-In the most general case, we use a multivariate skewed Student's t \emph{dynamic asymmetric copula} model introduced by~\textcite{ChristoffersenErrunzaJacobLanglois2012}. The joint distribution is parametrised by a single degrees of freedom parameter $\nu_c$, an $N$ vector of skewness parameters $\gamma_{c}$ and a (time-varying) correlation matrix $\Psi_{t}$. We describe the details of the copula distribution in~\autoref{app:ghstmv}.
+In the most general case, we use a multivariate skewed Student's t \emph{dynamic asymmetric copula} model introduced by~\textcite{ChristoffersenErrunzaJacobLanglois2012}. The joint distribution is parameterized by a single degrees of freedom parameter $\nu_c$, an $N$ vector of skewness parameters $\gamma_{c}$ and a (time-varying) correlation matrix $\Psi_{t}$. We describe the details of the copula distribution in~\autoref{app:ghstmv}.
 
 The normal and Student's t copula are nested in this model, as when $\gamma_{c,i} = 0$, we obtain a multivariate Student's t distribution, and if additionally $\nu_c = \infty$, we obtain the multivariate standard normal distribution.
 
