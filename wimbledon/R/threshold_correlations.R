@@ -4,7 +4,7 @@
 #' Threshold correlations
 #'
 #' Takes a data frame, and returns estimates of threshold corr, lb, ub
-#' using the factor names given
+#' using the factor names given. Makes the middle qs observation NA
 #'
 #' 
 #' @param pair Two strings in character vector
@@ -56,6 +56,14 @@ correlations_threshold <- function(pair, qs, df) {
     factor1 = factor1,
     factor2 = factor2
   )
+  
+  # Make NA
+  mid_number = ceiling(length(qs)/2)
+  result <- result %>% 
+    mutate(coef = replace(coef, qs == qs[mid_number], NA)) %>%
+    mutate(lb = replace(lb, qs == qs[mid_number], NA)) %>%
+    mutate(ub = replace(ub, qs == qs[mid_number], NA)) %>%
+    mutate(unc_coef = replace(unc_coef, qs == qs[mid_number], NA))
   
   return(result)
 }

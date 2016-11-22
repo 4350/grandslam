@@ -25,22 +25,22 @@ load('data/derived/garch/model_GARCH_chosen_stdres.RData')
 MODEL_ORDER <- c('stdres','returns','norm','std','ghst')
 
 ORDER_PAGE_1 <- list(
-    c('Mkt.RF', 'HML'),
-    c('Mkt.RF', 'CMA'),
-    c('Mkt.RF', 'RMW'),
-    c('Mom', 'HML'),
-    c('Mom', 'CMA'),
-    c('Mom', 'RMW')
+  c('Mkt.RF', 'HML'),
+  c('Mkt.RF', 'CMA'),
+  c('Mkt.RF', 'RMW'),
+  c('SMB', 'HML'),
+  c('SMB', 'CMA'),
+  c('SMB', 'RMW')
 )
 
 ORDER_PAGE_2 <- list(
-    c('SMB', 'HML'),
-    c('SMB', 'CMA'),
-    c('SMB', 'RMW'),
-    c('HML', 'CMA'),
-    c('HML', 'RMW'),
-    c('CMA', 'RMW')
-  )
+  c('Mom', 'HML'),
+  c('Mom', 'CMA'),
+  c('Mom', 'RMW'),
+  c('HML', 'CMA'),
+  c('HML', 'RMW'),
+  c('CMA', 'RMW')
+)
 
 WIDTH = 16
 HEIGHT = 20
