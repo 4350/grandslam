@@ -1,3 +1,5 @@
+#do_cdb_mv_tables
+
 
 # Setup -------------------------------------------------------------------
 
@@ -7,8 +9,12 @@ library(dplyr)
 library(PerformanceAnalytics)
 library(stargazer)
 
+#MV
 #MODEL_NAME <- 'results_full_dynamic_std_10000'
-MODEL_NAME <- 'results_sample'
+#MODEL_NAME <- 'results_sample'
+
+#CDB
+MODEL_NAME <- 'full_dynamic_std_10000'
 
 STRATEGIES <- list(
   '5F',
@@ -23,7 +29,12 @@ STRATEGIES <- list(
 
 load_field <- function(field) {
   out <- lapply(STRATEGIES, function(strategy) {
-    load(sprintf('data/derived/mv/%s_%s.RData', MODEL_NAME, strategy))
+    if(MODEL_NAME == 'full_dynamic_std_10000') {
+      load(sprintf('data/derived/cdb/constrOptim_q5_%s_%s.RData', MODEL_NAME, strategy))
+    } else {
+      load(sprintf('data/derived/mv/%s_%s.RData', MODEL_NAME, strategy))
+    }
+    
     results[[field]]
   })
   
@@ -37,6 +48,7 @@ load_field <- function(field) {
 
 returns <- load_field('portfolio_return')
 cdb <- load_field('cdb')
+var <- load_field('var')
 
 stats <- lapply(returns, function(strategy) {
   stats_labels <- c('Mean', 'Stdev', 'Skewness', 'Kurtosis')
@@ -51,11 +63,13 @@ stats <- lapply(returns, function(strategy) {
   data.frame(stats, SR = SR, MDD = MDD)
 })
 
+var_avg <- lapply(var, function(strategy) mean(strategy))
 cdb_avg <- lapply(cdb, function(strategy) mean(strategy))
 
 out_stats <- t(
   cbind(
     bind_rows(stats),
+    VaR = unlist(var_avg),
     CDB = unlist(cdb_avg)
   )
 )
@@ -75,7 +89,7 @@ wdf <- t(bind_rows(lapply(weights, function(weight) {
 out_matrix <- rbind(
   wdf, 
   out_stats
-  )
+)
 
 colnames(out_matrix) <- STRATEGIES
 stargazer(out_matrix, summary = FALSE, type = 'text', digits = 2)
