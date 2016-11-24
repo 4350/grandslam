@@ -101,12 +101,20 @@
 
 %% TABLES AND FIGURES
 % This puts table captions above tables and makes the "Table 1" label bold
-\RequirePackage[tableposition=top,labelfont=bf,font=footnotesize]{caption}
+\RequirePackage{caption}
 \RequirePackage{subcaption}    % Multipage figures
 \RequirePackage{booktabs}      % Nice tables
 \RequirePackage{tabularx}      % Full-width tables
 \RequirePackage{dcolumn}       % Aligned columns as below
 \newcolumntype{d}{D{.}{.}{-1}} % Use `d` column for numerical columns
+\newcolumntype{i}{D{.}{.}{0}}
 
 \RequirePackage{placeins}      % \FloatBar­rier to stop floats
 \RequirePackage{float}         % Better placement of floats
+
+\captionsetup{font={bf,normalsize},skip=15pt}
+\captionsetup[table]{position=top}
+\captionsetup[figure]{belowskip=15pt,position=below}
+
+% Environment for table descriptions
+\newenvironment{longcaption}{\begin{minipage}{\textwidth}}{\\\end{minipage}}
