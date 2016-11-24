@@ -11,9 +11,11 @@ STRATEGIES <- list(
   '5F',
   '5F_EXCL_CMA',
   '5F_EXCL_HML',
+  '5F_EXCL_RMW',
   '6F',
   '6F_EXCL_CMA',
-  '6F_EXCL_HML'
+  '6F_EXCL_HML',
+  '6F_EXCL_RMW'
 )
 
 load_field <- function(field) {
