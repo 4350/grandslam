@@ -232,58 +232,58 @@ MODEL_NAME = 'full_dynamic_std_10000'
 
 # Without Momentum
 do_optimize_mv(MODEL_NAME, strategy = '5F',
-               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
+               selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA', 'RMW'),
                df.realized = df.estim)
 
 do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_HML',
-               selectors = c('Mkt.RF',        'SMB', 'RMW', 'CMA'),
+               selectors = c('Mkt.RF', 'SMB',        'CMA', 'RMW'),
                df.realized = df.estim)
 
 do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_CMA',
-               selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW'),
+               selectors = c('Mkt.RF', 'SMB', 'HML',        'RMW'),
                df.realized = df.estim)
 
 do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_RMW',
-               selectors = c('Mkt.RF', 'HML', 'SMB', 'CMA'),
+               selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA'       ),
                df.realized = df.estim)
 
 # With Momentum
 do_optimize_mv(MODEL_NAME, strategy = '6F',
-               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'),
+               selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA', 'RMW', 'Mom'),
                df.realized = df.estim)
 
 do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_HML',
-               selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'),
+               selectors = c('Mkt.RF', 'SMB',        'CMA', 'RMW', 'Mom'),
                df.realized = df.estim)
 
 do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_CMA',
-               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
+               selectors = c('Mkt.RF', 'SMB', 'HML',        'RMW', 'Mom'),
                df.realized = df.estim)
 
 do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_RMW',
-               selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'CMA'),
+               selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA',        'Mom'),
                df.realized = df.estim)
 
 # Optimize sample full 5F ---------------------------------------------------------
 
 load('data/derived/weekly-estim.RData')
 do_optimize_fixed('full_sample', strategy = '5F',
-                  selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'),
+                  selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA', 'RMW'),
                   df.sample = df.estim[1:2766,],
                   df.realized = df.estim[2:2766,])
 
 do_optimize_fixed('full_sample', strategy = '5F_EXCL_HML',
-                  selectors = c('Mkt.RF',        'SMB', 'RMW', 'CMA'),
+                  selectors = c('Mkt.RF', 'SMB',        'CMA', 'RMW'),
                   df.sample = df.estim[1:2766,],
                   df.realized = df.estim[2:2766,])
 
 do_optimize_fixed('full_sample', strategy = '5F_EXCL_CMA',
-                  selectors = c('Mkt.RF', 'HML', 'SMB', 'RMW'),
+                  selectors = c('Mkt.RF', 'SMB', 'HML',        'RMW'),
                   df.sample = df.estim[1:2766,],
                   df.realized = df.estim[2:2766,])
 
 do_optimize_fixed('full_sample', strategy = '5F_EXCL_RMW',
-                  selectors = c('Mkt.RF', 'HML', 'SMB', 'CMA'),
+                  selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA'       ),
                   df.sample = df.estim[1:2766,],
                   df.realized = df.estim[2:2766,])
 
@@ -293,22 +293,22 @@ do_optimize_fixed('full_sample', strategy = '5F_EXCL_RMW',
 
 load('data/derived/weekly-estim.RData')
 do_optimize_fixed('full_sample', strategy = '6F',
-                  selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'),
+                  selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA', 'RMW', 'Mom'),
                   df.sample = df.estim[1:2766,],
                   df.realized = df.estim[2:2766,])
 
 do_optimize_fixed('full_sample', strategy = '6F_EXCL_HML',
-                  selectors = c('Mkt.RF', 'SMB', 'Mom', 'RMW', 'CMA'),
+                  selectors = c('Mkt.RF', 'SMB',        'CMA', 'RMW', 'Mom'),
                   df.sample = df.estim[1:2766,],
                   df.realized = df.estim[2:2766,])
 
 do_optimize_fixed('full_sample', strategy = '6F_EXCL_CMA',
-                  selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'),
+                  selectors = c('Mkt.RF', 'SMB', 'HML',        'RMW', 'Mom'),
                   df.sample = df.estim[1:2766,],
                   df.realized = df.estim[2:2766,])
 
 do_optimize_fixed('full_sample', strategy = '6F_EXCL_RMW',
-                  selectors = c('Mkt.RF', 'HML', 'SMB', 'Mom', 'CMA'),
+                  selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA',        'Mom'),
                   df.sample = df.estim[1:2766,],
                   df.realized = df.estim[2:2766,])
 
