@@ -1,20 +1,23 @@
+
+# Setup -------------------------------------------------------------------
+
 rm(list = ls())
 
 library(dplyr)
 library(PerformanceAnalytics)
 library(stargazer)
 
-MODEL_NAME <- 'results_full_dynamic_std_10000'
-#MODEL_NAME <- 'results_full_sample'
+#MODEL_NAME <- 'results_full_dynamic_std_10000'
+MODEL_NAME <- 'results_sample'
 
 STRATEGIES <- list(
   '5F',
-  '5F_EXCL_CMA',
   '5F_EXCL_HML',
+  '5F_EXCL_CMA',
   '5F_EXCL_RMW',
   '6F',
-  '6F_EXCL_CMA',
   '6F_EXCL_HML',
+  '6F_EXCL_CMA',
   '6F_EXCL_RMW'
 )
 
@@ -29,8 +32,11 @@ load_field <- function(field) {
 }
 
 
-# Summary statistics of realized returns ----
+
+# Summary stats  ----------------------------------------------------------
+
 returns <- load_field('portfolio_return')
+cdb <- load_field('cdb')
 
 stats <- lapply(returns, function(strategy) {
   stats_labels <- c('Mean', 'Stdev', 'Skewness', 'Kurtosis')
@@ -41,72 +47,37 @@ stats <- lapply(returns, function(strategy) {
   
   # SR
   SR <- stats$Mean / (stats$Stdev)
-  MDD <- maxDrawdown(strategy)
-  data.frame(stats, MDD = MDD, SR = SR)
+  MDD <- maxDrawdown(strategy) * 100
+  data.frame(stats, SR = SR, MDD = MDD)
 })
 
-cat(sprintf('== %s ==\n\n', MODEL_NAME))
-print(bind_rows(stats, .id = 'Strategy'))
+cdb_avg <- lapply(cdb, function(strategy) mean(strategy))
 
-# Summary statistics of weights ----
+out_stats <- t(
+  cbind(
+    bind_rows(stats),
+    CDB = unlist(cdb_avg)
+  )
+)
+
+
+# Optimal weights ---------------------------------------------------------
+
 weights <- load_field('weights')
 
-wdf <- bind_rows(lapply(weights, function(weight) {
+wdf <- t(bind_rows(lapply(weights, function(weight) {
   # lol
   100 * data.frame(t(data.frame(apply(weight, 2, mean))))
-}), .id = 'Strategy')
+})))
 
-stargazer::stargazer(t(wdf), summary = FALSE, type = 'text', digits = 3)
+# Output ------------------------------------------------------------------
 
-# T-testing diffs  ------------------------------------------------------------------------
+out_matrix <- rbind(
+  wdf, 
+  out_stats
+  )
 
-t_test_factor <- function(strategy1, strategy2) {
-  
-  factors = c('Mkt.RF','SMB','Mom','HML','CMA','RMW')
-  
-  out.list <- lapply(factors, function(factor) {
+colnames(out_matrix) <- STRATEGIES
+stargazer(out_matrix, summary = FALSE, type = 'text', digits = 2)
+#stargazer(out_matrix, summary = FALSE, type = 'latex', digits = 2, header = FALSE)
 
-    load(sprintf('data/derived/mv/%s_%s.RData', MODEL_NAME, strategy1))
-    results1 <- results[['weights']]
-    load(sprintf('data/derived/mv/%s_%s.RData', MODEL_NAME, strategy2)) 
-    results2 <- results[['weights']]
-    
-    if(!(
-      factor %in% colnames(results1) && factor %in% colnames(results2)
-    )) {
-      list()
-    } else {
-      
-      weights1 <- results1[,factor] * 100
-      weights2 <- results2[,factor] * 100
-      
-      df <- data.frame(weights1, weights2)
-      colnames(df) <- c(strategy1, strategy2)
-      
-      test <- t.test(df[,strategy1], df[,strategy2], paired = T)
-      
-      list(
-        factor = factor,
-        strategy1 = strategy1,
-        strategy2 = strategy2,
-        statistic = round(test$statistic,2),
-        estimate = round(test$estimate,1),
-        se = round(test$estimate / test$statistic,4),
-        p = round(test$p.value,4)
-      )
-      
-    }
-  })
-  
-  out.list <- bind_rows(out.list)
-  
-  stargazer(out.list, summary = F, type = 'text', digits = 2, digits.extra = 0)
-  
-}
-
-t_test_factor('5F_EXCL_CMA', '5F')
-t_test_factor('5F_EXCL_HML', '5F')
-
-
-t_test_factor('6F_EXCL_CMA', '6F')
-t_test_factor('6F_EXCL_HML', '6F')

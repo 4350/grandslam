@@ -27,7 +27,10 @@ library(PerformanceAnalytics)
 library(stargazer)
 
 load_all('wimbledon')
+load_all('australian')
 
+load('data/derived/weekly-estim.RData')
+MODEL_NAME = 'full_dynamic_std_10000'
 
 # Functions used in optimization  ---------------------------------------------------------------
 
@@ -40,29 +43,17 @@ load_all('wimbledon')
 #' last T values)
 #' 
 #' @param model_name copula model, one of 'ghskt', 'ght', 'norm'
-#' @param mu TxN vector of expected returns
-#' @param sigma NxNxT array of variance-covariance matrices
 #' @param strategy name for out file for this strategy
 #' @param selectors chosen allowed assets in this strategy, 
 #' choosing from Mkt.RF, HML, SMB, Mom, RMW, CMA
-#' @param df.realized data frame like df.estim, including dates and 6 factors
-#' of log returns, at least as long as the out-of-sample period which is given by
-#' the length of the distribution or mu and sigma
-#' @param df.mean optional df of factors used to calculate mean if 
-#' copula estimate from mean equation is not to be used
+#' @param q CDB VaR cutoff
 #' 
 #' @return saves a list of results to RData files mv_results_...
 #' 
-do_optimize_mv <- function(model_name, strategy, selectors, df.realized, df.mean = NULL) {
+do_optimize_mv <- function(model_name, strategy, selectors, q = 0.05) {
   
   # Load distribution simulated data
   load(sprintf('data/derived/distributions/%s.RData', model_name))
-  
-  # Simplify df.mean if inputted. Select selectors
-  if(!is.null(df.mean)) {
-    df.mean <- df.mean[,-1]
-    df.mean <- df.mean[, selectors]
-  }
   
   # Subset the data using selectors
   colnames(distribution) <- c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA')
@@ -72,25 +63,19 @@ do_optimize_mv <- function(model_name, strategy, selectors, df.realized, df.mean
   N <- ncol(distribution)
   
   T <- length(times)
+  
   # Outputs
   weights <- matrix(NA, ncol = N, nrow = T)
   sr <- rep(NA, T)
+  cdb <- rep(NA, T)
   
-  # Get MV optimal weights and SRs
+  # Get MV optimal weights and SRs and CDBs
   
   for (t in times) {
     tic(sprintf('Optimal weights at t = %d', t))
     
-    # Mu either from mean or copula distribution
-    
-    if(!is.null(df.mean)) {
-      mu_t <- colMeans(df.mean)
-    } else {
-      mu_t <- colMeans(distribution[,,t])
-    }
-    
-    # Sigma always from copula distribution
-    
+    # Mu, sigma from dist
+    mu_t <- colMeans(distribution[,,t])
     sigma_t <- cov(distribution[,,t])
     
     # Run optimizer
@@ -98,29 +83,33 @@ do_optimize_mv <- function(model_name, strategy, selectors, df.realized, df.mean
     
     toc()
     
+    # Get CDB
+    
+    fn_cdb <- cdb_fn(q, distribution[,,t])
+    cdb[t] <- fn_cdb(op$weights)
+    
+    # Save this
+    
     weights[t, ] <- op$weights
     sr[t] <- op$sr
   }
   
   colnames(weights) <- selectors
   
-  # Use realized returns and dates
-  dates <- tail(df.realized[,'Date'], T)
-  # Subset realized returns using selectors
-  realized <- tail(df.realized[, selectors], T)
-  
-  # Calculate the portfolios realized return
-  portfolio_return <- rowSums(weights * realized)
+  # Get realized dates, returns and CDB
+  metrics <- portfolio_metrics(weights, distribution, q, selectors)
   
   # Save list of data points as .RData file
-  results <- list(
-    Date = dates$Date,
-    sr = sr,
-    weights = weights,
-    portfolio_return = portfolio_return,
-    based_on = model_name,
-    strategy = strategy
+  results <- c(
+    metrics,
+    list(
+      sr_optim = sr,
+      model_name = model_name,
+      strategy = strategy,
+      weights = weights
+    )
   )
+  
   # Give this a specific name
   save(results, file = sprintf('data/derived/mv/results_%s_%s.Rdata', model_name, strategy))
   return(results)
@@ -186,16 +175,27 @@ sharpe_ratio_fn <- function(mu_t, sigma_t) {
 
 #' Optimize with fixed mu, sigma
 #' 
-do_optimize_fixed <- function(model_name, strategy, selectors, df.sample, df.realized) {
+#' @param model_name copula model, one of 'ghskt', 'ght', 'norm'
+#' @param strategy name for out file for this strategy
+#' @param selectors chosen allowed assets in this strategy, 
+#' choosing from Mkt.RF, HML, SMB, Mom, RMW, CMA
+#' @param df.sample sample data frame (df.estim)
+#' @param q CDB VaR cutoff
+
+do_optimize_fixed <- function(model_name, strategy, selectors, df.sample = df.estim, q = 0.05) {
   
-  # Save the dates and then select
-  dates <- df.realized[,'Date']
-  # Select returns 
-  df.realized <- df.realized[ , selectors]
+  # Load distribution simulated data
+  load(sprintf('data/derived/distributions/%s.RData', model_name))
+  
+  # Subset the data using selectors
+  colnames(distribution) <- c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA')
+  distribution <- distribution[, selectors, ]
+  
+  # Select subset and shorten to tail_T length
   df.sample <- df.sample[ , selectors]
   
-  N <- ncol(df.realized)
-  T <- nrow(df.realized)
+  N <- ncol(df.sample)
+  T <- nrow(df.sample)-1 #adj due to one day falls off in distributions
   
   # Get MV optimal weights and SRs
   mu = colMeans(df.sample)
@@ -208,109 +208,53 @@ do_optimize_fixed <- function(model_name, strategy, selectors, df.sample, df.rea
   
   colnames(weights) <- selectors
   
-  # Calculate the portfolios realized return
-  portfolio_return <- rowSums(weights * df.realized)
+  # Get dates realized returns and CDB
+  metrics <- portfolio_metrics(weights, distribution, q, selectors)
   
   # Save list of data points as .RData file
-  results <- list(
-    Date = dates$Date,
-    sr = sr,
-    weights = weights,
-    portfolio_return = portfolio_return,
-    based_on = model_name,
-    strategy = strategy
+  results <- c(
+    metrics,
+    list(
+      sr_optim = sr,
+      model_name = model_name,
+      strategy = strategy,
+      weights = weights
+    )
   )
+  
   # Give this a specific name
-  save(results, file = sprintf('data/derived/mv/results_%s_%s.Rdata', model_name, strategy))
+  save(results, file = sprintf('data/derived/mv/results_%s_%s.Rdata', 'sample', strategy))
   return(results)
 }
 
 # Get optimization results dynamic std full copula means ------------------------------------
 
-load('data/derived/weekly-estim.RData')
-MODEL_NAME = 'full_dynamic_std_10000'
-
 # Without Momentum
-do_optimize_mv(MODEL_NAME, strategy = '5F',
-               selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA', 'RMW'),
-               df.realized = df.estim)
-
-do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_HML',
-               selectors = c('Mkt.RF', 'SMB',        'CMA', 'RMW'),
-               df.realized = df.estim)
-
-do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_CMA',
-               selectors = c('Mkt.RF', 'SMB', 'HML',        'RMW'),
-               df.realized = df.estim)
-
-do_optimize_mv(MODEL_NAME, strategy = '5F_EXCL_RMW',
-               selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA'       ),
-               df.realized = df.estim)
+do_optimize_mv(MODEL_NAME, '5F'         , c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'))
+do_optimize_mv(MODEL_NAME, '5F_EXCL_HML', c('Mkt.RF',        'SMB', 'RMW', 'CMA'))
+do_optimize_mv(MODEL_NAME, '5F_EXCL_CMA', c('Mkt.RF', 'HML', 'SMB', 'RMW'       ))
+do_optimize_mv(MODEL_NAME, '5F_EXCL_RMW', c('Mkt.RF', 'HML', 'SMB',        'CMA'))
 
 # With Momentum
-do_optimize_mv(MODEL_NAME, strategy = '6F',
-               selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA', 'RMW', 'Mom'),
-               df.realized = df.estim)
-
-do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_HML',
-               selectors = c('Mkt.RF', 'SMB',        'CMA', 'RMW', 'Mom'),
-               df.realized = df.estim)
-
-do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_CMA',
-               selectors = c('Mkt.RF', 'SMB', 'HML',        'RMW', 'Mom'),
-               df.realized = df.estim)
-
-do_optimize_mv(MODEL_NAME, strategy = '6F_EXCL_RMW',
-               selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA',        'Mom'),
-               df.realized = df.estim)
+do_optimize_mv(MODEL_NAME, '6F'         , c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'))
+do_optimize_mv(MODEL_NAME, '6F_EXCL_HML', c('Mkt.RF',        'SMB', 'Mom', 'RMW', 'CMA'))
+do_optimize_mv(MODEL_NAME, '6F_EXCL_CMA', c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'       ))
+do_optimize_mv(MODEL_NAME, '6F_EXCL_RMW', c('Mkt.RF', 'HML', 'SMB', 'Mom',        'CMA'))
 
 # Optimize sample full 5F ---------------------------------------------------------
 
-load('data/derived/weekly-estim.RData')
-do_optimize_fixed('full_sample', strategy = '5F',
-                  selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA', 'RMW'),
-                  df.sample = df.estim[1:2766,],
-                  df.realized = df.estim[2:2766,])
-
-do_optimize_fixed('full_sample', strategy = '5F_EXCL_HML',
-                  selectors = c('Mkt.RF', 'SMB',        'CMA', 'RMW'),
-                  df.sample = df.estim[1:2766,],
-                  df.realized = df.estim[2:2766,])
-
-do_optimize_fixed('full_sample', strategy = '5F_EXCL_CMA',
-                  selectors = c('Mkt.RF', 'SMB', 'HML',        'RMW'),
-                  df.sample = df.estim[1:2766,],
-                  df.realized = df.estim[2:2766,])
-
-do_optimize_fixed('full_sample', strategy = '5F_EXCL_RMW',
-                  selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA'       ),
-                  df.sample = df.estim[1:2766,],
-                  df.realized = df.estim[2:2766,])
-
+do_optimize_fixed(MODEL_NAME, '5F'         , c('Mkt.RF', 'HML', 'SMB', 'RMW', 'CMA'))
+do_optimize_fixed(MODEL_NAME, '5F_EXCL_HML', c('Mkt.RF',        'SMB', 'RMW', 'CMA'))
+do_optimize_fixed(MODEL_NAME, '5F_EXCL_CMA', c('Mkt.RF', 'HML', 'SMB', 'RMW'       ))
+do_optimize_fixed(MODEL_NAME, '5F_EXCL_RMW', c('Mkt.RF', 'HML', 'SMB',        'CMA'))
 
 
 # Optimize sample full 6F ---------------------------------------------------------
 
-load('data/derived/weekly-estim.RData')
-do_optimize_fixed('full_sample', strategy = '6F',
-                  selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA', 'RMW', 'Mom'),
-                  df.sample = df.estim[1:2766,],
-                  df.realized = df.estim[2:2766,])
-
-do_optimize_fixed('full_sample', strategy = '6F_EXCL_HML',
-                  selectors = c('Mkt.RF', 'SMB',        'CMA', 'RMW', 'Mom'),
-                  df.sample = df.estim[1:2766,],
-                  df.realized = df.estim[2:2766,])
-
-do_optimize_fixed('full_sample', strategy = '6F_EXCL_CMA',
-                  selectors = c('Mkt.RF', 'SMB', 'HML',        'RMW', 'Mom'),
-                  df.sample = df.estim[1:2766,],
-                  df.realized = df.estim[2:2766,])
-
-do_optimize_fixed('full_sample', strategy = '6F_EXCL_RMW',
-                  selectors = c('Mkt.RF', 'SMB', 'HML', 'CMA',        'Mom'),
-                  df.sample = df.estim[1:2766,],
-                  df.realized = df.estim[2:2766,])
+do_optimize_fixed(MODEL_NAME, '6F'         , c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW', 'CMA'))
+do_optimize_fixed(MODEL_NAME, '6F_EXCL_HML', c('Mkt.RF',        'SMB', 'Mom', 'RMW', 'CMA'))
+do_optimize_fixed(MODEL_NAME, '6F_EXCL_CMA', c('Mkt.RF', 'HML', 'SMB', 'Mom', 'RMW'       ))
+do_optimize_fixed(MODEL_NAME, '6F_EXCL_RMW', c('Mkt.RF', 'HML', 'SMB', 'Mom',        'CMA'))
 
 
 
