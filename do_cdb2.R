@@ -80,6 +80,7 @@ do_best_cdb <- function(model_name, strategy, selectors, q = 0.05) {
   
   # Output: Optimal Weights and CDB at optimal weights
   weights <- matrix(NA, ncol = N, nrow = length(times))
+  colnames(weights) <- selectors
   cdb <- rep(NA, length(times))
   
   for (t in times) {
@@ -114,6 +115,7 @@ do_ew_cdb <- function(model_name, strategy, selectors, q = 0.05) {
   
   # Output: Optimal Weights and CDB at EW
   weights <- matrix(NA, ncol = N, nrow = length(times))
+  colnames(weights) <- selectors
   cdb <- rep(NA, length(times))
   
   for (t in times) {
