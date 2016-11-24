@@ -18,18 +18,18 @@ PAIRS <- list(
   c('Mkt.RF', 'HML'),
   c('Mkt.RF', 'CMA'),
   c('Mkt.RF', 'RMW'),
-  c('Mom', 'HML'),
-  c('Mom', 'CMA'),
-  c('Mom', 'RMW'),
   c('SMB', 'HML'),
   c('SMB', 'CMA'),
   c('SMB', 'RMW'),
+  c('Mom', 'HML'),
+  c('Mom', 'CMA'),
+  c('Mom', 'RMW'),
   c('HML', 'CMA'),
   c('HML', 'RMW'),
   c('CMA', 'RMW')
 )
 
-QS <- seq(0.10, 0.90, 0.01)
+QS <- c(seq(0.10, .49, 0.01), 0.4999, 0.49995, 0.50, seq(0.51, 0.90, 0.01))
 
 
 # Do and save stdres data set ---------------------------------------------

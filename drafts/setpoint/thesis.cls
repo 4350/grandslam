@@ -71,7 +71,7 @@
 
 % Make the bibliography heading an un-numbered section (not included in
 % toc); refname uses the right translation, probably.
-\defbibheading{bibliography}[\refname]{\pagebreak \section*{#1}}
+\defbibheading{bibliography}[\refname]{\section*{#1}}
 
 \setlength\bibhang{0pt}               % Don't indent bibliography second line
 \setlength\bibitemsep{\baselineskip}  % Separate entries by one line
