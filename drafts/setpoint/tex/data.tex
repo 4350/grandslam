@@ -27,35 +27,11 @@ The sort ensures that SMB includes firms small and big firms equally from the ot
 French's financial statement data originates from Compustat, stock return data is from CRSP and Treasury return data is from Ibbotson Associates.
 
 \subsection{Summary statistics}
-% Table created by stargazer v.5.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
-% Date and time: lör, okt 15, 2016 - 22:22:53
-\begin{table}[!htbpp] \centering 
-  \scriptsize
-  \renewcommand{\arraystretch}{1.2}
-  \caption{Summary statistics of weekly returns on factor strategies. \\ \quad \\
-  Kurtosis is excess kurtosis, i.e. zero for a normal distribution. LB [5/10] is the weighted Ljung-Box test up to 5/10 lags, from \textcite{FisherGallagher2012}, where the null hypothesis is no autocorrelation.}
-  \label{tab:summarydata} 
-\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X r r r r r r} 
-  \toprule
-  & Mkt.RF & SMB & Mom & HML & CMA & RMW \\ 
-\midrule
-Observations & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ & $2,766$ \\ 
-Maximum (\%) & $12.6$ & $6.0$ & $12.0$ & $11.7$ & $5.4$ & $9.4$ \\ 
-Minimum (\%) & $$-$19.8$ & $$-$9.8$ & $$-$17.5$ & $$-$8.3$ & $$-$4.4$ & $$-$6.2$ \\ 
-Mean (\%) & $0.1$ & $0.0$ & $0.1$ & $0.1$ & $0.1$ & $0.1$ \\ 
-Median (\%) & $0.3$ & $0.1$ & $0.2$ & $0.0$ & $0.0$ & $0.0$ \\ 
-Volatility (\%) & $2.2$ & $1.2$ & $1.9$ & $1.2$ & $0.9$ & $0.9$ \\
-Skewness & $$-$0.688$ & $$-$0.504$ & $$-$1.390$ & $0.331$ & $0.306$ & $0.724$ \\ 
-Kurtosis (excess) & $6.191$ & $4.997$ & $11.987$ & $7.318$ & $3.149$ & $13.005$ \\
-\midrule
-Return LB [5] p-value & $0.263$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
-Return LB [10] p-value & $0.007$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
-Return\textsuperscript{2} LB [5] p-value & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
-Return\textsuperscript{2} LB [10] p-value & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ & $0.000$ \\ 
-\bottomrule
-\end{tabularx} 
-\end{table}
+
+\input{tex/tables/summary_stats}
+
 For all series, there are 2,766 consecutive data points and no missing data. Mkt.RF is the most volatile and extreme of the series, with weekly returns between -19.8\% and 12.6\% and a weekly volatility of 2.2\%. CMA and RMW seem to be less extreme than HML, with less negative minimums and smaller volatilities. The factor strategies have excess kurtosis, or fat tails, which is typical for financial returns. The excess kurtoses of the Mom, HML and RMW factors are even higher than the kurtosis of the Mkt.RF factor, where RMW is exceptionally high at 13.0. However, while market returns are negatively skewed, HML, CMA and RMW instead exhibit positive skewness. QQ-plots versus normal theoretical quantiles in \autoref{fig:qq_returns} graphically show the non-normality.
+
 \begin{figure}[htbp]
   \centering
   \footnotesize
@@ -88,25 +64,7 @@ We conclude that factor return series are non-normal and that returns are not in
   \includegraphics[scale=1]{graphics/cumretStdPlot.png}  
 \end{figure}
 
-Plots of cumulative returns (\autoref{fig:cumret}) clearly show the high returns to the momentum strategy throughout the sample period. However, normalizing the series to 10\% annual volatility (\autoref{fig:cumretstd}) gives a more nuanced picture of mean-variance performance. Since 1963, each of the strategies except for SMB has outperformed the market factor. Furthermore, factor strategies seem to crash at different times and diversify eachother, e.g. Mom performed well during 1999-2000 and RMW performed well during 2008-2009. The unconditional correlation matrix of returns is given in \autoref{tab:corr_matrix} and the general low or even negative correlation coefficients show the diversification benefits of factor strategies. The HML--CMA pair does stand out, however, with an unconditional correlation of 0.63, which could be related to a partial overlap of the factor components as discussed in \autoref{sec:literature} -- past investment is shown to be negatively empirically related to the current book-to-market ratio. The substantially higher correlation in this asset pair indicates smaller diversification benefits. We also note that RMW has more negative correlations than the other factors.
+Plots of cumulative returns (\autoref{fig:cumret}) clearly show the high returns to the momentum strategy throughout the sample period. However, normalizing the series to 10\% annual volatility (\autoref{fig:cumretstd}) gives a more nuanced picture of mean-variance performance. Since 1963, each of the strategies except for SMB has outperformed the market factor. Furthermore, factor strategies seem to crash at different times and diversify eachother, e.g. Mom performed well during 1999-2000 and RMW performed well during 2008-2009.
 
-\begin{table}[!htbpp] 
-  \centering
-  \footnotesize
-  \renewcommand{\arraystretch}{1.2}
-  \caption{Correlation matrix \\ \quad \\
-  Unconditional sample correlation matrix of factor return series. Based on weekly return data 1963--2016}
-  \label{tab:corr_matrix} 
-\begin{tabularx}{\textwidth}{@{\extracolsep{5pt}} X D{.}{.}{1} D{.}{.}{1} D{.}{.}{1} D{.}{.}{1} D{.}{.}{1} D{.}{.}{1}} 
-  \toprule
-  & \multicolumn{1}{c}{Mkt.RF} & \multicolumn{1}{c}{SMB} & \multicolumn{1}{c}{Mom} & \multicolumn{1}{c}{HML} & \multicolumn{1}{c}{CMA} & \multicolumn{1}{c}{RMW} \\ 
-\midrule
-\text{Mkt.RF} & $1.00$ & $$ & $$ & $$ & $$ & $$ \\ 
-\text{SMB} & $0.09$ & $1.00$ & $$ & $$ & $$ & $$ \\ 
-\text{Mom} & $$-$0.11$ & $$-$0.01$ & $1.00$ & $$ & $$ & $$ \\ 
-\text{HML} & $$-$0.28$ & $$-$0.03$ & $$-$0.22$ & $1.00$ & $$ & $$ \\ 
-\text{CMA} & $$-$0.42$ & $$-$0.05$ & $0.07$ & $0.63$ & $1.00$ & $$ \\ 
-\text{RMW} & $$-$0.15$ & $$-$0.34$ & $0.08$ & $$-$0.05$ & $$-$0.07$ & $1.00$ \\ 
-\bottomrule
-\end{tabularx} 
-\end{table}
+Looking at the correlation matrix of factor returns, the generally low or even negative correlation coefficients show the diversification benefits of factor strategies. The HML--CMA pair does stand out, however, with an unconditional correlation of 0.63, which could be related to a partial overlap of the factor components as discussed in \autoref{sec:literature} -- past investment is shown to be negatively empirically related to the current book-to-market ratio. The substantially higher correlation in this asset pair indicates smaller diversification benefits. We also note that RMW has more negative correlations than the other factors.
+

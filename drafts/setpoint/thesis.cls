@@ -97,7 +97,7 @@
 
 % Add "Appendix" section to ToC and start of appendices
 \newcommand*{\Appendixautorefname}{Appendix}
-\usepackage[titletoc,title]{appendix} % Ensure "Appendices" is added to ToC
+\RequirePackage[toc,title]{appendix} % Ensure "Appendices" is added to ToC
 
 %% TABLES AND FIGURES
 % This puts table captions above tables and makes the "Table 1" label bold
@@ -105,6 +105,7 @@
 \RequirePackage{subcaption}    % Multipage figures
 \RequirePackage{booktabs}      % Nice tables
 \RequirePackage{tabularx}      % Full-width tables
+\RequirePackage{multirow}      % Span multiple rows
 \RequirePackage{dcolumn}       % Aligned columns as below
 \newcolumntype{d}{D{.}{.}{-1}} % Use `d` column for numerical columns
 \newcolumntype{i}{D{.}{.}{0}}
