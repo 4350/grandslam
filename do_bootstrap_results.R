@@ -15,6 +15,7 @@ copula_results <- function(estimate, bootstrap) {
   # parameters we're interested in
   copula_parameters <- list(
     nu = function(c) c@distribution@nu,
+    nu_rep = function(c) 1/c@distribution@nu,
     gamma1 = function(c) c@distribution@gamma[1],
     gamma2 = function(c) c@distribution@gamma[2],
     gamma3 = function(c) c@distribution@gamma[3],
@@ -54,13 +55,13 @@ load('data/derived/copula/full_dynamic.RData')
 load('data/derived/copula/full_constant.RData')
 
 stargazer(
-  copula_results(dynamic_copula_fit$norm, 'norm')$fit,
+  copula_results(constant_copula_fit$ghst, 'ghst')$fit,
   type = 'text',
-  digits = 3,
+  digits = 2,
   digits.extra = 0,
   summary = F,
   rownames = F
 )
 
-lapply(dynamic_copula_fit, function(r) r$fit@dynamics@alpha + r$fit@dynamics@beta)
-#lapply(dynamic_copula_fit, function(r) r$ll)
+# lapply(dynamic_copula_fit, function(r) r$fit@dynamics@alpha + r$fit@dynamics@beta)
+lapply(dynamic_copula_fit, function(r) r$ll)

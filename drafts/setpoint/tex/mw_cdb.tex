@@ -11,11 +11,7 @@ We begin by describing the construction and intuition of CDB and subsequently pr
 
 \subsection{Formula and interpretation of the CDB statistic}
 
-This description of CDB follows~\textcite{ChristoffersenErrunzaJacobLanglois2012}. Define ES as the expected loss in some bottom percentile $q$:
-\begin{align}
-    \text{ES}_{i,t}^q(r_{i,t}) = -\mathbb{E}[r_{i,t} | r_{i,t} \leq F_{i,t}^{-1}(q)]
-\end{align}
-where $F_{i,t}^{-1}(q)$ is the inverse CDF of simple returns $r_{i,t}$ at $q$ (equivalent to the $q\%$ Value-at-Risk). 
+
 
 The expected shortfall represents the expected loss when returns realize below the Value-at-Risk of the portfolio. Depending on the distribution at hand, the expected shortfall can be closer or further to the Value-at-Risk. Intuitively, if assets offer little diversification, then no combination of assets will reduce total portfolio risk; and ES will be higher. 
 
@@ -50,12 +46,15 @@ Note that this analysis is completely dependent on having a conditional model of
 % Picture different between 5-factor and 6-factor
 \autoref{fig:cdb} plots optimal conditional diversification benefit measures of the five- and six-factor asset universes, where we experiment by excluding HML, CMA and RMW one at a time. We have smoothed the plots using quarterly moving averages in order to make them easier to read. We proceed with a number of interesting results that emerge from this picture:
 
-\begin{figure}
+\begin{figure}[!ht]
   \centering
   \footnotesize
   \renewcommand{\arraystretch}{1.2}
-  \caption{5\% Conditional diversification benefit (CDB) for six different asset universes, full sample (1963--2016). 
-  The line has been smoothed with a moving average on a quarterly window to make it easier to read.}
+  \caption{5\% Optimal Conditional Diversification Beneift (CDB)}
+
+  \begin{longcaption}
+    Five (without Momentum) and six factor universes. The line has been smoothed with a moving average on a quarterly window to make it easier to read.
+  \end{longcaption}
   \label{fig:cdb}
   \includegraphics[scale = 1]{graphics/cdb/CDB.png}
 \end{figure}
@@ -68,15 +67,15 @@ Second, there are notable dips in the diversification benefit measure. The dips 
 
 % HML is a better diversifier on average
 % CMA better when diversification is hard to come by
-Third, the level decreases in diversification benefit of removing HML or CMA seem quite small. Furthermore, this decrease is highly similar; At certain times, portfolios including HML are more diversified and vice versa, but no pattern emerges. However, we note that the exclusion of RMW is dramatically different. Without RMW, the level decrease is substantial and dips in CDB become much more pronounced and frequent. 
+Third, the level decreases in diversification benefit of removing HML or CMA seem quite small. Furthermore, this decrease is highly similar; At certain times, portfolios including HML are more diversified and vice versa, but no pattern emerges. However, we note that the exclusion of RMW is dramatically different. Without RMW, the level decrease is substantial and dips in CDB become much more pronounced and frequent.
+
+\input{tex/tables/cdb_model}
 
 \autoref{tab:cdb_table} displays CDB summary statistics and results of paired t-tests of CDB difference between strategies (column less row strategy). This table tells largely the same story as the previous graph. In a five-factor model, excluding CMA leads to significantly lower CDB compared to excluding HML (i.e. CMA is more important as a diversifier), however, the effect is reversed in six-factor model. Furthermore, the average differences, $-0.10$ and $0.27$ respectively, are not very large -- especially compared to the effect of excluding RMW.\footnote{Standard errors are computed ignoring uncertainty in the copula model parameters, which means that the significance is overestimated.}
 
 % \autoref{tab:cdb_table} displays CDB summary statistics and the results of paired t-tests of the differences between strategies. This table tells the same story as the graph. Excluding RMW is significantly worse for diversification than excluding either HML or CMA. For HML and CMA, differences are small: In a five-factor setting [HML] is the significantly better diversifier, while in a six-factor setting [CMA] is.\footnote{p-values are computed ignoring uncertainty in the model parameters}.
 
 In summary, we find that the high similarity of HML and CMA indicates that tail diversification benefits are not dramatically improved by including both the factors, which is coherent with fact that they are closely related and overlap. This does not mean that both factors should not be considered, however, as it could improve the conventional risk-return tradeoff in a mean-variance setting. The RMW factor, on the other hand, is shown to be very important for diversification purposes and should be considered by all factor investors concerned with tail risk.
-
-\input{tex/tables/cdb_model}
 
 % What periods does low CDB correspond to?
 % Story related to threshold correlations and patterns seen Mkt-HML
