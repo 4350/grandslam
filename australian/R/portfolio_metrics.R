@@ -23,7 +23,7 @@ portfolio_metrics <- function(weights, distribution, q, selectors) {
   portfolio_return <- rowSums(weights * realized)
   
   # Calculate the CDB and VaR
-  cdb_var_results <- cdb_var_es(q, distribution, weights)
+  cdb_var_es_results <- cdb_var_es(q, distribution, weights)
   
   # List of results
   results <- c(

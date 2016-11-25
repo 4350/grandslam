@@ -128,7 +128,7 @@ summary.plots <- function(df, outlabel, factor) {
 summary.cumretplots <- function(df, outlabel) {
   # Long format for plot
   df <- gather(df, "factor", "ret", 2:ncol(df))
-  df$factor <- factor(df$factor, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+  df$factor <- factor(df$factor, levels = c('Mkt.RF','SMB','HML','CMA','RMW','Mom'))
   
   # Mutate to create cumulative and standardized returns at 10% annual vol
   df <- df %>% 
@@ -150,6 +150,21 @@ summary.cumretplots <- function(df, outlabel) {
     guides(color = guide_legend(nrow = 1))+
     scale_colour_Publication()
   
+  # Plot cumulative return series w/o momentum
+  out.cumret.no.mom <- df %>%
+    dplyr::filter(factor %in% c('Mkt.RF','SMB','HML','CMA','RMW')) %>%
+    ggplot(aes(x=Date, y=cumret, group=factor)) +
+    geom_line(aes(color=factor))+
+    #ggtitle('Cumulative returns to factor strategies')+
+    xlab('Year')+
+    ylab('Cumulative gross return')+
+    theme(legend.position="bottom")+
+    scale_x_date(date_breaks = "2 years", date_labels = "%y")+
+    theme_Publication()+
+    guides(color = guide_legend(nrow = 1))+
+    scale_colour_Publication()
+  
+  
   # Plot cumulative standardized return series
   out.cumstdret <- df %>%
     ggplot(aes(x=Date, y=cumstdret, group=factor)) +
@@ -165,6 +180,7 @@ summary.cumretplots <- function(df, outlabel) {
   
   # Save out
   ggsave(filename = 'output/cumretPlot.png', out.cumret, 'png', dpi = 300, width = 16, height = 8, units = "cm", limitsize = F)
+  ggsave(filename = 'output/cumretPlot_no_mom.png', out.cumret.no.mom, 'png', dpi = 300, width = 16, height = 8, units = "cm", limitsize = F)
   ggsave(filename = 'output/cumretStdPlot.png', out.cumstdret, 'png', dpi = 300, width = 16, height = 8, units = "cm", limitsize = F)
   
 }
