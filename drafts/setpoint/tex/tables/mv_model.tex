@@ -1,0 +1,83 @@
+%!TEX root = ../../main.tex
+
+\begin{table}
+  \centering
+  \footnotesize
+  \renewcommand{\arraystretch}{1.2}
+
+  \caption{Mean-Variance Optimization with Dynamic Copula Model (1963--2016)}
+
+  \begin{longcaption}
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  \end{longcaption}
+
+  \label{tab:mw_mv_model}
+
+  \begin{tabularx}{\textwidth}{@{} l dddd X dddd @{}}
+    \toprule
+    &
+      \multicolumn{4}{c}{Five Factors} &&
+      \multicolumn{4}{c}{Six Factors} \\
+    \cmidrule{2-5}
+    \cmidrule{7-10}
+    &
+      \multirow{2}{*}{All} &
+      \multicolumn{1}{c}{Excl} &
+      \multicolumn{1}{c}{Excl} &
+      \multicolumn{1}{c}{Excl} & &
+      \multirow{2}{*}{All} &
+      \multicolumn{1}{c}{Excl} &
+      \multicolumn{1}{c}{Excl} &
+      \multicolumn{1}{c}{Excl} \\
+    &
+      &
+      \multicolumn{1}{c}{CMA} &
+      \multicolumn{1}{c}{HML} &
+      \multicolumn{1}{c}{RMW} &&
+      &
+      \multicolumn{1}{c}{CMA} &
+      \multicolumn{1}{c}{HML} &
+      \multicolumn{1}{c}{RMW} \\
+    \midrule
+    \multicolumn{1}{@{}l}{\textbf{Average Weights}} \\
+    Mkt.RF    & 20.0  & 25.0   & 25.0   & 25.0   & & 16.7  & 20.0    & 20.0    & 20.0 \\
+    SMB       & 20.0  & 25.0   & 25.0   & 25.0   & & 16.7  & 20.0    & 20.0    & 20.0 \\
+    HML       & 20.0  &        & 25.0   & 25.0   & & 16.7  &         & 20.0    & 20.0 \\
+    CMA       & 20.0  & 25.0   &        & 25.0   & & 16.7  & 20.0    &         & 20.0 \\
+    RMW       & 20.0  & 25.0   & 25.0   &        & & 16.7  & 20.0    & 20.0    & \\
+    Mom       &       &        &        &        & & 16.7  & 20.0    & 20.0    & 20.0 \\
+    \midrule
+    \multicolumn{1}{@{}l}{\textbf{Difference}} \\
+    Mkt.RF    &       & 5.0    & 5.0    & 5.0    & &       & 20.0    & 20.0    & 20.0 \\
+    SMB       &       & 5.0    & 5.0    & 5.0    & &       & 20.0    & 20.0    & 20.0 \\
+    HML       &       & -20.0  & 5.0    & 5.0    & &       & -20.0   & 20.0    & 20.0 \\
+    CMA       &       & 5.0    & -20.0  & 5.0    & &       & 20.0    & -20.0   & 20.0 \\
+    RMW       &       & 5.0    & 5.0    & -20.0  & &       & 20.0    & 20.0    & -20.0     \\
+    Mom       &       &        &        &        & &       & 20.0    & 20.0    & 20.0 \\
+    \midrule
+    \multicolumn{1}{@{}l}{\textbf{Performance}} \\
+    Mean (\%) & 3.00  & 5.00   & 5.00   & 5.00   & & 10.00 & 20.00   & 20.00   & 20.00 \\
+    SD (\%)   & 3.00  & 5.00   & 5.00   & 5.00   & & 10.00 & 20.00   & 20.00   & 20.00 \\
+    Skewness  & 3.00  & 5.00   & 5.00   & 5.00   & & 10.00 & 20.00   & 20.00   & 20.00 \\
+    Kurtosis  & 3.00  & 5.00   & 5.00   & 5.00   & & 10.00 & 20.00   & 20.00   & 20.00 \\
+    Sharpe    & 3.00  & 5.00   & 5.00   & 5.00   & & 10.00 & 20.00   & 20.00   & 20.00 \\
+    MDD (\%)  & 3.00  & 5.00   & 5.00   & 5.00   & & 10.00 & 20.00   & 20.00   & 20.00 \\
+    CDB       & 93.00 & 85.00  & 35.00  & 15.00  & & 10.00 & 20.00   & 20.00   & 20.00 \\
+    \midrule
+    \multicolumn{1}{@{}l}{\textbf{Difference CDB}} \\
+    All       &       & -5.00  & -5.00  & -5.00  & &       & -20.00  & -20.00  & -20.00 \\
+              &       & (5.00) & (5.00) & (5.00) & &       & (20.00) & (20.00) & (20.00) \\
+              \\
+    Excl HML  &       &        & -5.00  & -5.00  & &       &         & -20.00  & -20.00 \\
+              &       &        & (5.00) & (5.00) & &       &         & (20.00) & (20.00) \\
+              \\
+    Excl CMA  &       &        &        & -5.00  & &       &         &         & -20.00 \\
+              &       &        &        & (5.00) & &       &         &         & (20.00) \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
