@@ -6,6 +6,7 @@ library(tidyr)
 library(dplyr)
 library(ggplot2)
 library(scales)
+library(gtable)
 library(ggfortify)
 library(zoo)
 library(gridExtra)
@@ -14,22 +15,41 @@ library(extrafont)
 
 load_all('wimbledon')
 
-MODEL = 'results_full_dynamic_std_10000'
-MODEL_NAME_1 = '6F_EXCL_HML'
-MODEL_NAME_2 = '6F'
 
-load(sprintf('data/derived/mv/%s_%s.RData', MODEL, MODEL_NAME_1))
+# Inputs ------------------------------------------------------------------
+
+# Graph name
+NAME = 'CDB_MV'
+
+#MV
+#MODEL = 'mv/results_full_dynamic_std_10000'
+#SAMPLE_MODEL = 'mv/results_sample'
+#CDB
+MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000'
+SAMPLE_MODEL = 'mv/results_full_dynamic_std_10000'
+
+MODEL_NAME_1 = '6F'
+MODEL_NAME_2 = '6F_EXCL_HML'
+
+LABELS = c("CDB optimal weights", #model 1
+           #"Six-factor excl. CMA"#, #model-2
+           "MV optimal weights" #sample-1
+           #"Five-factor excl. CMA (sample)" #sample-2
+           )
+
+
+# Loading -----------------------------------------------------------------
+
+load(sprintf('data/derived/%s_%s.RData', MODEL, MODEL_NAME_1))
 results1 <- results
 
-load(sprintf('data/derived/mv/%s_%s.RData', MODEL, MODEL_NAME_2))
+load(sprintf('data/derived/%s_%s.RData', MODEL, MODEL_NAME_2))
 results2 <- results
 
-SAMPLE_MODEL = 'results_full_sample'
-
-load(sprintf('data/derived/mv/%s_%s.RData', SAMPLE_MODEL, MODEL_NAME_1))
+load(sprintf('data/derived/%s_%s.RData', SAMPLE_MODEL, MODEL_NAME_1))
 sample_results1 <- results
 
-load(sprintf('data/derived/mv/%s_%s.RData', SAMPLE_MODEL, MODEL_NAME_2))
+load(sprintf('data/derived/%s_%s.RData', SAMPLE_MODEL, MODEL_NAME_2))
 sample_results2 <- results
 
 rm(results)
@@ -58,6 +78,16 @@ tutti <- tutti %>%
   group_by(Model, Factor) %>% 
   mutate(ma = rollapply(Weight, 52, mean, align = 'right', fill = NA))
 
+if(NAME == 'CDB') {
+  tutti <- tutti %>%
+    filter(Model %in% c(MODEL_NAME_1, MODEL_NAME_2))
+}
+
+if(NAME == 'CDB_MV') {
+  tutti <- tutti %>%
+    filter(Model %in% c(MODEL_NAME_1, sprintf('Sample %s', MODEL_NAME_1)))
+}
+
 g <- ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
     facet_grid(Factor ~ ., switch = 'y') +
     geom_line()+
@@ -77,7 +107,7 @@ g <- ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
 
 # First legend
 g_legend <- g+theme(legend.position = 'bottom')+
-  scale_colour_manual(labels = c("Six-factor (model)","Six-factor excl. HML (model)","Six-factor (sample)", "Six-factor excl. HML (sample)"), values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
+  scale_colour_manual(labels = LABELS, values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
 
 g_legend = gtable_filter(ggplotGrob(g_legend), "guide-box") 
 
@@ -91,7 +121,7 @@ g <-
     heights = c(19,2)
   )
 
-ggsave(sprintf('output/mv/Weights_%s_%s.png', MODEL_NAME_1, MODEL_NAME_2),
+ggsave(sprintf('output/weights/Weights_%s_%s_%s.png', NAME, MODEL_NAME_1, MODEL_NAME_2),
        g,
        width = 7.9,
        height = 20,

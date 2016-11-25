@@ -6,14 +6,14 @@
 #' import_font('fontpath'), but font needs to be .tty
 #' afterwards run fonts() to see its inside :)
 
-theme_Publication <- function(base_size=11, base_family="Minion Pro") {
+theme_Publication <- function(base_size=10, base_family="Minion Pro") {
   library(grid)
   library(ggthemes)
   half_line <- base_size/2
   (theme_foundation(base_size = base_size, base_family = base_family)
   + theme(plot.title = element_text(family = "Minion Pro", 
                                     face = "bold",
-                                    size = rel(0.8), 
+                                    size = 10, 
                                     hjust = 0.5),
           text = element_text(family = "Minion Pro", 
                               face = "plain",
@@ -26,13 +26,13 @@ theme_Publication <- function(base_size=11, base_family="Minion Pro") {
                               margin = margin(), 
                               debug = FALSE),
           plot.background = element_rect(colour = NA),
-          axis.title = element_text(face = "plain",size = rel(0.8)),
+          axis.title = element_text(face = "plain",size = 8),
           axis.title.x = element_text(margin = margin(t = 0.8 * half_line,
                                                       b = 0.8 * half_line/2)),
           axis.title.y = element_text(angle = 90,
                                       margin = margin(r = 0.8 * half_line,
                                                       l = 0.8 * half_line/2)),
-          axis.text = element_text(size = rel(0.8), colour = "grey30"), 
+          axis.text = element_text(size = 8, colour = "grey30"), 
           axis.line = element_line(colour = 'black'),
           axis.ticks = element_line(colour = "grey20"), 
           axis.ticks.length = unit(half_line/2, "pt"), 
@@ -48,13 +48,13 @@ theme_Publication <- function(base_size=11, base_family="Minion Pro") {
           legend.position = "bottom",
           legend.direction = "horizontal",
           legend.justification = "center", 
-          legend.key.size= unit(0.2, "cm"),
+          legend.key.size= unit(0.3, "cm"),
           legend.margin = unit(0, "cm"),
           legend.title = element_blank(), 
-          legend.text = element_text(size = rel(0.9)),
+          legend.text = element_text(size = 8),
           plot.margin=unit(c(1,1,1,1),"mm"),
           strip.background=element_rect(colour = NA, fill="grey85"),
-          strip.text = element_text(face = "bold", colour = "grey10", size = rel(0.8)),
+          strip.text = element_text(face = "bold", colour = "grey10", size = 8),
           strip.text.x = element_text(margin = margin(t = half_line,
                                                       b = half_line)), 
           strip.text.y = element_text(angle = -90, 
