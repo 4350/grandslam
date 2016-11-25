@@ -71,8 +71,8 @@ es_avg <- lapply(es, function(strategy) mean(strategy))
 out_stats <- t(
   cbind(
     bind_rows(stats),
-    VaR = unlist(var_avg),
-    ES = unlist(es_avg),
+    VaR = unlist(var_avg) * 100, 
+    ES = unlist(es_avg) * 100,
     CDB = unlist(cdb_avg)
   )
 )
