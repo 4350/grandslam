@@ -67,22 +67,24 @@ The candidate specifications under normal and Student's \textit{t} distributed i
 
 \begin{figure}[!pt]
   \centering
-  \caption{QQ plots of standardized residuals \\ \quad \\ Quantile-quantile plots of theoretical standardized residuals and standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications, with normal, Student's and skewed Student's t innovations. Data from the theoretical distribution should line up on the dashed line. Based on weekly data 1963-2016.}
-  \begin{subfigure}{0.70\textwidth}
-    \includegraphics[width=\textwidth]{graphics/qq_norm.png}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[scale = 1]{graphics/qq_norm.png}
     \caption{Normal}
   \end{subfigure}
   \\
-  \begin{subfigure}{0.70\textwidth}
-    \includegraphics[width=\textwidth]{graphics/qq_std.png}
-    \caption{Student's \textit{t}}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[scale = 1]{graphics/qq_std.png}
+    \caption{Symmetric \emph{t}}
   \end{subfigure}
   \\
-  \begin{subfigure}{0.70\textwidth}
-    \includegraphics[width=\textwidth]{graphics/qq_ghst.png}
-    \caption{Skewed Student's \textit{t}}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[scale = 1]{graphics/qq_ghst.png}
+    \caption{Asymmetric \emph{t}}
   \end{subfigure}
-
+  \caption{QQ plots of standardized residuals}
+  \begin{longcaption}
+    Standardized residuals from the best (lowest BIC) ARMA-GARCH model specifications, with normal, symmetric \emph{t} and skewed \emph{t} innovations. Data from the theoretical distribution should line up on the dashed line. Based on weekly data 1963--2016.
+  \end{longcaption}
   \label{fig:garch_qq}
 \end{figure}
 
@@ -90,6 +92,6 @@ The candidate specifications under normal and Student's \textit{t} distributed i
 
 % We note that the Mkt.RF factor is, according to our model selection procedure, best fitted by a ARMA(0, 0) mean equation, indicating no predictive power of 1-week lagged returns. Also, in the variance equation, we note that the relatively low $\alpha = 0.037$ sensitivity to shocks is increased considerably by $\eta = 0.181$ in the case of a \emph{negative} shock. Furthermore, the Mom factor stands out with a much higher estimate of $\alpha$ (0.186) than any of the other series (all around 0.10) and a lower $\beta$ (0.793). This means that volatility in the momentum factor is more sensitive than other factor strategies to return shocks and less predictable by past volatility alone. We also note that the Mkt.RF and Mom factors exhibit relatively higher unconditional volatilities (of 0.022 and 0.018) than do other factors (around 0.010).
 
-For both the value-related and non-value related factors, many of the estimates of $\gamma_i$, the skewness of the skewed Student's \textit{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates for SMB and Mom. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots indicate misspecification for models with both the normal and Student's \textit{t} innovations.
+For both the value-related and non-value related factors, many of the estimates of $\gamma_i$, the skewness of the skewed \emph{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates for SMB and Mom. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots indicate misspecification for models with both the normal and Student's \emph{t} innovations.
 
 % subsection univariate_modeling_of_returns (end)

@@ -8,6 +8,7 @@ In this subsection, we demonstrate that the standardized residuals, ${z_t}$, fro
 
 Threshold (or exceedance) correlations have previously been used to highlight the asymmetric dependence structure of i.a. country equity indices~\autocite{LonginSolnik2001}, portfolios by industry, size, value and momentum~\autocite{AngChen2002} and factor strategies~\autocite{ChristoffersenLanglois2013}. The following analysis is still new as it adds the investment (CMA) and profitability (RMW) factors. We follow~\textcite{ChristoffersenLanglois2013} definition of threshold correlation
 \begin{align}
+\label{eq:th_corr}
     ThCorr(r_i, r_j) = 
     \begin{cases} 
         Corr\Big(r_i, r_j \,|\, r_i < F_i^{-1}(p), r_j < F_j^{-1}(p)\Big)  & \text{for } p < 0.5 \\
@@ -18,11 +19,13 @@ where $F_i^{-1}(p)$ the empirical quantile of $r_i$ at percentile $p$. Threshold
 
 \begin{figure}[H]
   \centering
-  \footnotesize
-  \caption{Illustration of threshold correlations on ARMA-GARCH residuals from the Mkt.RF--HML asset pair, with 95\% confidence bounds. The unconditional correlation is given by the dashed line. Based on weekly data 1963--2016.}
-  \label{fig:illustrate_threshold}
   \includegraphics[scale=1]{graphics/threshold_explain_res.png}
-  
+  \footnotesize
+  \caption{Illustration of threshold correlations}
+  \begin{longcaption}
+    Data is ARMA-GARCH residuals from the Mkt.RF--HML asset pair. Based on weekly data 1963--2016. 95\% shaded confidence bounds. The unconditional correlation is given by the dashed line.
+  \end{longcaption}
+  \label{fig:illustrate_threshold}
 \end{figure}
 
 We now plot threshold correlations without the adjacent scatter graph. \autoref{fig:threshold1} displays threshold correlations for HML, CMA and RMW against eachother as well as against the the other factors Mkt.RF, SMB and Mom. We note that for most asset pairs, the threshold correlation is significantly different from the unconditional correlation coefficient, given by the dashed line.
@@ -37,19 +40,21 @@ While the patterns in threshold correlations are interesting, we are careful not
 
 \begin{figure}[H]
   \centering
-  \footnotesize
-  \caption{Threshold correlations of ARMA-GARCH standardized residuals, fitted on full dataset (1963--2016). 95\% confidence bounds taking the model as given. The unconditional correlation is given by the dashed line.}
-  \label{fig:threshold1}
   \includegraphics[scale=1]{graphics/threshold1.png}
+  \footnotesize
+  \caption{Threshold correlations of ARMA-GARCH standardized residuals}
+  \begin{longcaption}
+    Based on weekly data 1963--2016. The formula for threshold correlations for a threshold $p$ is given in~\autoref{eq:th_corr}. 95\% shaded confidence bounds, taking the model as given. The unconditional correlation is given by the dashed line.
+  \end{longcaption}
+  \label{fig:threshold1}
 \end{figure}
 
 \begin{figure}[H]
   \ContinuedFloat
   \centering
-  \caption{Threshold correlations of ARMA-GARCH standardized residuals (cont.)}
   \includegraphics[scale=1]{graphics/threshold2.png}
-
-  
+  \footnotesize
+  \caption{Threshold correlations of ARMA-GARCH standardized residuals (cont.)}
 \end{figure}
 
 \subsubsection{Rolling correlations}
@@ -62,16 +67,20 @@ where $r_i$, $r_j$ are the different pairs of the factor strategies' ARMA-GARCH 
 % plots
 \begin{figure}[!ht]
   \centering
-  \caption{Rolling correlations of ARMA-GARCH standardized residuals \\ \quad \\
-   Rolling correlations are fitted on the full dataset (1963--2016). 95\% confidence bounds taking the model as given. The unconditional correlation is given by the dashed line.}
   \includegraphics[scale=1]{graphics/rolling1.png}
+  \footnotesize
+  \caption{Rolling correlations of ARMA-GARCH standardized residuals}
+  \begin{longcaption}
+    Based on weekly data 1963--2016. 95\% shaded confidence bounds, taking the model as given. The unconditional correlation is given by the dashed line.
+  \end{longcaption}
   \label{fig:rolling1}
 \end{figure}
 \begin{figure}[!ht]
   \ContinuedFloat
   \centering
-  \caption{Rolling correlations of ARMA-GARCH standardized residuals (cont.)}
   \includegraphics[scale=1]{graphics/rolling2.png}  
+  \footnotesize
+  \caption{Rolling correlations of ARMA-GARCH standardized residuals (cont.)}
 \end{figure}
 % talk
 First, we note that for most factor pairs, the rolling 52-week correlations are time-varying, and indeed appear to swing wildly. The unconditional correlation of Mkt--HML is negative in the studied time period, but rolling correlations range between -0.75 and 0.75. Also of note is the Momentum factor's rapid shifts between positive and negative correlations to the other factors. 

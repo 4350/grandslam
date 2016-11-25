@@ -33,7 +33,7 @@ plot_th_main <- function(pair) {
     
     # Axes options
     ylab('Correlation') +
-    xlab('Quantiles') +
+    xlab('Threshold') +
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.50, .75)) + 
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
     
@@ -77,7 +77,7 @@ plot_th_appendix <- function(pair) {
     
     # Axes options
     ylab('Correlation') +
-    xlab('Quantiles') +
+    xlab('Threshold') +
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.50, .75)) + 
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
     
@@ -117,7 +117,7 @@ plot_th_simulated <- function(pair) {
     
     # Axes options
     ylab('Correlation') +
-    xlab('Quantiles') +
+    xlab('Threshold') +
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.20, .60)) + 
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
     
