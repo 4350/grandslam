@@ -23,13 +23,13 @@ portfolio_metrics <- function(weights, distribution, q, selectors) {
   portfolio_return <- rowSums(weights * realized)
   
   # Calculate the CDB and VaR
-  cdb_var_results <- cdb_var(q, distribution, weights)
+  cdb_var_results <- cdb_var_es(q, distribution, weights)
   
   # List of results
   results <- c(
     list(Date = dates$Date,
          portfolio_return = portfolio_return),
-    cdb_var_results
+    cdb_var_es_results
   )
   
 }

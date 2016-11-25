@@ -49,6 +49,7 @@ load_field <- function(field) {
 returns <- load_field('portfolio_return')
 cdb <- load_field('cdb')
 var <- load_field('var')
+es <- load_field('es')
 
 stats <- lapply(returns, function(strategy) {
   stats_labels <- c('Mean', 'Stdev', 'Skewness', 'Kurtosis')
@@ -65,11 +66,13 @@ stats <- lapply(returns, function(strategy) {
 
 var_avg <- lapply(var, function(strategy) mean(strategy))
 cdb_avg <- lapply(cdb, function(strategy) mean(strategy))
+es_avg <- lapply(es, function(strategy) mean(strategy))
 
 out_stats <- t(
   cbind(
     bind_rows(stats),
     VaR = unlist(var_avg),
+    ES = unlist(es_avg),
     CDB = unlist(cdb_avg)
   )
 )

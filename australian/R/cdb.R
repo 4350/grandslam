@@ -28,20 +28,23 @@ cdb_fn <- function(q, returns) {
   }
 }
 
-cdb_var <- function(q, distribution, weights) {
+cdb_var_es <- function(q, distribution, weights) {
   
   times = nrow(weights)
   cdb <- c(NA, T)
   var <- c(NA, T)
+  es <- c(NA, T)
   
   for(t in 1:times) {
     fn <- cdb_fn(q, distribution[,,t])
     cdb[t] <- fn(weights[t,])
     fn_var <- var_fn(q, distribution[,,t])
     var[t] <- fn_var(weights[t,])
+    fn_es <- es_fn(q, distribution[,,t])
+    es[t] <- fn_es(weights[t,])
   }
   
-  list(cdb = cdb, var = var)
+  list(cdb = cdb, var = var, es = es)
 }
 
 var_fn <- function(q, returns) {
@@ -56,5 +59,21 @@ var_fn <- function(q, returns) {
   function(weights) {
     portfolio_returns <- returns %*% weights
     -quantile(portfolio_returns, q, names = F)
+  }
+}
+
+es_fn <- function(q, returns) {
+  # Compute the risk measures of each factor separately
+  var <- apply(returns, 2, function(r) -quantile(r, q))
+  es <- lapply(seq_along(var), function(i) {
+    r <- returns[, i]
+    -mean(r[r <= -var[i]])
+  })
+  es <- unlist(es)
+  
+  function(weights) {
+    portfolio_returns <- returns %*% weights
+    portfolio_var <- -quantile(portfolio_returns, q, names = F)
+    -mean(portfolio_returns[portfolio_returns <= -portfolio_var])
   }
 }
