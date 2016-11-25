@@ -19,20 +19,21 @@ load_all('wimbledon')
 # Inputs ------------------------------------------------------------------
 
 # Graph name
-NAME = 'CDB'
+NAME = 'CDB_MV'
 
 #MV
 #MODEL = 'mv/results_full_dynamic_std_10000'
 #SAMPLE_MODEL = 'mv/results_sample'
 #CDB
 MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000'
+SAMPLE_MODEL = 'mv/results_full_dynamic_std_10000'
 
-MODEL_NAME_1 = '6F_EXCL_CMA'
-MODEL_NAME_2 = '6F'
+MODEL_NAME_1 = '6F'
+MODEL_NAME_2 = '6F_EXCL_HML'
 
-LABELS = c("Six-factor", #model 1
-           "Six-factor excl. CMA"#, #model-2
-           #"Five-factor (sample)", #sample-1
+LABELS = c("CDB optimal weights", #model 1
+           #"Six-factor excl. CMA"#, #model-2
+           "MV optimal weights" #sample-1
            #"Five-factor excl. CMA (sample)" #sample-2
            )
 
@@ -80,6 +81,11 @@ tutti <- tutti %>%
 if(NAME == 'CDB') {
   tutti <- tutti %>%
     filter(Model %in% c(MODEL_NAME_1, MODEL_NAME_2))
+}
+
+if(NAME == 'CDB_MV') {
+  tutti <- tutti %>%
+    filter(Model %in% c(MODEL_NAME_1, sprintf('Sample %s', MODEL_NAME_1)))
 }
 
 g <- ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
