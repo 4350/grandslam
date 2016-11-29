@@ -8,12 +8,7 @@
   \caption{CDB Optimization with Dynamic Copula Model (1963--2016)}
 
   \begin{longcaption}
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    Average weights are averages of dynamic CDB optimal weights based on simulations of the return distribution from the copula model. Differences in average weights are expressed relative to the full five- and six-factor models. Performance measures are based on realized returns. SR is the annualized Sharpe Ratio. VaR, ES and CDB are all based on the one-week-ahead 5\% lower tail of the return distribution. Differences in CDB are to be read as column model minus row model and its associated standard errors (in parentheses) are computed taking the copula model as given.
   \end{longcaption}
 
   \label{tab:cdb_model}
@@ -27,13 +22,13 @@
     \cmidrule{7-10}
     &
       \multirow{2}{*}{All} &
-      \multicolumn{1}{c}{Excl} &
-      \multicolumn{1}{c}{Excl} &
-      \multicolumn{1}{c}{Excl} & &
+      \multicolumn{1}{c}{Excl.} &
+      \multicolumn{1}{c}{Excl.} &
+      \multicolumn{1}{c}{Excl.} & &
       \multirow{2}{*}{All} &
-      \multicolumn{1}{c}{Excl} &
-      \multicolumn{1}{c}{Excl} &
-      \multicolumn{1}{c}{Excl} \\
+      \multicolumn{1}{c}{Excl.} &
+      \multicolumn{1}{c}{Excl.} &
+      \multicolumn{1}{c}{Excl.} \\
     &
       &
       \multicolumn{1}{c}{HML} &
@@ -61,19 +56,22 @@
     Mom    & &       &       &       & & & -0.7  & 1.3   & 7.5 \\
     \midrule
     \multicolumn{1}{@{}l}{\textbf{Performance}} \\
-    Mean (\%)      & 2.77  & 2.94 & 2.85  & 3.37  & & 3.37  & 3.39 & 3.41  & 3.90 \\
-    SD (\%)        & 2.42  & 2.49 & 2.69  & 3.89  & & 2.37  & 2.52 & 2.56  & 3.49 \\
-    SR             & 1.14  & 1.18 & 1.06  & 0.87  & & 1.42  & 1.34 & 1.33  & 1.12 \\
-    Avg. VaR  (\%) & 0.46  & 0.48 & 0.52  & 0.78  & & 0.45  & 0.47 & 0.49  & 0.69 \\
-    Avg. ES  (\%)  & 0.61  & 0.64 & 0.69  & 1.04  & & 0.60  & 0.64 & 0.66  & 0.92 \\
-    Avg. CDB       & 0.90  & 0.89 & 0.89  & 0.83  & & 0.91  & 0.90 & 0.91  & 0.87 \\
+    Mean (\%)      & 2.77  & 2.94  & 2.85  & 3.37  & & 3.37  & 3.39  & 3.41  & 3.90 \\
+    SD (\%)        & 2.42  & 2.49  & 2.69  & 3.89  & & 2.37  & 2.52  & 2.56  & 3.49 \\
+    SR             & 1.14  & 1.18  & 1.06  & 0.87  & & 1.42  & 1.34  & 1.33  & 1.12 \\
+    Avg. VaR  (\%) & 0.46  & 0.48  & 0.52  & 0.78  & & 0.45  & 0.47  & 0.49  & 0.69 \\
+    Avg. ES  (\%)  & 0.61  & 0.64  & 0.69  & 1.04  & & 0.60  & 0.64  & 0.66  & 0.92 \\
+    Avg. CDB       & 90.42 & 89.29 & 89.19 & 83.42 & & 91.33 & 90.24 & 90.51 & 86.62 \\
     \midrule
     \multicolumn{1}{@{}l}{\textbf{Difference CDB}} \\
-    All      & & -0.01 & -0.01 & -0.07 & & & -0.01 & 0.00 & -0.04 \\
+    All       & & -1.13  & -1.23  & -7.01  & & & -1.09  & -0.82  & -4.71 \\
+              & & (0.02) & (0.03) & (0.11) & & & (0.02) & (0.03) & (0.10) \\
               \\
-    Excl HML & &       & 0.00 & -0.06 & & &       & 0.01  & -0.03 \\
+    Excl. HML & &        & -0.10  & -5.88  & & &        & 0.27   & -3.62 \\
+              & &        & (0.04) & (0.11) & & &        & (0.04) & (0.10) \\
               \\
-    Excl CMA & &       &       & -0.06 & & &       &       & -0.04 \\
+    Excl. CMA & &        &        & -5.78  & & &        &        & -3.89 \\
+              & &        &        & (0.11) & & &        &        & (0.10) \\
     \bottomrule
   \end{tabularx}
 \end{table}

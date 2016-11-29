@@ -73,7 +73,7 @@ out_stats <- t(
     bind_rows(stats),
     VaR = unlist(var_avg) * 100, 
     ES = unlist(es_avg) * 100,
-    CDB = unlist(cdb_avg)
+    CDB = unlist(cdb_avg) * 100
   )
 )
 

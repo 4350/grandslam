@@ -8,12 +8,7 @@
   \caption{Mean-Variance Optimization with Sample Inputs (1963--2016)}
 
   \begin{longcaption}
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    Static weights are the MV optimal weights based on in-sample sample estimators of means and covariances. Differences in average weights are expressed relative to the full five- and six-factor models. Performance measures are based on realized returns. SR is the annualized Sharpe Ratio. VaR, ES and CDB are all based on the one-week-ahead 5\% lower tail of the return distribution, which is given by simulations from the copula model. Differences in CDB are to be read as column model minus row model and its associated standard errors (in parentheses) are computed taking the copula model as given.
   \end{longcaption}
 
   \label{tab:mw_mv_sample}
@@ -27,13 +22,13 @@
     \cmidrule{7-10}
     &
       \multirow{2}{*}{All} &
-      \multicolumn{1}{c}{Excl} &
-      \multicolumn{1}{c}{Excl} &
-      \multicolumn{1}{c}{Excl} & &
+      \multicolumn{1}{c}{Excl.} &
+      \multicolumn{1}{c}{Excl.} &
+      \multicolumn{1}{c}{Excl.} & &
       \multirow{2}{*}{All} &
-      \multicolumn{1}{c}{Excl} &
-      \multicolumn{1}{c}{Excl} &
-      \multicolumn{1}{c}{Excl} \\
+      \multicolumn{1}{c}{Excl.} &
+      \multicolumn{1}{c}{Excl.} &
+      \multicolumn{1}{c}{Excl.} \\
     &
       &
       \multicolumn{1}{c}{HML} &
@@ -44,7 +39,7 @@
       \multicolumn{1}{c}{CMA} &
       \multicolumn{1}{c}{RMW} \\
     \midrule
-    \multicolumn{1}{@{}l}{\textbf{Average weights}} \\
+    \multicolumn{1}{@{}l}{\textbf{Static weights}} \\
     Mkt.RF & 13.6 & 13.7 & 13.8 & 21.5 & & 13.2 & 13.4 & 13.2 & 18.5 \\
     SMB    & 14.0 & 14.1 & 18.0 & 12.0 & & 12.0 & 12.7 & 13.4 & 9.1 \\
     HML    & 6.2  &      & 26.7 & 11.2 & & 13.2 &      & 27.0 & 22.3 \\
@@ -66,14 +61,17 @@
     SR             & 1.27  & 1.25  & 1.07  & 0.96  & & 1.44  & 1.38 & 1.36  & 1.22 \\
     Avg. VaR  (\%) & 0.56  & 0.57  & 0.63  & 0.89  & & 0.57  & 0.59 & 0.64  & 0.84 \\
     Avg. ES  (\%)  & 0.76  & 0.78  & 0.86  & 1.20  & & 0.79  & 0.81 & 0.88  & 1.16 \\
-    Avg. CDB       & 0.87  & 0.87  & 0.86  & 0.79  & & 0.88  & 0.87 & 0.87  & 0.83 \\
+    Avg. CDB       & 87.34  & 86.68  & 86.45  & 79.15  & & 87.87  & 87.02 & 86.77  & 82.63 \\
     \midrule
     \multicolumn{1}{@{}l}{\textbf{Difference CDB}} \\
-    All      & & 0.00 & -0.01 & -0.08 & & & -0.01 & -0.01 & -0.05 \\
+    All       & & -0.66   & -0.89  & -8.19  & & & -0.85  & -1.10  & -5.24 \\
+              & & (0.01) & (0.05) & (0.13) & & & (0.03) & (0.04) & (0.10) \\
               \\
-    Excl HML & &      & -0.01 & -0.08 & & &       & 0.00  & -0.04 \\
+    Excl. HML & &        & -0.22  & -7.53  & & &        & -0.22   & -4.40 \\
+              & &        & (0.06) & (0.13) & & &        & (0.06) & (0.11) \\
               \\
-    Excl CMA & &      &       & -0.07 & & &       &       & -0.04 \\
+    Excl. CMA & &        &        & -7.31  & & &        &        & -4.14 \\
+              & &        &        & (0.14) & & &        &        & (0.10) \\
     \bottomrule
   \end{tabularx}
 \end{table}
