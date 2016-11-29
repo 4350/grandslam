@@ -3,15 +3,13 @@
 \section{Optimizing factor allocations} % (fold)
 \label{sec:optimizing_factor_allocations}
 
-We now turn to the issue of optimizing factor allocations using our estimated copula model.
+We now turn to the issue of optimizing factor allocations using our estimated copula model. We optimize portfolio weights according to two techniques: Optimal Mean-Variance (MV) investing and Optimal Conditional Diversification Benefit (CDB) investing, where the latter is a measure introduced by~\textcite{ChristoffersenErrunzaJacobLanglois2012}.
 
-We optimize portfolio weights according to two techniques: Optimal Mean-Variance (MV) investing and Optimal Conditional Diversification Benefit (CDB) investing, where the latter is a measure introduced by~\textcite{ChristoffersenErrunzaJacobLanglois2012}.
+The goal of the first optimization exercise is to determine the conventional risk-reward profile of including HML, CMA and RMW respectively. MV results will also test the conjecture in~\textcite{FF2015}, postulating that the inclusion of HML does not improve the Sharpe Ratio of the tangency portfolio. 
 
-The goal of the first optimization exercise is to determine the risk-reward profile of including HML, CMA and RMW respectively. MV results will test the conjecture in~\textcite{FF2015} that the inclusion of HML does not improve the Sharpe Ratio of the tangency portfolio. 
+The goal of the second optimization is to consider risk beyond variance, by examining the impact on tail risk of including HML, CMA and RMW respectively. CDB analysis studies whether the non-normal features in the data (i.e. high skewness, kurtosis and tail dependence) give any additional reason, beyond the MV results, to include or exclude the factors HML, CMA and RMW, respectively.
 
-The goal of the second optimization is to consider risk beyond variance by examining the impact on tail risk of including HML, CMA and RMW respectively. CDB analysis studies whether the non-normal features in the data (i.e. high skewness, kurtosis and tail dependence) give any additional reason, beyond the MV results, to include or exclude the factors HML, CMA and RMW, respectively.
-
-CDB is based on the portfolio expected shortfall (ES), i.e. the expected loss in case the return realizes below its Value-at-Risk (VaR), and therefore concerns the properties of the lower tail of the portfolio distribution. Naturally, such features are not captured by MV analysis.
+CDB is based on the portfolio expected shortfall (ES), i.e. the expected loss in case the return realizes below its Value-at-Risk (VaR), and therefore concerns the properties of the lower tail of the portfolio distribution. Naturally, such features are not captured by means and covariances in MV analysis.
 
 The remainder of this section presents the construction of the CDB measure and presents the general optimization problem for MV and CDB. Results of the optimizations are presented in the following sections.
 

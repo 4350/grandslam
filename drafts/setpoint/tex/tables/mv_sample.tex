@@ -8,12 +8,7 @@
   \caption{Mean-Variance Optimization with Sample Inputs (1963--2016)}
 
   \begin{longcaption}
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    Static weights are the MV optimal weights based on in-sample sample estimators of means and covariances. Differences in average weights are expressed relative to the full five- and six-factor models. Performance measures are based on realized returns. SR is the annualized Sharpe Ratio. VaR, ES and CDB are all based on the one-week-ahead 5\% lower tail of the return distribution, which is given by simulations from the copula model. Differences in CDB are to be read as column model minus row model and its associated standard errors (in parentheses) are computed taking the copula model as given.
   \end{longcaption}
 
   \label{tab:mw_mv_sample}
@@ -44,7 +39,7 @@
       \multicolumn{1}{c}{CMA} &
       \multicolumn{1}{c}{RMW} \\
     \midrule
-    \multicolumn{1}{@{}l}{\textbf{Average weights}} \\
+    \multicolumn{1}{@{}l}{\textbf{Static weights}} \\
     Mkt.RF & 13.6 & 13.7 & 13.8 & 21.5 & & 13.2 & 13.4 & 13.2 & 18.5 \\
     SMB    & 14.0 & 14.1 & 18.0 & 12.0 & & 12.0 & 12.7 & 13.4 & 9.1 \\
     HML    & 6.2  &      & 26.7 & 11.2 & & 13.2 &      & 27.0 & 22.3 \\
