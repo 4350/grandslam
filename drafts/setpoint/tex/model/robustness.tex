@@ -9,16 +9,21 @@ By simulating 250,000 weeks of shocks in the copula, and then transforming these
 
 \begin{figure}[!ht]
   \centering
-  \caption{Threshold correlations of standardized residuals from the constant copulas \\ \quad \\ Threshold correlations of simulated constant copula, with ARMA-GARCH standardized residuals (95\% confidence bounds taking the ARMA-GARCH models as given). The simulated threshold correlations are based on 250,000 simulated returns each.}
   \includegraphics[scale=1]{graphics/threshold_simulated_1.png}  
+  \footnotesize
+  \caption{Threshold correlations of standardized residuals from the constant copulas}
+  \begin{longcaption}
+    Threshold correlations of simulated constant copulas, with ARMA-GARCH standardized residuals (95\% confidence bounds taking the ARMA-GARCH models as given). The simulated threshold correlations are based on 250,000 simulated returns each.
+  \end{longcaption}
   \label{fig:threshold_simulated1}
 \end{figure}
 \pagebreak
 \begin{figure}[!ht]
   \ContinuedFloat
   \centering
-  \caption{Threshold correlations of standardized residuals from the constant copulas (cont.)}
   \includegraphics[scale=1]{graphics/threshold_simulated_2.png}  
+  \footnotesize
+  \caption{Threshold correlations of standardized residuals from the constant copulas (cont.)}
 \end{figure}
 \pagebreak
 
@@ -36,15 +41,20 @@ In-sample, we simulate 10,000 standardized residuals for each week from the esti
 
 \begin{figure}[!ht]
   \centering
-  \caption{Rolling correlations of standardized residuals from the dynamic copula \\ \quad \\ Rolling correlations of standardized residuals from the simulated dynamic symmetric Student's \textit{t} copula (95\% confidence bounds taking the ARMA-GARCH models as given). The simulated rolling correlations are based on 10,000 simulations each week.}
   \includegraphics[width=\textwidth]{graphics/rolling_simulated1.png}
+  \footnotesize
+  \caption{Rolling correlations of standardized residuals from the dynamic copula}
+  \begin{longcaption}
+    Rolling correlations of standardized residuals from the simulated dynamic symmetric \textit{t} copula (95\% confidence bounds taking the ARMA-GARCH models as given). The simulated rolling correlations are based on 10,000 simulations each week.
+  \end{longcaption}
   \label{fig:rolling_simulated}
 \end{figure}
 \begin{figure}[!ht]
   \ContinuedFloat
   \centering
-  \caption{Rolling correlations of standardized residuals from the dynamic copula (cont.)}
   \includegraphics[width=\textwidth]{graphics/rolling_simulated2.png}
+  \footnotesize
+  \caption{Rolling correlations of standardized residuals from the dynamic copula (cont.)}
 \end{figure}
 
 While we do not get a perfect overlap, the copula model generates the time-varying correlations very well. When there are large swings, however, the model does not always have enough amplitude. We conclude that the model captures the dynamic feature well.

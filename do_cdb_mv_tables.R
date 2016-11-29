@@ -10,11 +10,11 @@ library(PerformanceAnalytics)
 library(stargazer)
 
 #MV
-MODEL_NAME <- 'results_full_dynamic_std_10000'
+#MODEL_NAME <- 'results_full_dynamic_std_10000'
 #MODEL_NAME <- 'results_sample'
 
 #CDB
-#MODEL_NAME <- 'full_dynamic_std_10000'
+MODEL_NAME <- 'full_dynamic_std_10000'
 
 STRATEGIES <- list(
   '5F',

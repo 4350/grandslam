@@ -18,23 +18,27 @@ load_all('wimbledon')
 
 # Inputs ------------------------------------------------------------------
 
-# Graph name
-NAME = 'CDB_MV'
+# COMPARE
+# NAME = 'CDB_MV'
+# MODEL = 'mv/results_full_dynamic_std_10000'
+# SAMPLE_MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000'
 
 #MV
+#NAME = 'MV'
 #MODEL = 'mv/results_full_dynamic_std_10000'
 #SAMPLE_MODEL = 'mv/results_sample'
 #CDB
+NAME = 'CDB'
 MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000'
-SAMPLE_MODEL = 'mv/results_full_dynamic_std_10000'
+SAMPLE_MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000' # is not active when NAME = 'CDB'
 
-MODEL_NAME_1 = '6F'
-MODEL_NAME_2 = '6F_EXCL_HML'
+MODEL_NAME_1 = '5F'
+MODEL_NAME_2 = '5F_EXCL_RMW' # not active when NAME = 'CDB_MV'
 
-LABELS = c("CDB optimal weights", #model 1
-           #"Six-factor excl. CMA"#, #model-2
-           "MV optimal weights" #sample-1
-           #"Five-factor excl. CMA (sample)" #sample-2
+LABELS = c("Five-factor", #model 1
+           "Five-factor excl. RMW" #model-2
+           #"Six-factor (CDB optimal)" #sample-1
+           #"Five-factor excl. RMW (sample)" #sample-2
            )
 
 
