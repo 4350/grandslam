@@ -134,7 +134,7 @@ summary.cumretplots <- function(df, outlabel) {
   df <- df %>% 
     group_by(factor) %>%
     mutate(cumret = cumprod(1+ret)) %>%
-    mutate(stdret = ret/sd(ret)*.10/sqrt(252)) %>%
+    mutate(stdret = ret/sd(ret)*.10/sqrt(52)) %>%
     mutate(cumstdret = cumprod(1+stdret))
   
   # Plot cumulative return series
