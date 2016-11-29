@@ -1,9 +1,9 @@
-%!TEX root = ../main.tex
+%!TEX root = ../../main.tex
 
 \section{Univariate diagnostic tests}
 \label{app:univariate_diagnostics}
 
-\textbf{Autocorrelation test}
+\subsection*{Autocorrelation test}
 
 The autocorrelation test is a weighted Ljung-Box test, following~\textcite{FisherGallagher2012} and~\textcite{LjungBox1978}. Under the null of a correctly specified model with no serial correlation, the weighted Ljung-Box test has been shown to generate results closer to its asymptotic distribution than the standard Ljung-Box test. The test statistic is given by
 \begin{align}
@@ -11,7 +11,7 @@ The autocorrelation test is a weighted Ljung-Box test, following~\textcite{Fishe
 \end{align}
 where $T$ is the number of observations, $\hat{r}^{2}_{k} ( \hat{\epsilon}_{t} / \hat{\sigma}_{t} )$ is the squared sample autocorrelation of standardized residuals with lag order $k$ and max lag order $m$. Under the null, the test statistic is asymptotically distributed $\sum\limits^m_{k = 1} \chi^2_k \gamma_k$, where $\{\chi^2_k\}$ are independent chi-squared random variables with one degree of freedom and $\{\gamma_k\}$ are eigenvalues of a weighting matrix. We consider two maximum lag orders, 5 and 10 weeks. The maximum lag length was chosen by visual inspection of the autocorrelation functions for standardized residuals.
 
-\textbf{Volatility clustering test}
+\subsection*{Volatility clustering test}
 
 For ARCH effects, we use the weighted LM test, following~\textcite{FisherGallagher2012} and~\textcite{LiMak1994}. The test has the null of no autocorrelation in standardized squared residuals from the model, and the test statistic is given by:
 \begin{align}
@@ -19,7 +19,7 @@ For ARCH effects, we use the weighted LM test, following~\textcite{FisherGallagh
 \end{align}
 where $T$ is the number of observations, $b$ the number of autoregressive lags in the GARCH ($b=1$), $\hat{r}^2_k (\hat{\epsilon}^2_t / \hat{\sigma}_t)$ is the squared sample autocorrelation of standardized squared residuals with lag order $k$ and max lag order $m$. Under the null, the test statistic is asymptotically distributed $\sum\limits^m_{k = 1} \chi^2_k w_k$, where $\{\chi^2_k\}$ are independent chi-squared random variables with one degree of freedom and $\{w_k\}$ are the weighting parameters ($w = (m - k + (b+1))/m$). The maximum lag length was chosen by visual inspection of the autocorrelation functions for standardized squared residuals.
 
-\textbf{Leverage effect test}
+\subsection*{Leverage effect test}
 
 We use the sign bias test of~\textcite{EngleNg1993} to determine whether there are significant leverage effects in the factor returns. Run the regression
 \begin{align}
