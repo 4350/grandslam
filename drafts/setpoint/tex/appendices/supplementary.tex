@@ -1,10 +1,54 @@
 %!TEX root = ../../main.tex
 
-\section{CDB optimal weights} % (fold)
-\label{app:cdb_weights}
+\section{Additional Figures and Tables} % (fold)
+\label{app:supplementary}
 
-% section cdb_optimal_weights (end)
+% XXX Move all graphs and tables here
 
+% Threshold 
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=1]{graphics/appendix_threshold_1.png}
+  \footnotesize
+  \caption{Threshold correlations of returns and ARMA-GARCH standardized residuals}
+  \begin{longcaption}
+    Based on weekly data 1963--2016. The formula for threshold correlations for a threshold $p$ is given in~\autoref{eq:th_corr}. 95\% shaded confidence bounds, taking the model as given for standardized residuals. The unconditional correlations are given by the dashed lines.
+  \end{longcaption}
+  \label{fig:appendix_threshold1}
+\end{figure}
+\begin{figure}[H]
+  \ContinuedFloat
+  \centering
+  \includegraphics[scale=1]{graphics/appendix_threshold_2.png}
+  \footnotesize
+  \caption{Threshold correlations of returns and ARMA-GARCH standardized residuals (cont.)}
+\end{figure}
+
+% Rolling on returns
+\begin{figure}[!ht]
+  \centering
+  \footnotesize
+  \includegraphics[scale=1]{graphics/appendix_rolling1.png}
+  
+  \caption{Rolling correlations of returns and ARMA-GARCH standardized residuals}
+  \begin{longcaption}
+    Based on weekly data 1963--2016. 95\% shaded confidence bounds, taking the model as given for standardized residuals. The unconditional correlations are given by the dashed lines.
+  \end{longcaption}
+  \label{fig:appendix_rolling1}
+\end{figure}
+\begin{figure}[!ht]
+  \ContinuedFloat
+  \centering
+  \footnotesize
+  \includegraphics[scale=1]{graphics/appendix_rolling2.png}
+
+  \caption{Rolling correlations of returns and ARMA-GARCH standardized residuals (cont.)}
+\end{figure}
+
+% MV performance table
+\input{tex/tables/mv_sample}
+
+% Weights of CDB portfolios over time
 \begin{figure}[htbp]
   \centering
   \footnotesize
@@ -61,3 +105,5 @@
   \footnotesize
   \caption{CDB optimal weights with six factors (cont.)}
 \end{figure}
+
+% section supplementary_figures_and_tables (end)
