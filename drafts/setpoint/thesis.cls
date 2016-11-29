@@ -56,25 +56,16 @@
 % BIBLIOGRAPHY
 \RequirePackage[
   hyperref=true,    % Make references hyperlinks
-  style=authoryear  % Select style
+  maxcitenames=3,
+  uniquename=false,
+  style=apa         % Select style
 ]{biblatex}
 
-% Put bibliography on its own page
-\defbibenvironment{bibliography}
-  {\begin{singlespacing}\list{}
-    {\setlength{\leftmargin}{\bibhang}%
-    \setlength{\itemindent}{-\leftmargin}%
-    \setlength{\itemsep}{\bibitemsep}%
-    \setlength{\parsep}{\bibparsep}}}
-  {\endlist\end{singlespacing}}
-  {\item}
+\DeclareLanguageMapping{american}{american-apa}
 
 % Make the bibliography heading an un-numbered section (not included in
 % toc); refname uses the right translation, probably.
 \defbibheading{bibliography}[\refname]{\section*{#1}}
-
-\setlength\bibhang{0pt}               % Don't indent bibliography second line
-\setlength\bibitemsep{\baselineskip}  % Separate entries by one line
 
 %% TYPOGRAPHY OPTIONS
 
