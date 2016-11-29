@@ -32,16 +32,15 @@ French's financial statement data originates from Compustat, stock return data i
 
 For all series, there are 2,766 consecutive data points and no missing data. Mkt.RF is the most volatile and extreme of the series, with weekly returns between -19.8\% and 12.6\% and a weekly volatility of 2.2\%. CMA and RMW seem to be less extreme than HML, with less negative minimums and smaller volatilities. The factor strategies have excess kurtosis, or fat tails, which is typical for financial returns. The excess kurtoses of the Mom, HML and RMW factors are even higher than the kurtosis of the Mkt.RF factor, where RMW is exceptionally high at 13.0. However, while market returns are negatively skewed, HML, CMA and RMW instead exhibit positive skewness. QQ-plots versus normal theoretical quantiles in \autoref{fig:qq_returns} graphically show the non-normality.
 
-\begin{figure}[htbp]
+\begin{figure}[ht!]
   \centering
   \footnotesize
-  \renewcommand{\arraystretch}{1.2}
+  \includegraphics[scale=1]{graphics/qq_returns.png}
   \caption{QQ-plots versus normal distribution}
   \begin{longcaption}
-    Based on weekly returns 1963--2016. Data from a normal distribution should line up on the dahsed line.
+    Based on weekly returns 1963--2016. Data from a normal distribution should line up on the dashed line.
   \end{longcaption}
   \label{fig:qq_returns}
-  \includegraphics[scale=1]{graphics/qq_returns.png}
 \end{figure}
 
 We conduct Ljung-Box tests of the factor returns to control for weekly autocorrelation.\footnote{For a detailed description of the test, see \autoref{app:univariate_diagnostics}.} The p-values of these tests are given in \autoref{tab:summarydata} and are very low for all factors except Mkt.RF, leading to a strong rejection of the zero autocorrelation null hypothesis. For Mkt.RF, the p-value is not small enough for a rejection of zero autocorrelation at the 5 week maximum lag length, but strongly rejected at the 10 week maximum lag length. We also conduct Ljung-Box tests of the squared factor returns to control for volatility clustering (ARCH effects). Here, the null hypothesis is that there are no ARCH effects, and p-values given in \autoref{tab:summarydata} strongly reject the null for all factors, both at max lag length of 5 and 10 weeks.
