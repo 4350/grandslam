@@ -71,7 +71,7 @@
 
 \RequirePackage{microtype}  % Black magic as far as I'm concerned
 \RequirePackage{mathspec}   % Change font (only with XeTeX)
-\RequirePackage{titlesec}   % Set section titles easily
+\RequirePackage[small]{titlesec}   % Set section titles easily
 \RequirePackage{titleps}    % For setting page headers/footers
 \RequirePackage{enumerate}  % For enumerate environment
 
