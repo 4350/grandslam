@@ -3,7 +3,7 @@
 \subsection{Univariate modeling of returns} % (fold)
 \label{sub:univariate_modeling_of_returns}
 
-A building block of the copula estimation are the univariate models. We proceed by estimating models of each factor's return series and attempt to capture predictable autocorrelation, volatility clustering and leverage effects. By fitting ARMA-GARCH models, we can filter these effects and reduce the time-varying densities $f_{i,t}(r_{i,t+1})$ to constant densities of \emph{standardized residuals} $f_{i}(z_{i,t+1})$
+We proceed by estimating models of each factor's return series and attempt to capture predictable autocorrelation, volatility clustering and leverage effects. By fitting ARMA-GARCH models, we can filter these effects and reduce the time-varying densities $f_{i,t}(r_{i,t+1})$ to constant densities of \emph{standardized residuals} $f_{i}(z_{i,t+1})$.
 
 \subsubsection{General univariate model: ARMA-GJR-GARCH}
 
@@ -29,17 +29,17 @@ where $r_{i,t}$ are weekly returns of each factor. The conditional volatility ev
 \end{align}
 where $I$ is an indicator function that is equal to one when $\varepsilon_{i,t-1} \leq 0$. 
 
-A positive $\eta_i$ captures the leverage effect by increasing the current period's volatility if the previous period's residual $\varepsilon_{i,t-1}$ was below zero. A significant $\eta_i$ thus introduces asymmetric volatility in the model. For the market factor, it is expected that $\eta_i$ is positive, reflecting the leverage effect in the market itself and no impact from the short risk-free component. However, for the other factors, which are constructed as all-equity zero-cost long-short portfolios, the direction of $\eta_i$ is less obvious~\autocite{ChristoffersenLanglois2013}. If there are leverage effects for stocks in general, negative shocks will lead to more volatility than positive shocks in a portfolio of stocks. But in a zero-cost portfolio, the leverage effects of the long positions in stocks could be eliminated by the short positions in other firms. The level of the leverage effect in a zero-cost portfolio therefore depends on the relative strength of leverage effects in the long and short components.
+A positive $\eta_i$ captures the leverage effect by increasing the current period's volatility if the previous period's residual $\varepsilon_{i,t-1}$ was below zero. A significant $\eta_i$ thus introduces asymmetric volatility in the model. For the market factor, it is expected that $\eta_i$ is positive, reflecting the leverage effect in the market itself, and no impact from the short risk-free component. However, for the other factors, which are constructed as all-equity zero-cost long-short portfolios, the direction of $\eta_i$ is less obvious~\autocite{ChristoffersenLanglois2013}. If there are leverage effects for stocks in general, negative shocks will lead to more volatility than positive shocks in a portfolio of stocks. But in a zero-cost portfolio, the leverage effects of the long positions in stocks could be offset by the short positions in other firms. The level of the leverage effect in a zero-cost portfolio therefore depends on the relative strength of leverage effects in the long and short components.
 
 % XXX In the estimation, we also use variance targeting as proposed by~\textcite{EngleMezrich1995}, which is shown makes optimization faster and sometimes more certain to reach the global maximum. This means that $\omega$ is not estimated in the maximum likelihood setting, but instead set to 1 minus the persistence of the process times the sample mean of squared residuals, where the persistence is $\alpha + \beta$ for the GARCH.\footnote{Note that in the case of the GJR-GARCH for the Mkt.RF factor, the persistence is $\alpha + \beta + \eta \kappa$ where $\kappa$ is the probability that standardized residuals $z_t$ are below zero.}
-The ARMA-GARCH models are estimated independently on each series using maximum likelihood estimation, with assumed distributions of standardized residuals $z_{i,t}$. Similar to the multivariate copula, we evaluate models where the standardized residuals are assumed to follow univariate skewed Student's \emph{t} distributions with $\nu_i$ degrees of freedom and skewness $\gamma_i$, nesting the Student's \emph{t} when $\gamma_i = 0$ and the standard normal when $\nu_i = \infty$. Allowing for the asymmetric Student's \emph{t} distribution allows for additional asymmetry not captured by the leverage effect~\autocite{ChristoffersenErrunzaJacobLanglois2012}.
+The ARMA-GARCH models are estimated independently on each series using maximum likelihood estimation, with assumed distributions of standardized residuals $z_{i,t}$. Similar to the multivariate copula, we evaluate models where the standardized residuals are assumed to follow univariate skewed Student's \emph{t} distributions with $\nu_i$ degrees of freedom and skewness $\gamma_i$, nesting the Student's \emph{t} when $\gamma_i = 0$ and the standard normal when $\nu_i = \infty$. Allowing for the skewed Student's \emph{t} distribution allows for additional asymmetry not captured by the leverage effect~\autocite{ChristoffersenErrunzaJacobLanglois2012}.
 
 \subsubsection{Factor specific model selection process}
 
 Our selection process is as follows.
 
 \begin{enumerate}[(i)]
-  \item For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, Student's t and skewed Student's t residuals, with and without $\eta_i$ fixed to zero (in which case we obtain the basic GARCH(1,~1) model).
+  \item For each factor strategy, we estimate GJR-GARCH models on the full dataset ($T = 2766$) up to ARMA(3, 3) and GARCH(1, 1) under normal, symmetric \emph{t} and skewed \emph{t} residuals, with and without $\eta_i$ fixed to zero (in which case we obtain the basic GARCH(1,~1) model).
   \item We then compute the Bayesian Information Criterion~\autocite[BIC]{Schwarz1978} for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
 \end{enumerate}
 
@@ -55,7 +55,7 @@ In a well-specified model, we expect there to be no significant serial correlati
 
 \subsubsection{Model selection and estimation results}
 
-The result of our selection and estimation procedure are presented in~\autoref{tab:garch_estimation}. The Mkt.RF factor is the only model that requires a GJR-GARCH $\eta_i \neq 0$, while the remaining models are all standard GARCH (1, 1). The minimization of BIC leads to ARMA(0, 0) for Mkt.RF, ARMA(1, 0) for Mom and CMA and ARMA(1, 1) for the remaining factors HML, SMB, RMW. 
+The result of our selection and estimation procedure are presented in~\autoref{tab:garch_estimation}. The Mkt.RF factor is the only model that requires a GJR-GARCH $(\eta_i \neq 0)$, while the remaining models are all standard GARCH (1, 1). The minimization of BIC leads to ARMA(0, 0) for Mkt.RF, ARMA(1, 0) for Mom and CMA and ARMA(1, 1) for the remaining factors HML, SMB, RMW. 
 
 \input{tex/tables/garch_estimation}
 
@@ -63,7 +63,7 @@ Based on these ARMA-GARCH specifications, the Ljung-Box and LM tests indicate no
 
 The lack of significant sign bias in the GARCH specifications for all models except Mkt.RF is interesting, in line with the argument that any leverage effects could cancel out in a zero-cost long-short equity portfolio; the Mkt.RF is the only factor that is net-long equities and also exhibited leverage effects, with a negative sign bias as a GARCH model. We note that the sign bias of Mkt.RF has been eliminated in the GJR-GARCH model.
 
-The candidate specifications under normal and Student's \textit{t} distributed innovations all display misaligned QQ-plots (see~\autoref{fig:garch_qq}). The empirical distributions deviate from the 45 degree theoretical lines, especially in the more extreme quantiles. This indicates asymmetry in the residual series. In unreported results, we have controlled that the misspecification of normal and Student's \textit{t} residuals is persistent even if GJR-GARCH models are fitted for all factors -- i.e. leverage effects cannot explain the misspecification. By comparison, the QQ-plot with skewed Student's \textit{t} innovations seems to fit the data well. We proceed with skewed Student's \textit{t} residual distributions.
+The candidate specifications under normal and symmetric \emph{t} distributed innovations all display misaligned QQ-plots (see~\autoref{fig:garch_qq}). The empirical distributions deviate from the 45 degree theoretical lines, especially in the more extreme quantiles. This indicates asymmetry in the residual series. In unreported results, we have controlled that the misspecifications of normal and symmetric \emph{t} residuals are persistent even if GJR-GARCH models are fitted for all factors -- i.e. leverage effects cannot explain the misspecification. By comparison, the QQ-plots with skewed \emph{t} innovations seem to fit the data well. We proceed with skewed Student's \textit{t} residual distributions.
 
 \begin{figure}[!pt]
   \centering
@@ -92,6 +92,6 @@ The candidate specifications under normal and Student's \textit{t} distributed i
 
 % We note that the Mkt.RF factor is, according to our model selection procedure, best fitted by a ARMA(0, 0) mean equation, indicating no predictive power of 1-week lagged returns. Also, in the variance equation, we note that the relatively low $\alpha = 0.037$ sensitivity to shocks is increased considerably by $\eta = 0.181$ in the case of a \emph{negative} shock. Furthermore, the Mom factor stands out with a much higher estimate of $\alpha$ (0.186) than any of the other series (all around 0.10) and a lower $\beta$ (0.793). This means that volatility in the momentum factor is more sensitive than other factor strategies to return shocks and less predictable by past volatility alone. We also note that the Mkt.RF and Mom factors exhibit relatively higher unconditional volatilities (of 0.022 and 0.018) than do other factors (around 0.010).
 
-For both the value-related and non-value related factors, many of the estimates of $\gamma_i$, the skewness of the skewed \emph{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates for SMB and Mom. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots indicate misspecification for models with both the normal and Student's \emph{t} innovations.
+Many of the estimates of $\gamma_i$, the skewness of the skewed \emph{t} GARCH innovation process, are statistically insignificant. This is also the case for the degree of freedom estimates, $\nu$ for the SMB and Mom models. Although these parameters are not significantly estimated, we believe that including them is essential as QQ-plots indicate misspecification for the models with normal and symmetric \emph{t} innovations.
 
 % subsection univariate_modeling_of_returns (end)

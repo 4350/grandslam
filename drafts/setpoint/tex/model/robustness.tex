@@ -2,10 +2,10 @@
 \subsection{Copula robustness check}
 \label{sub:05_robust}
 
-This section provides an in-sample robustness check of how well the copula models can reproduce the threshold correlations and rolling correlations found in the dependence analysis of ARMA-GARCH residuals. By comparing simulated data from the copulas to the empirical data, we find that the main features are captured. However, we highlight that tail dependence is only reconstructed to a certain extent.
+This subsection provides an in-sample robustness check of how well the copula models can reproduce the threshold correlations and rolling correlations found in the dependence analysis of ARMA-GARCH residuals. By comparing simulated data from the copulas to ARMA-GARCH residual data, we find that the main features are captured. However, we highlight that tail dependence is only reproduced to a certain extent.
 
 \subsubsection{Threshold correlations in constant copulas}
-By simulating 250,000 weeks of shocks in the copula, and then transforming these shocks into standardized residuals for each of the factors, we can test the constant \textit{t} copula's ability to generate the threshold correlations in the ARMA-GARCH residuals.\footnote{This robustness check is inspired by \textcite{ChristoffersenLanglois2013}.} If a Student's \textit{t} copula specification reasonably well captures tail dependence, the threshold correlations from the empirical and the copula specification should align. The results are presented in~\autoref{fig:threshold_simulated1}.
+By simulating 250,000 weeks of shocks in the copula, and then transforming these shocks into standardized residuals for each of the factors, we can test the constant \textit{t} copulas' abilities to generate the threshold correlations in the ARMA-GARCH residuals.\footnote{This robustness check is inspired by \textcite{ChristoffersenLanglois2013}.} If a Student's \textit{t} copula specification reasonably well captures tail dependence, the threshold correlations from the empirical and the copula specification should align. The results are presented in~\autoref{fig:threshold_simulated1}.
 
 \begin{figure}[!ht]
   \centering
