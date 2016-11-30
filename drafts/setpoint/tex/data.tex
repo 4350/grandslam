@@ -19,13 +19,20 @@ We proceed with descriptions of how factors are constructed. The Mkt.RF factor i
 \end{itemize}
 The sort ensures that SMB includes firms small and big firms equally from the remaining factors, and that the other factors include equal amounts of small and big firms, as noted in the equations below. Note that momentum originates from a different data set and does not affect the SMB composition.
 \begin{align*}
-  \text{HML} &= 1/2 \cdot (\text{Small value} + \text{Big value}) - 1/2 \cdot (\text{Small growth} + \text{Big growth}) \\
-  \text{CMA} &= 1/2 \cdot (\text{Small conservative} + \text{Big conservative}) - 1/2 \cdot (\text{Small aggressive} + \text{Big aggressive}) \\
-  \text{RMW} &= 1/2 \cdot (\text{Small robust} + \text{Big robust}) - 1/2 \cdot (\text{Small weak} + \text{Big weak}) \\
   \text{SMB} &= 1/3 \cdot (\text{SMB}_\text{HML} + \text{SMB}_\text{CMA} + \text{SMB}_\text{RMW}) \\
-  \text{Mom} &= 1/2 \cdot (\text{Small high} + \text{Big high}) - 1/2 \cdot (\text{Small low} + \text{Big low})
+  \\
+  \text{HML} &= 1/2 \cdot (\text{Small value} + \text{Big value})   \\
+             &- 1/2 \cdot (\text{Small growth} + \text{Big growth}) \\
+  \\
+  \text{CMA} &= 1/2 \cdot (\text{Small conservative} + \text{Big conservative}) \\
+             &- 1/2 \cdot (\text{Small aggressive} + \text{Big aggressive}) \\
+  \\
+  \text{RMW} &= 1/2 \cdot (\text{Small robust} + \text{Big robust}) \\
+             &- 1/2 \cdot (\text{Small weak} + \text{Big weak}) \\
+  \\
+  \text{Mom} &= 1/2 \cdot (\text{Small high} + \text{Big high}) \\
+             &- 1/2 \cdot (\text{Small low} + \text{Big low})
 \end{align*}
-
 French's financial statement data originates from Compustat, stock return data is from CRSP and Treasury return data is from Ibbotson Associates.
 
 \subsection{Summary statistics}

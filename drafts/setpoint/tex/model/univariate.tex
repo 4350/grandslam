@@ -1,4 +1,4 @@
-%!TEX root = ../main.tex
+%!TEX root = ../../main.tex
 
 \subsection{Univariate modeling of returns} % (fold)
 \label{sub:univariate_modeling_of_returns}
@@ -43,7 +43,7 @@ Our selection process is as follows.
   \item We then compute the Bayesian Information Criterion~\autocite[BIC]{Schwarz1978} for each factor strategy and specification and select the ARMA order with the lowest BIC as our primary candidates.
 \end{enumerate}
 
-For the candidate models
+\noindent For the candidate models
 
 \begin{enumerate}[(i)]
   \item We check for remaining serial correlation and ARCH effects.
@@ -67,6 +67,8 @@ The candidate specifications under normal and symmetric \emph{t} distributed inn
 
 \begin{figure}[!pt]
   \centering
+  \footnotesize
+
   \begin{subfigure}{9cm}
     \includegraphics[width = 9cm]{graphics/qq_norm.png}
     \caption{Normal}
