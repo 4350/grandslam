@@ -5,10 +5,10 @@
   \footnotesize
   \renewcommand{\arraystretch}{1.2}
 
-  \caption{CDB Optimization with Dynamic Copula Model (1963--2016)}
+  \caption{CDB optimization with dynamic copula model (1963--2016)}
 
   \begin{longcaption}
-    Average weights are averages of dynamic CDB optimal weights based on simulations of the return distribution from the copula model. Differences in average weights are expressed relative to the full five- and six-factor models. Performance measures are based on realized returns. SR is the annualized Sharpe Ratio. VaR, ES and CDB are all based on the one-week-ahead 5\% lower tail of the return distribution. Differences in CDB are to be read as column model minus row model and its associated standard errors (in parentheses) are computed taking the copula model as given.
+    Average weights are averages of dynamic CDB optimal weights based on simulations of the return distribution from the dynamic symmetric \emph{t} copula model. Differences in average weights are expressed relative to the full five- and six-factor models. Performance measures are based on realized returns. SR is the annualized Sharpe Ratio. VaR, ES and CDB are all based on the one-week-ahead 5\% lower tail of the return distribution. Differences in CDB are to be read as column model minus row model and its associated standard errors (in parentheses) are computed taking the copula model as given.
   \end{longcaption}
 
   \label{tab:cdb_model}
@@ -16,8 +16,8 @@
   \begin{tabularx}{\textwidth}{@{} l dddd X dddd @{}}
     \toprule
     &
-      \multicolumn{4}{c}{Five Factors} &&
-      \multicolumn{4}{c}{Six Factors} \\
+      \multicolumn{4}{c}{Five (four) factor models} &&
+      \multicolumn{4}{c}{Six (five) factor models} \\
     \cmidrule{2-5}
     \cmidrule{7-10}
     &
@@ -63,13 +63,11 @@
     Avg. ES  (\%)  & 0.61  & 0.64  & 0.69  & 1.04  & & 0.60  & 0.64  & 0.66  & 0.92 \\
     Avg. CDB       & 90.42 & 89.29 & 89.19 & 83.42 & & 91.33 & 90.24 & 90.51 & 86.62 \\
     \midrule
-    \multicolumn{1}{@{}l}{\textbf{Difference CDB}} \\
+    \multicolumn{1}{@{}l}{\textbf{Difference CDB (column model minus row model)}} \\
     All       & & -1.13  & -1.23  & -7.01  & & & -1.09  & -0.82  & -4.71 \\
               & & (0.02) & (0.03) & (0.11) & & & (0.02) & (0.03) & (0.10) \\
-              \\
     Excl. HML & &        & -0.10  & -5.88  & & &        & 0.27   & -3.62 \\
               & &        & (0.04) & (0.11) & & &        & (0.04) & (0.10) \\
-              \\
     Excl. CMA & &        &        & -5.78  & & &        &        & -3.89 \\
               & &        &        & (0.11) & & &        &        & (0.10) \\
     \bottomrule

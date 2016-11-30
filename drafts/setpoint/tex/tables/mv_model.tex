@@ -5,10 +5,10 @@
   \footnotesize
   \renewcommand{\arraystretch}{1.2}
 
-  \caption{Mean-Variance Optimization with Dynamic Copula Model (1963--2016)}
+  \caption{Mean-variance optimization with dynamic copula model (1963--2016)}
 
   \begin{longcaption}
-    Average weights are averages of dynamic MV optimal weights based on means and covariances from the copula model. Differences in average weights are expressed relative to the full five- and six-factor models. Performance measures are based on realized returns. SR is the annualized Sharpe Ratio. VaR, ES and CDB are all based on the one-week-ahead 5\% lower tail of the return distribution, which is given by simulations from the copula model. Differences in CDB are to be read as column model minus row model and its associated standard errors (in parentheses) are computed taking the copula model as given.
+    Average weights are averages of dynamic MV optimal weights based on means and covariances from the dynamic symmetric \emph{t} copula model. Differences in average weights are expressed relative to the full five- and six-factor models. Performance measures are based on realized returns. SR is the annualized Sharpe Ratio. VaR, ES and CDB are all based on the one-week-ahead 5\% lower tail of the return distribution, which is given by simulations from the copula model. Differences in CDB are to be read as column model minus row model and its associated standard errors (in parentheses) are computed taking the copula model as given.
   \end{longcaption}
 
   \label{tab:mv_model}
@@ -16,8 +16,8 @@
   \begin{tabularx}{\textwidth}{@{} l dddd X dddd @{}}
     \toprule
     &
-      \multicolumn{4}{c}{Five Factors} &&
-      \multicolumn{4}{c}{Six Factors} \\
+      \multicolumn{4}{c}{Five (four) factor models} &&
+      \multicolumn{4}{c}{Six (five) factor models} \\
     \cmidrule{2-5}
     \cmidrule{7-10}
     &
@@ -63,13 +63,11 @@
     Avg. ES  (\%)  & 0.83  & 0.94  & 1.02  & 1.58  & & 0.79  & 0.90  & 0.93  & 1.31 \\
     Avg. CDB       & 82.78  & 79.38  & 77.98  & 68.03  & & 84.66  & 81.44  & 81.68  & 74.75 \\
     \midrule
-    \multicolumn{1}{@{}l}{\textbf{Difference CDB}} \\
+    \multicolumn{1}{@{}l}{\textbf{Difference CDB (column model minus row model)}} \\
     All      & & -3.40  & -4.81  & -14.75  & & & -3.22  & -2.98  & -9.91 \\
              & & (0.17) & (0.22) & (0.37) & & & (0.14) & (0.15) & (0.28) \\
-              \\
     Excl. HML & &        & -1.41  & -11.35  & & &        & 0.24  & -6.69 \\
              & &        & (0.29) & (0.41) & & &        & (0.22) & (0.32) \\
-              \\
     Excl. CMA & &        &        & -9.95  & & &        &        & -6.93 \\
              & &        &        & (0.43) & & &        &        & (0.31) \\
     \bottomrule

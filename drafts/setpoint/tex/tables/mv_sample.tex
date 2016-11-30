@@ -5,7 +5,7 @@
   \footnotesize
   \renewcommand{\arraystretch}{1.2}
 
-  \caption{Mean-Variance Optimization with Sample Inputs (1963--2016)}
+  \caption{Mean-Variance optimization with static sample inputs (1963--2016)}
 
   \begin{longcaption}
     Static weights are the MV optimal weights based on in-sample sample estimators of means and covariances. Differences in average weights are expressed relative to the full five- and six-factor models. Performance measures are based on realized returns. SR is the annualized Sharpe Ratio. VaR, ES and CDB are all based on the one-week-ahead 5\% lower tail of the return distribution, which is given by simulations from the copula model. Differences in CDB are to be read as column model minus row model and its associated standard errors (in parentheses) are computed taking the copula model as given.
@@ -16,8 +16,8 @@
   \begin{tabularx}{\textwidth}{@{} l dddd X dddd @{}}
     \toprule
     &
-      \multicolumn{4}{c}{Five Factors} &&
-      \multicolumn{4}{c}{Six Factors} \\
+      \multicolumn{4}{c}{Five (four) factor models} &&
+      \multicolumn{4}{c}{Six (five) factor models} \\
     \cmidrule{2-5}
     \cmidrule{7-10}
     &
@@ -63,13 +63,11 @@
     Avg. ES  (\%)  & 0.76  & 0.78  & 0.86  & 1.20  & & 0.79  & 0.81 & 0.88  & 1.16 \\
     Avg. CDB       & 87.34  & 86.68  & 86.45  & 79.15  & & 87.87  & 87.02 & 86.77  & 82.63 \\
     \midrule
-    \multicolumn{1}{@{}l}{\textbf{Difference CDB}} \\
+    \multicolumn{1}{@{}l}{\textbf{Difference CDB (column model minus row model)}} \\
     All       & & -0.66   & -0.89  & -8.19  & & & -0.85  & -1.10  & -5.24 \\
               & & (0.01) & (0.05) & (0.13) & & & (0.03) & (0.04) & (0.10) \\
-              \\
     Excl. HML & &        & -0.22  & -7.53  & & &        & -0.22   & -4.40 \\
               & &        & (0.06) & (0.13) & & &        & (0.06) & (0.11) \\
-              \\
     Excl. CMA & &        &        & -7.31  & & &        &        & -4.14 \\
               & &        &        & (0.14) & & &        &        & (0.10) \\
     \bottomrule
