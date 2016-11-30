@@ -41,15 +41,13 @@ summary_table <- df.estim %>%
     dplyr::select(-Date) %>%
     select(Mkt.RF, SMB, Mom, HML, CMA, RMW) %>%
     basicStats() %>%
-    .[c('nobs','Maximum','Minimum','Mean','Median','Stdev','Skewness','Kurtosis'),] %>%
-    round(., digits = 4)
+    .[c('nobs','Maximum','Minimum','Mean','Median','Stdev','Skewness','Kurtosis'),]
 
 summary_table <- rbind(summary_table,
                        'Return LB [5] p-value' = ret_LB_5,
                        'Return LB [10] p-value' = ret_LB_10,
                        'Squared return LB [5] p-value' = sqr_ret_LB_5,
-                       'Squared return LB [10] p-value' = sqr_ret_LB_10) %>%
-  round(., digits = 3)
+                       'Squared return LB [10] p-value' = sqr_ret_LB_10)
 
 write.table(summary_table, file = 'output/MarginalStats/summaryTable.Estim.csv')
 #stargazer(summary_table, summary = FALSE)
@@ -100,10 +98,10 @@ ggsave('output/MarginalStats/qq_returns.png', g, device = 'png', width = 9, heig
 
 # Corr matrix data --------------------------------------------------------
 
-cor_matrix <- cor(df.estim[,-1] %>% select(Mkt.RF, SMB, Mom, HML, CMA, RMW))
+cor_matrix <- cor(df.estim[,-1] %>% select(Mkt.RF, SMB, HML, CMA, RMW, Mom))
 cor_matrix[upper.tri(cor_matrix)] <- NA
 stargazer(cor_matrix)
-
+stargazer(cor_matrix, type = 'text', digits = 2)
 
 # Marginal plots ----
 varlist = list('Mkt.RF','HML','SMB','Mom','RMW','CMA')
