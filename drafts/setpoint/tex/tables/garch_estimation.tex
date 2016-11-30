@@ -11,17 +11,17 @@
     Models from~\autoref{eq:garch_mean} and~\autoref{eq:garch_garch} on $N = 2766$ weekly returns 1963--2016, with skewed Student's \emph{t} innovations. Robust standard errors in parentheses, following~\textcite{White1982}. $\omega$ is set using variance targeting, following~\textcite{EngleMezrich1995}. \emph{UV} is the estimate of unconditional volatility; \emph{VP} is the estimate of variance persistence. Ljung-Box and ARCH-LM tests are the weighted portmanteau tests from \textcite{FisherGallagher2012} and the sign bias test is from \textcite{EngleNg1993} (see~\autoref{app:univariate_diagnostics}). Significance given by $^{*}p<10\%$; $^{**}p<5\%$; $^{***}p<1\%$
   \end{longcaption}
  
-  \begin{tabularx}{\textwidth}{@{}l X dddddd @{}}
+  \begin{tabularx}{\textwidth}{@{}l X dddddd}
     \toprule
     &&
       \multicolumn{1}{c}{Mkt.RF} &
       \multicolumn{1}{c}{SMB} &
-      \multicolumn{1}{c}{Mom} &
       \multicolumn{1}{c}{HML} &
       \multicolumn{1}{c}{CMA} &
-      \multicolumn{1}{c}{RMW} \\
+      \multicolumn{1}{c}{RMW} &
+      \multicolumn{1}{c}{Mom} \\
     \midrule
-    $\mu$      & & 0.12^{***}  & 0.03        & 0.06^{**}   & 0.04^{***}  & 0.05^{***} & 0.14^{***} \\
+    $\mu$ (\%) & & 0.12^{***}  & 0.03        & 0.06^{**}   & 0.04^{***}  & 0.05^{***} & 0.14^{***} \\
                & & (0.03)      & (0.03)      & (0.03)      & (0.01)      & (0.02)     & (0.05) \\
                \\
     $\phi_1$   & &             & 0.77^{***}  & 0.72^{***}  & 0.11^{***}  & 0.59^{***} & 0.13^{**} \\
@@ -45,18 +45,18 @@
     $\gamma$   & & -2.36^{***} & -0.65       & 0.63        & 0.48        & 0.25       & -2.12 \\
                & & (0.84)      & (1.04)      & (0.41)      & (0.49)      & (0.42)     & (9.90) \\
                \\
-    $\omega$   & & 0.00        & 0.00        & 0.00        & 0.00        & 0.00       & 0.00 \\
+    $\omega$ (ppm) & & 15.52        & 6.25       & 2.67        & 0.99        & 0.61       & 6.94 \\
     \midrule
     \multicolumn{8}{@{}l}{\textbf{Log-likelihood (LLH), unconditional volatility (UV) and variance persistence (VP)}} \\
     LLH  &&
-      \multicolumn{1}{D{.}{.}{2}}{7,051} &
-      \multicolumn{1}{D{.}{.}{2}}{8,567} &
-      \multicolumn{1}{D{.}{.}{2}}{7,941} &
-      \multicolumn{1}{D{.}{.}{2}}{8,788} &
-      \multicolumn{1}{D{.}{.}{2}}{9,574} &
-      \multicolumn{1}{D{.}{.}{0}}{9,872} \\
-    UV   && 0.022 & 0.010 & 0.017 & 0.010 & 0.010 & 0.010 \\
-    VP   && 0.968 & 0.957 & 0.979 & 0.982 & 0.987 & 0.992 \\
+      \multicolumn{1}{D{.}{.}{3}}{7\,051} &
+      \multicolumn{1}{D{.}{.}{3}}{8\,567} &
+      \multicolumn{1}{D{.}{.}{3}}{7\,941} &
+      \multicolumn{1}{D{.}{.}{3}}{8\,788} &
+      \multicolumn{1}{D{.}{.}{3}}{9\,574} &
+      \multicolumn{1}{D{.}{.}{3}}{9\,872} \\
+    UV (\%)   && 2.19 & 1.20 & 1.22 & 0.88 & 0.87 & 1.83 \\
+    VP (\%)   && 96.75 & 95.66 & 98.20 & 98.71 & 99.18 & 97.93 \\
     \midrule
     \multicolumn{8}{@{}l}{\textbf{p-values of Ljung-Box (LB), ARCH-LM (ARCH) and sign bias tests}} \\
     LB(5)          && 0.15 & 0.27 & 0.83 & 1.00 & 0.18 & 1.00 \\
