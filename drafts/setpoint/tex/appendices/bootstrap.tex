@@ -1,14 +1,12 @@
-%!TEX root = ../main.tex
+%!TEX root = ../../main.tex
 
 \section{Stationary bootstrap of copula parameter standard errors}
 \label{App:Appendix_bootstrap}
 
-We rely on the multi-step maximum likelihood estimation of the copula model, which takes the standardized residuals of marginal distributions as given in the second step. The first estimation step introduces parameter uncertainty that is not taken into account by the conventional standard errors of the second estimation.\footnote{Here, our model deviates from~\textcite{ChristoffersenLanglois2013}, who use a semi-parametric model that uses the empirical density function, and find standard errors using the analytical approach in~\textcite{ChenFan2006}. However, those errors are not valid in a time-varying copula context, as the estimation of means and variances impact the asymptotic distributions of copula parameters~\autocite{Remillard2010}.} We use the stationary block bootstrap method of \textcite{PolitisRomano1994} with a block length of 45 weeks (approx. 1 year of data) to find reliable standard errors for copula parameters. The procedure is theoretically supported by \textcite{GonclavesWhite2004} and implemented as follows:
+We rely on the multi-step maximum likelihood estimation of the copula model, which takes the standardized residuals of marginal distributions as given in the second step. The first estimation step introduces parameter uncertainty that is not taken into account by the conventional standard errors of the second estimation.\footnote{Here, our model deviates from~\textcite{ChristoffersenLanglois2013}, who use a semi-parametric model that uses the empirical density function, and find standard errors using the analytical approach in~\textcite{ChenFan2006}. However, those errors are not valid in a time-varying copula context, as the estimation of means and variances impact the asymptotic distributions of copula parameters~\autocite{Remillard2010}.} We use the stationary block bootstrap method of \textcite{PolitisRomano1994} with a block length of 104 weeks (2 years of data) to find reliable standard errors for copula parameters. The procedure is theoretically supported by \textcite{GonclavesWhite2004} and implemented as follows (as described in~\textcite{Patton2012}):
 \begin{enumerate}[(i)]
-    \item Generate a block bootstrap version of the original weekly return data
-    \item Estimate the ARMA-GJR-GARCH models and calculate standardized residuals
-    \item Transform standardized residuals to uniform and estimate the copula model
-    \item Collect the copula parameters $\Theta_i$
-    \item Repeat (i)-(iv) N times to get $\{\Theta_i\}^{N}_{i=1}$
-    \item Use the standard errors from the empirical distribution of $\{\Theta_i\}^{N}_{i=1}$
+    \item Generate a stationary block bootstrap of the original weekly return data with an expected block length of 104 weeks.
+    \item Estimate the copula model of interest and collect the parameter set $\theta_i$.
+    \item Repeat (i)-(ii) $S$ times (we use $S = 100$).
+    \item Use the standard deviation of the distribution of $\{\theta_i\}_{i=1}^S$ as the standard error for the parameters.
 \end{enumerate}
