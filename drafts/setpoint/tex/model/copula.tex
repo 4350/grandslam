@@ -1,4 +1,4 @@
-%!TEX root = ../main.tex
+%!TEX root = ../../main.tex
 
 \subsection{Definition of copula model} % (fold)
 \label{sub:definition_of_copula_model}
@@ -39,7 +39,7 @@ where $Q_t$ is normalized to the correlation matrix $\Psi_t$:
 \end{align}
 The $Q_t$ process is comprised of three components that are weighted according to $\alpha, \beta$: (1) a time-invariant component, $Q$ (2) an innovation component from copula shocks, $\bar{z}_{t-1}^{*} \bar{z}_{t-1}^{*\top},$\footnote{Where $\bar{z}_{i,t+1}^* = z_{i,t+1}^* \sqrt{q_{ii,t}}$ is due to a correction by~\textcite{Aielli2013}, that improves the reliability of the estimation procedure.} and (3) an autoregressive component of order one $Q_{t-1}$. In order for the the correlation matrix $\Psi_t$ to be positive definite, $Q_t$ has to be positive definite, which is ascertained by requiring that $\alpha \geq 0$, $\beta \geq 0$ and $(\alpha + \beta) < 1$. The model nests a constant copula when $\alpha = \beta = 0$.
 
-The model for $c_t(U_{t+1})$ is thus comprised of $1 + N$ distribution parameters $\{\nu_c, \gamma_c\}$ and (${2 + (N(N-1) / 2)}$) dynamics parameters $\{\alpha, \beta, Q\}$ where the elements of $Q$ are estimated using moment matching, and the remaining parameters $\{\alpha, \beta, \nu_c, \gamma_c\}$ are estimated using maximum likelihood.\footnote{We have relegated the details of the estimation of the dynamic process to~\autoref{app:copula_cdcc}.}
+The model for $c_t(U_{t+1})$ is comprised of $1 + N$ distribution parameters $\{\nu_c, \gamma_c\}$ and (${2 + (N(N-1) / 2)}$) dynamics parameters $\{\alpha, \beta, Q\}$ where the elements of $Q$ are estimated using moment matching, and the remaining parameters $\{\alpha, \beta, \nu_c, \gamma_c\}$ are estimated using maximum likelihood.\footnote{A detailed description of the copula estimation procedure can be found in~\autoref{app:copula_cdcc}.}
 
 % Gustaf: Här är det svårt -- jag har svårt att beskriva $z_t^*$ när konceptet
 % standardized residuals är en del av ARMA-GARCH delen. Vet ej riktigt hur man

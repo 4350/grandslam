@@ -5,9 +5,11 @@
 
 This is a step-by-step description of the procedure used to estimate the copula model, given the set of standardized residuals $\{z_{t}\}$ from each GARCH model. It is adapted from~\textcite{ChristoffersenErrunzaJacobLanglois2012} and uses the cDCC model of~\textcite{Aielli2013}.
 
-For each week, compute uniform residuals by applying the probability integral transform to standardized residuals from each GARCH model:
+Each week, compute uniform residuals by applying the probability integral transform to standardized residuals from each GARCH model:
 \begin{align}
-  u_{i, t+1} = \int_{-\infty}^{z_{i,t+1}} f_{i}(z_{i,t+1})
+  u_{i, t+1}
+    = \int_{-\infty}^{z_{i,t+1}} f_{i}(z) dz
+    = \int_{-\infty}^{r_{i,t+1}} f_{i,t}(r)dr
 \end{align}
 Note that while the distributions of returns is time-varying due to GARCH dynamics, the distribution of standardized residuals is assumed constant, and in the case of skewed Student's t is parameterized by the shape $\nu_i$ and skewness parameter $\gamma_i$ (estimated as part of the GARCH models).
 
@@ -23,7 +25,7 @@ These shocks are now used to fit the corrected DCC process of~\textcite{Aielli20
     + \alpha (\bar{z}_{i,t-1}^*)^2
     + \beta q_{ii,t-1}
 \end{align}
-The corrected shocks are used to estimate the time-invariant component $Q$ using moment matching:
+The corrected shocks are used to estimate the time-invariant component $Q$:
 \begin{align}
   \hat{Q} = \frac{1}{T} \sum_{t=1}^T \bar{z}_{t}^* \bar{z}_t^{*\top}
 \end{align}
