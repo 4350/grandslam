@@ -60,7 +60,7 @@ write.table(summary_table, file = 'output/MarginalStats/summaryTable.Estim.csv')
 plot_df <- df.estim[,-1] %>%
   gather('factor','value')
 
-plot_df$factor <- factor(plot_df$factor, levels = c('Mkt.RF','SMB','Mom','HML','CMA','RMW'))
+plot_df$factor <- factor(plot_df$factor, levels = c('Mkt.RF','SMB','HML','CMA','RMW','Mom'))
 
 line_df <- plot_df %>%
   group_by(factor) %>%
@@ -78,24 +78,24 @@ g <- ggplot(plot_df,
          sample = value
          )
        )+
-  stat_qq(size = 1)+
+  stat_qq(size = 0.5)+
   geom_abline(
     aes(intercept = intercept, slope = slope),
     linetype = 2,
     data = line_df
   )+
   coord_cartesian(xlim = c(-4,4))+
-  annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+  annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=0.25)+
   facet_wrap( ~ factor, nrow = 2, ncol = 3)+
   theme_Publication() +
   theme(strip.background = element_blank())+
   scale_colour_Publication() +
-  ylab('Sample log returns') +
-  xlab('Theoretical standardized quantiles') +
+  ylab('Sample returns') +
+  xlab('Theoretical quantiles') +
   theme(legend.position = 'none')+
   scale_y_continuous(labels = scales::percent)
 
-ggsave('output/MarginalStats/qq_returns.png', g, device = 'png', width = 16, height = 10, units = 'cm', limitsize = F)
+ggsave('output/MarginalStats/qq_returns.png', g, device = 'png', width = 9, height = 5.8, units = 'cm', limitsize = F)
   
 
 # Corr matrix data --------------------------------------------------------

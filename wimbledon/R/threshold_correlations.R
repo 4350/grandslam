@@ -126,7 +126,7 @@ plot_th_explain <- function(pair, width = 16, height = 9) {
   
   # Subset data to pair
   plot_df_th <- th_corr_stdres %>% 
-    filter(factor1 == pair[1], factor2 == pair[2])
+    dplyr::filter(factor1 == pair[1], factor2 == pair[2])
   plot_df_scatter <- data.frame(
     x = df.stdres[,pair[1]],
     y = df.stdres[,pair[2]]
@@ -205,7 +205,7 @@ plot_th_explain <- function(pair, width = 16, height = 9) {
     xlab('Mkt.RF') +
     ylab('HML') +
     coord_cartesian(xlim = c(-5,5), ylim = c(-5, 5))+
-    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=0.25)+
     ggtitle("Scatter plot")
   
   # Combine the two in grid

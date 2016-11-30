@@ -1,6 +1,6 @@
 %!TEX root = ../main.tex
 
-\section{Optimizing factor allocations} % (fold)
+\section{Optimizing factor allocation} % (fold)
 \label{sec:optimizing_factor_allocations}
 
 We now turn to the issue of optimizing factor allocations using our estimated copula model. We optimize portfolio weights according to two techniques: Optimal Mean-Variance (MV) investing and Optimal Conditional Diversification Benefit (CDB) investing, where the latter is a measure introduced by~\textcite{ChristoffersenErrunzaJacobLanglois2012}.
@@ -17,7 +17,7 @@ The remainder of this section presents the construction of the CDB measure and p
 
 %We evaluate this based on static weights (based on sample estimates of expected returns and covariances) and dynamic weights (based on copula model estimates).
 
-\subsection{Conditional Diversification Benefit} % (fold)
+\subsection{Conditional diversification benefit (CDB)} % (fold)
 \label{sub:conditional_diversification_benefit}
 
 This description of CDB follows~\textcite{ChristoffersenErrunzaJacobLanglois2012}. Define ES as the expected loss in some bottom percentile $q$:
@@ -44,7 +44,7 @@ CDB is a number between zero and one (we report CDB scaled to 0--100) and measur
 
 % subsection conditional_diversification_benefit (end)
 
-\subsection{Optimization Problem} % (fold)
+\subsection{Optimization problem} % (fold)
 \label{sub:optimization_problem}
 
 Each week, we choose portfolio weights to maximize the Sharpe Ratio (SR) in the mean-variance case, and CDB in the CDB case. We impose two restrictions on our optimization problem. First, all factor weights must be positive. This reduces the problem with extreme weights, as seen in the unconstrained optimization problem, and reflects a view that an investor will not bet against factors that have generated a history of positive premia. Second, factor weights must sum to unity, i.e. the portfolio is fully invested across factors. In light of~\textcite{Asness2015}, we consider portfolios with and without momentum (five- and six-factor portfolios, respectively).

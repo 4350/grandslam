@@ -6,7 +6,7 @@
 plot_th_main <- function(pair) {
   # Subset data to pair
   plot_df <- th_corr_stdres %>%
-    filter(factor1 == pair[1], factor2 == pair[2])
+    dplyr::filter(factor1 == pair[1], factor2 == pair[2])
   
   # Do plot
   g <- ggplot(plot_df, aes(x = qs, y = coef)) +
@@ -29,7 +29,7 @@ plot_th_main <- function(pair) {
     theme_Publication() +
     scale_colour_Publication()+
     theme(legend.position = 'none')+
-    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=0.25)+
     
     # Axes options
     ylab('Correlation') +
@@ -47,7 +47,7 @@ plot_th_appendix <- function(pair) {
   
   # Bind return and stdres data and subset to pair
   plot_df <- bind_rows(th_corr_stdres, th_corr_returns) %>%
-    filter(factor1 == pair[1], factor2 == pair[2])
+    dplyr::filter(factor1 == pair[1], factor2 == pair[2])
   
   # Set model ordering
   plot_df$model <- factor(plot_df$model, levels = MODEL_ORDER)
@@ -73,7 +73,7 @@ plot_th_appendix <- function(pair) {
     theme_Publication() +
     scale_colour_Publication()+
     theme(legend.position = 'none')+
-    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=0.25)+
     
     # Axes options
     ylab('Correlation') +
@@ -91,7 +91,7 @@ plot_th_simulated <- function(pair) {
   
   # Bind return and stdres data and subset to pair
   plot_df <- bind_rows(th_corr_stdres, th_corr_simulated) %>%
-    filter(factor1 == pair[1], factor2 == pair[2])
+    dplyr::filter(factor1 == pair[1], factor2 == pair[2])
   
   # Set model ordering
   plot_df$model <- factor(plot_df$model, levels = MODEL_ORDER)
@@ -100,7 +100,7 @@ plot_th_simulated <- function(pair) {
   g <- ggplot(plot_df, aes(x = qs, y = coef)) +
     # Conf. bounds
     geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
-                data = plot_df %>% filter(model == 'stdres'),
+                data = plot_df %>% dplyr::filter(model == 'stdres'),
                 fill = 'grey10',
                 alpha = 0.1,
                 show.legend = FALSE
@@ -113,7 +113,7 @@ plot_th_simulated <- function(pair) {
     theme_Publication() +
     scale_colour_Publication()+
     theme(legend.position = 'none')+
-    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=1)+
+    annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=0.25)+
     
     # Axes options
     ylab('Correlation') +
@@ -133,7 +133,7 @@ plot_th_simulated <- function(pair) {
 plot_roll_main <- function(pair) {
   # Subset data to pair
   plot_df <- roll_corr_stdres %>%
-    filter(factor1 == pair[1], factor2 == pair[2])
+    dplyr::filter(factor1 == pair[1], factor2 == pair[2])
   
   # Do plot
   g <- ggplot(plot_df, aes(x = Date, y = coef)) +
@@ -156,7 +156,7 @@ plot_roll_main <- function(pair) {
     theme_Publication() +
     scale_colour_Publication()+
     theme(legend.position = 'none')+
-    annotate("segment",x=tail(plot_df$Date,1),xend=plot_df$Date[1],y=Inf,yend=Inf,color="black",lwd=1)+
+    annotate("segment",x=tail(plot_df$Date,1),xend=plot_df$Date[1],y=Inf,yend=Inf,color="black",lwd=0.25)+
     
     # Axes options
     ylab('Correlation') +
@@ -173,7 +173,7 @@ plot_roll_main <- function(pair) {
 plot_roll_appendix <- function(pair) {
   # Subset data to pair
   plot_df <- bind_rows(roll_corr_stdres, roll_corr_returns) %>%
-    filter(factor1 == pair[1], factor2 == pair[2])
+    dplyr::filter(factor1 == pair[1], factor2 == pair[2])
   
   # Set model ordering
   plot_df$model <- factor(plot_df$model, levels = MODEL_ORDER)
@@ -199,7 +199,7 @@ plot_roll_appendix <- function(pair) {
     theme_Publication() +
     scale_colour_Publication()+
     theme(legend.position = 'none')+
-    annotate("segment",x=tail(plot_df$Date,1),xend=plot_df$Date[1],y=Inf,yend=Inf,color="black",lwd=1)+
+    annotate("segment",x=tail(plot_df$Date,1),xend=plot_df$Date[1],y=Inf,yend=Inf,color="black",lwd=0.25)+
     
     # Axes options
     ylab('Correlation') +
@@ -216,7 +216,7 @@ plot_roll_appendix <- function(pair) {
 plot_roll_simulated <- function(pair) {
   # Subset data to pair
   plot_df <- bind_rows(roll_corr_stdres, roll_corr_simulated) %>%
-    filter(factor1 == pair[1], factor2 == pair[2], model %in% c('stdres','std'))
+    dplyr::filter(factor1 == pair[1], factor2 == pair[2], model %in% c('stdres','std'))
   
   # Set model ordering
   plot_df$model <- factor(plot_df$model, levels = MODEL_ORDER)
@@ -242,7 +242,7 @@ plot_roll_simulated <- function(pair) {
     theme_Publication() +
     scale_colour_Publication()+
     theme(legend.position = 'none')+
-    annotate("segment",x=tail(plot_df$Date,1),xend=plot_df$Date[1],y=Inf,yend=Inf,color="black",lwd=1)+
+    annotate("segment",x=tail(plot_df$Date,1),xend=plot_df$Date[1],y=Inf,yend=Inf,color="black",lwd=0.25)+
     
     # Axes options
     ylab('Correlation') +

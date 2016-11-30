@@ -136,14 +136,14 @@ do_qq_data <- function(model.GARCH) {
   
   # Give levels for facet
   qq_data <- bind_rows(qq_data, .id = 'factor')
-  qq_data$order <- factor(qq_data$factor, levels = names(model.GARCH))
+  qq_data$order <- factor(qq_data$factor, levels = c('Mkt.RF','SMB','HML','CMA','RMW','Mom'))
   return(qq_data)
 }
 
 do_qq_plot <- function(qq_data) {
   # Run ggplot on the qq_data
   ggplot(qq_data, aes(x = theo_x, y = sample_y)) +
-    geom_point(size = 1) +
+    geom_point(size = 0.5) +
     geom_abline(linetype = 2, intercept = 0, slope = 1) +
     annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=0.25)+
     facet_wrap(~ order, nrow = 2, ncol = 3)+

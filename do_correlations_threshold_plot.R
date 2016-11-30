@@ -62,10 +62,10 @@ g <- generate_page(ORDER_PAGE_2, plot_th_appendix, c('ARMA-GARCH standardized re
 ggsave('output/thresholdCorrelations/appendix_threshold_2.png', g, width = WIDTH, height = HEIGHT, units = 'cm')
 
 # Simulated section
-g <- generate_page(ORDER_PAGE_1, plot_th_simulated, c('Standardized residuals', 'Normal','Symmetric t','Asymmetric t'))
+g <- generate_page(ORDER_PAGE_1, plot_th_simulated, c('Standardized residuals', 'Normal','Symmetric t','Skewed t'))
 ggsave('output/thresholdCorrelations/threshold_simulated_1.png', g, width = WIDTH, height = HEIGHT, units = 'cm')
 
-g <- generate_page(ORDER_PAGE_2, plot_th_simulated, c('Standardized residuals', 'Normal','Symmetric t','Asymmetric t'))
+g <- generate_page(ORDER_PAGE_2, plot_th_simulated, c('Standardized residuals', 'Normal','Symmetric t','Skewed t'))
 ggsave('output/thresholdCorrelations/threshold_simulated_2.png', g, width = WIDTH, height = HEIGHT, units = 'cm')  
 
 # Explanatory plot
