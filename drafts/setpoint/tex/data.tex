@@ -14,32 +14,16 @@ We proceed with descriptions of how factors are constructed. The Mkt.RF factor i
   \item High-minus-low, is long firms above the 70\textsuperscript{th} percentile book-to-market and short stocks below the 30\textsuperscript{th} percentile, in the small and big firm group respectively.
   \item Conservative-minus-aggressive, is long firms above the 70\textsuperscript{th} percentile total asset growth and short firms below the 30\textsuperscript{th} percentile. 
   \item Robust-minus-weak, is long firms above the 70\textsuperscript{th} percentile operating profitability and short firms below the 30\textsuperscript{th} percentile. 
-  \item Small-minus-big, is long firms below the 50\textsuperscript{th} percentile market cap and short firms above the 50\textsuperscript{th} percentile, in each of the three groups HML, RMW and CMA.
+  \item Small-minus-big, is long firms below the 50\textsuperscript{th} percentile market cap and short firms above the 50\textsuperscript{th} percentile, in each of the three groups HML, CMA and RMW.
   \item Momentum, is long firms above the 70\textsuperscript{th} percentile prior 2-12 month return (i.e. excluding the last month) and short stocks below the 30\textsuperscript{th} percentile, in the small and big firm group respectively.
 \end{itemize}
-The sort ensures that SMB includes firms small and big firms equally from the remaining factors, and that the other factors include equal amounts of small and big firms, as noted in the equations below. Note that momentum originates from a different data set and does not affect the SMB composition.
-\begin{align*}
-  \text{SMB} &= 1/3 \cdot (\text{SMB}_\text{HML} + \text{SMB}_\text{CMA} + \text{SMB}_\text{RMW}) \\
-  \\
-  \text{HML} &= 1/2 \cdot (\text{Small value} + \text{Big value})   \\
-             &- 1/2 \cdot (\text{Small growth} + \text{Big growth}) \\
-  \\
-  \text{CMA} &= 1/2 \cdot (\text{Small conservative} + \text{Big conservative}) \\
-             &- 1/2 \cdot (\text{Small aggressive} + \text{Big aggressive}) \\
-  \\
-  \text{RMW} &= 1/2 \cdot (\text{Small robust} + \text{Big robust}) \\
-             &- 1/2 \cdot (\text{Small weak} + \text{Big weak}) \\
-  \\
-  \text{Mom} &= 1/2 \cdot (\text{Small high} + \text{Big high}) \\
-             &- 1/2 \cdot (\text{Small low} + \text{Big low})
-\end{align*}
-French's financial statement data originates from Compustat, stock return data is from CRSP and Treasury return data is from Ibbotson Associates.
+The sort ensures that SMB includes firms small and big firms equally from the remaining factors, and that the other factors include equal amounts of small and big firms. Note that momentum originates from a different data set and does not affect the SMB composition. French's financial statement data originates from Compustat, stock return data is from CRSP and Treasury return data is from Ibbotson Associates.
 
 \subsection{Summary statistics}
 
 \input{tex/tables/summary_stats}
 
-For all series, there are 2,766 consecutive data points and no missing data. Mkt.RF is the most volatile and extreme of the series, with weekly returns between -19.8\% and 12.6\% and a weekly volatility of 2.2\%. CMA and RMW seem to be less extreme than HML, with less negative minimums and smaller volatilities. The factor strategies have excess kurtosis, or fat tails, which is typical for financial returns. The excess kurtoses of the Mom, HML and RMW factors are even higher than the kurtosis of the Mkt.RF factor, where RMW is exceptionally high at 13.0. However, while market returns are negatively skewed, HML, CMA and RMW instead exhibit positive skewness. QQ-plots versus normal theoretical quantiles in \autoref{fig:qq_returns} graphically show the non-normality.
+For all factors, there are 2,766 consecutive data points and no missing data. Mkt.RF is the most volatile and extreme of the series, with weekly returns between -19.8\% and 12.6\% and a weekly volatility of 2.2\%. CMA and RMW seem to be less extreme than HML, with less negative minimums and smaller volatilities. The factor strategies have excess kurtosis, or fat tails, which is typical for financial returns. The excess kurtoses of the Mom, HML and RMW factors are even higher than the kurtosis of the Mkt.RF factor, where RMW is exceptionally high at 13.0. However, while market returns are negatively skewed, HML, CMA and RMW instead exhibit positive skewness. QQ-plots versus normal theoretical quantiles in \autoref{fig:qq_returns} graphically show the non-normality.
 
 \begin{figure}[ht!]
   \centering
@@ -54,14 +38,14 @@ For all series, there are 2,766 consecutive data points and no missing data. Mkt
 
 We conduct Ljung-Box tests of the factor returns to control for weekly autocorrelation.\footnote{For a detailed description of the test, see \autoref{app:univariate_diagnostics}.} The p-values of these tests are given in \autoref{tab:summarydata} and are very low for all factors except Mkt.RF, leading to a strong rejection of the zero autocorrelation null hypothesis. For Mkt.RF, the p-value is not small enough for a rejection of zero autocorrelation at the 5 week maximum lag length, but strongly rejected at the 10 week maximum lag length. We also conduct Ljung-Box tests of the squared factor returns to control for volatility clustering (ARCH effects). Here, the null hypothesis is that there are no ARCH effects, and p-values given in \autoref{tab:summarydata} strongly reject the null for all factors, both at max lag length of 5 and 10 weeks.
 
-We conclude that factor return series are non-normal and that returns are not independently distributed over time -- more specifically, past returns have predictive power on future returns, and past volatility has predictive power on future volatility, i.e. the series exhibit both autocorrelation as well as autoregressive heteroscedasticity. These predictable phenomena in financial return data are typically captured by models that incorporate autoregressive components for both the conditional mean and variance equations, such as the family of ARMA-GARCH models, which are further discussed in \autoref{sec:modeling_of_factor_returns}.
+We conclude that factor return series are non-normal and that returns are not independently distributed over time -- more specifically, past returns have predictive power on future returns, and past volatility has predictive power on future volatility, i.e. the series exhibit both autocorrelation as well as autoregressive heteroscedasticity. These predictable phenomena in financial return data are typically captured by models that incorporate autoregressive components for both the conditional mean and variance equations, such as the family of ARMA-GARCH models, which is further discussed in \autoref{sec:modeling_of_factor_returns}.
 \begin{figure}[htbp]
   \centering
   \includegraphics[scale=1]{graphics/cumretPlot.png}  
   \footnotesize
   \caption{Cumulative returns to factor strategies}
   \begin{longcaption}
-    Cumulative returns to investing one dollar in each factor strategy, beginning 1963-07-05. Based on weekly returns 1963--2010.
+    Cumulative returns to investing one dollar in each factor strategy, beginning 1963-07-05. Based on weekly returns 1963--2016.
   \end{longcaption}
   \label{fig:cumret}
 \end{figure}
@@ -71,7 +55,7 @@ We conclude that factor return series are non-normal and that returns are not in
   \footnotesize
   \caption{Cumulative returns to factor strategies, excl. momentum}
   \begin{longcaption}
-    Cumulative returns to investing one dollar in each factor strategy, beginning 1963-07-05. Based on weekly returns 1963--2010.
+    Cumulative returns to investing one dollar in each factor strategy, beginning 1963-07-05. Based on weekly returns 1963--2016.
   \end{longcaption}
   \label{fig:cumret_no_mom}
 \end{figure}
@@ -81,13 +65,13 @@ We conclude that factor return series are non-normal and that returns are not in
   \footnotesize
   \caption{Standardized cumulative returns to factor strategies}
   \begin{longcaption}
-    Cumulative returns to investing one dollar in each factor strategy, standardized to 10\% annual volatility, beginning 1963-07-05. Based on weekly returns 1963--2010.
+    Cumulative returns to investing one dollar in each factor strategy, standardized to 10\% annual volatility, beginning 1963-07-05. Based on weekly returns 1963--2016.
   \end{longcaption}
   \label{fig:cumretstd}
 \end{figure}
 
-A plot of cumulative gross returns (\autoref{fig:cumret}) clearly show the high returns to the momentum strategy throughout the sample period. Taking out momentum, \autoref{fig:cumret_no_mom} shows that the Mkt.RF factor has the highest cumulative gross return, but also that it is the most volatile of the remaining strategies. We normalize the series to 10\% annual volatility in \autoref{fig:cumretstd}, which gives a more nuanced picture of risk-adjusted performance. Since 1963, each of the strategies except for SMB has outperformed the market factor. Furthermore, factor strategies seem to crash at different times and diversify eachother (e.g. Mom performed well during the bubble of 1999-2000 and RMW performed well during the recession of 2007-2009).
+A plot of cumulative gross returns (\autoref{fig:cumret}) clearly show the high returns to the momentum strategy throughout the sample period. Taking out momentum, \autoref{fig:cumret_no_mom} shows that the Mkt.RF factor has the highest cumulative gross return, but also that it is the most volatile of the remaining strategies. We normalize the series to 10\% annual volatility in \autoref{fig:cumretstd}, which gives a more nuanced picture of risk-adjusted performance. Since 1963, each of the strategies except for SMB has outperformed the market factor. Furthermore, factor strategies seem to crash at different times and diversify each other (e.g. Mom performed well during the bubble of 1999--2000 and RMW performed well during the recession of 2007--2009).
 
-Looking at the correlation matrix of factor returns, the generally low or even negative correlation coefficients indicate the diversification benefits of factor strategies. The HML--CMA pair does stand out, however, with an unconditional correlation of 0.63, which could be related to a partial overlap of the factor components, as discussed in \autoref{sec:literature} -- past investment is shown to be negatively empirically related to the current book-to-market ratio. The substantially higher correlation in this asset pair indicates smaller diversification benefits. We also note that the new factor RMW has an interesting pattern of low of negative correlations to all other factors.
+Looking at the correlation matrix of factor returns, the generally low or even negative correlation coefficients indicate the diversification benefits of factor strategies. The HML--CMA pair does stand out, however, with an unconditional correlation of 0.63, which could be related to a partial overlap of the factor components, as discussed in \autoref{sec:literature} -- past investment is shown to be negatively empirically related to the current book-to-market ratio. The substantially higher correlation in this asset pair indicates smaller diversification benefits. We also note that the new factor RMW has an interesting pattern of low of negative correlations to all other factors, indicating diversification benefits.
 \FloatBarrier
 
