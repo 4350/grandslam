@@ -148,7 +148,8 @@ summary.cumretplots <- function(df, outlabel) {
     scale_x_date(date_breaks = "2 years", date_labels = "%y")+
     theme_Publication()+
     guides(color = guide_legend(nrow = 1))+
-    scale_colour_Publication()
+    scale_colour_Publication()+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 48.32, label = 'Mom'), family = 'Minion Pro', size = 2, parse = F)
   
   # Plot cumulative return series w/o momentum
   out.cumret.no.mom <- df %>%
@@ -162,7 +163,12 @@ summary.cumretplots <- function(df, outlabel) {
     scale_x_date(date_breaks = "2 years", date_labels = "%y")+
     theme_Publication()+
     guides(color = guide_legend(nrow = 1))+
-    scale_colour_Publication()
+    scale_colour_Publication()+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 12.64, label = 'Mkt.RF'), family = 'Minion Pro', size = 2, parse = F)+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 8.13, label = 'HML'), family = 'Minion Pro', size = 2, parse = F)+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 6.70, label = 'CMA'), family = 'Minion Pro', size = 2, parse = F)+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 4.97, label = 'RMW'), family = 'Minion Pro', size = 2, parse = F)+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 2.61, label = 'SMB'), family = 'Minion Pro', size = 2, parse = F)
   
   
   # Plot cumulative standardized return series
@@ -176,7 +182,13 @@ summary.cumretplots <- function(df, outlabel) {
     scale_x_date(date_breaks = "2 years", date_labels = "%y")+
     theme_Publication()+
     guides(color = guide_legend(nrow = 1))+
-    scale_colour_Publication()
+    scale_colour_Publication()+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 20.44, label = 'Mom'), family = 'Minion Pro', size = 2, parse = F)+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 18.00, label = 'CMA'), family = 'Minion Pro', size = 2, parse = F)+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 11.50, label = 'RMW'), family = 'Minion Pro', size = 2, parse = F)+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 10.32, label = 'HML'), family = 'Minion Pro', size = 2, parse = F)+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 5.84, label = 'Mkt.RF'), family = 'Minion Pro', size = 2, parse = F)+
+    geom_text(aes(x = as.Date('2018-01-01'), y = 2.90, label = 'SMB'), family = 'Minion Pro', size = 2, parse = F)
   
   # Save out
   ggsave(filename = 'output/cumretPlot.png', out.cumret, 'png', dpi = 300, width = 16, height = 8, units = "cm", limitsize = F)

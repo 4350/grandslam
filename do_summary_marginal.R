@@ -110,4 +110,5 @@ lapply(varlist,
        function(varlist) summary.plots(df.estim, 'Estim', varlist))
 
 # Cumulative plots
+load_all('wimbledon')
 summary.cumretplots(df.estim, 'Estim')
