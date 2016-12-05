@@ -3,11 +3,11 @@
 \subsection{Univariate modeling of returns} % (fold)
 \label{sub:univariate_modeling_of_returns}
 
-We proceed by estimating models of each factor's return series and attempt to capture predictable autocorrelation, volatility clustering and leverage effects. By fitting ARMA-GARCH models, we can filter these effects and reduce the time-varying densities $f_{i,t}(r_{i,t+1})$ to constant densities of \emph{standardized residuals} $f_{i}(z_{i,t+1})$.
+We proceed by estimating models of each factor's return series, which attempt to capture predictable autocorrelation, volatility clustering and leverage effects. By fitting ARMA-GARCH models, we can filter these effects and reduce the time-varying densities $f_{i,t}(r_{i,t+1})$ to constant densities of \emph{standardized residuals} $f_{i}(z_{i,t+1})$.
 
 \subsubsection{General univariate model: ARMA-GJR-GARCH}
 
-The ARMA-GARCH is a broad model family designed to eliminate predictable components of financial return series, and was originally introduced by~\textcite{Bollerslev1986}. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1). The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when positive and negative return shocks have different impact on future volatility~\autocite{Black1976}.
+The ARMA-GARCH is a broad model family designed to model predictable components of financial return series, and was originally introduced by~\textcite{Bollerslev1986}. The models use autoregressive and moving average lags to capture serial correlation in return data (ARMA), as well as autoregressive and moving average lags to capture ARCH effects in residuals from the mean equation (GARCH). We evaluate the GJR-GARCH model of~\textcite{glosten1993relation}, which is a parsimonious extension of the standard GARCH(1, 1). The GJR-GARCH is designed to also capture leverage effects~\autocite{glosten1993relation}, i.e. when positive and negative return shocks have different impact on future volatility~\autocite{Black1976}.
 
 We estimate conditional mean equations for each factor \emph{up to} ARMA(3, 3):
 \begin{align}
