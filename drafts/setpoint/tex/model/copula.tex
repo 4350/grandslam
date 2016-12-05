@@ -13,7 +13,7 @@ The elements of $U_{t+1} = \{u_{i,t+1},\ldots,u_{N,t+1}\}$ are related to the or
 \begin{align}
   u_{i,t+1} = F_{i,t}(r_{i,t+1}) = \int_{-\infty}^{r_{i,t+1}} f_{i,t}(r)dr
 \end{align}
-The copula function $c_t(U_{t+1})$ is a multivariate skewed Student's \emph{t} distribution. This distribution is parameterized by a single degrees of freedom parameter $\nu_c$, controlling the degree of dependence, a vector of $N$ skewness parameters $\gamma_c$, controlling the asymmetry in dependence, and a potentially time-varying correlation matrix $\Psi_{t}$.\footnote{We describe the details of the skewed Student's t distribution, including the expanded form of $c_t$, in~\autoref{app:ghstmv}.} The skewed Student's \emph{t} distribution nests the standard (hereafter symmetric) Student's \emph{t} distribution when all $\gamma_{i,c} = 0$ and the standard normal distribution when additionally $\nu_c = \infty$.
+The copula function $c_t(U_{t+1})$ is a multivariate skewed \emph{t} distribution. This distribution is parameterized by a single degrees of freedom parameter $\nu_c$, controlling the degree of dependence, a vector of $N$ skewness parameters $\gamma_c$, controlling the asymmetry in dependence, and a potentially time-varying correlation matrix $\Psi_{t}$.\footnote{We describe the details of the skewed \emph{t} distribution, including the expanded form of $c_t$, in~\autoref{app:ghstmv}.} The skewed \emph{t} distribution nests the standard (hereafter symmetric) \emph{t} distribution when all $\gamma_{i,c} = 0$ and the standard normal distribution when additionally $\nu_c = \infty$.
 
 The log-likelihood of the model is constructed from~\autoref{eq:copula_sklar}:
 \begin{align}
