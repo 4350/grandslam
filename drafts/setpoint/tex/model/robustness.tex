@@ -1,4 +1,4 @@
-%!TEX root = ../main.tex
+%!TEX root = ../../main.tex
 \subsection{Copula robustness check}
 \label{sub:05_robust}
 
@@ -7,7 +7,7 @@ This subsection provides an in-sample robustness check of how well the copula mo
 \subsubsection{Threshold correlations in constant copulas}
 By simulating 250,000 weeks of shocks in the copula, and then transforming these shocks into standardized residuals for each of the factors, we can test the constant \textit{t} copulas' abilities to generate the threshold correlations in the ARMA-GARCH residuals.\footnote{This robustness check is inspired by \textcite{ChristoffersenLanglois2013}.} If a Student's \textit{t} copula specification reasonably well captures tail dependence, the threshold correlations from the empirical and the copula specification should align. The results are presented in~\autoref{fig:threshold_simulated1}.
 
-\begin{figure}[!ht]
+\begin{figure}[p]
   \centering
   \includegraphics[scale=1]{graphics/threshold_simulated_1.png}  
   \footnotesize
@@ -18,15 +18,13 @@ By simulating 250,000 weeks of shocks in the copula, and then transforming these
   \end{longcaption}
   \label{fig:threshold_simulated1}
 \end{figure}
-\pagebreak
-\begin{figure}[!ht]
+\begin{figure}[p]
   \ContinuedFloat
   \centering
   \includegraphics[scale=1]{graphics/threshold_simulated_2.png}  
   \footnotesize
   \caption{Threshold correlations of standardized residuals from the constant copulas (cont.)}
 \end{figure}
-\pagebreak
 
 First, we note that for most factors, the normal copula is the far away from generating threshold correlations that correspond to the ARMA-GARCH residuals around the median. This is highly expected, as the normal copula does not generate tail dependence, and hence the need for the Student's \textit{t} based copula models. The symmetric \textit{t} and skewed \textit{t} copulas better capture the threshold correlations, as the fatter tails of the Student's \textit{t} distribution allows for tail dependence. For example, note how the normal copula generates negative threshold correlations for both the Mom--HML and RMW--HML asset pairs, while the Student's \textit{t} based copulas are much closer to the higher values in the data. On the other hand, the Student's \textit{t} based copulas sometimes seem to overshoot the empirical threshold correlation, as in the Mkt.RF--RMW asset pair.
 
@@ -42,7 +40,7 @@ Although imperfect, the multivariate copula modeling of tail dependence could co
 
 In-sample, we simulate 10,000 standardized residuals for each week from the estimated dynamic symmetric Student's \textit{t} copula model, and compute the rolling 52-week correlations. This is done to ascertain ourselves that the chosen copula specification does in fact capture the time-variation in correlations. The comparison is made between standardized residuals from the simulated copula model and standardized residuals from the ARMA-GARCH models of univariate series. If satisfactory, the rolling correlations of the simulated copula model and the ARMA-GARCH models will be roughly the same.
 
-\begin{figure}[!ht]
+\begin{figure}[p]
   \centering
   \includegraphics[width=\textwidth]{graphics/rolling_simulated1.png}
   \footnotesize
@@ -53,7 +51,7 @@ In-sample, we simulate 10,000 standardized residuals for each week from the esti
   \end{longcaption}
   \label{fig:rolling_simulated}
 \end{figure}
-\begin{figure}[!ht]
+\begin{figure}[p]
   \ContinuedFloat
   \centering
   \includegraphics[width=\textwidth]{graphics/rolling_simulated2.png}
