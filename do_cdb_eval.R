@@ -68,14 +68,16 @@ cdb_cdb$Strategy <- factor(
   c('All', 'Excl. HML', 'Excl. CMA', 'Excl. RMW')
 )
 
-g <- ggplot(cdb_cdb, aes(x = Week, y = CDB, color = Strategy)) +
+g <- ggplot(cdb_cdb, aes(x = Week, y = CDB, color = Strategy, linetype = Strategy)) +
   geom_line() +
   facet_wrap( ~ Factors, nrow = 2, ncol = 1, scales = 'free') +
   coord_cartesian(ylim = c(30, 100)) +
   scale_colour_Publication() +
+  scale_linetype_manual(values = c('solid','longdash','dotdash','dotted'))+
   theme_Publication()+
   theme(panel.margin = unit(1, "lines"))+
   theme(legend.key.size = unit(0.75, 'lines'))+
+  theme(legend.key.width = unit(0.6, 'cm'))+
   theme(strip.background = element_blank())+
   annotate("segment",x=cdb_cdb$Week[21712],xend=cdb_cdb$Week[1],y=Inf,yend=Inf,color="black",lwd=0.25)+
   xlab('Year')+
@@ -88,7 +90,7 @@ ggsave(
   sprintf('output/cdb/%s.png', NAME),
   g,
   width = 14.0,
-  height = 20,
+  height = 18,
   units = 'cm',
   limitsize = FALSE
 )
