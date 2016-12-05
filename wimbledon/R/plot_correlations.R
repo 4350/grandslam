@@ -99,7 +99,7 @@ plot_th_simulated <- function(pair) {
   # Do plot
   g <- ggplot(plot_df, aes(x = qs, y = coef)) +
     # Conf. bounds
-    geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = NA, fill = 'grey40'),
+    geom_ribbon(aes(x = qs, ymin = lb, ymax = ub, linetype = model, fill = 'grey40'),
                 data = plot_df %>% dplyr::filter(model == 'stdres'),
                 fill = 'grey10',
                 alpha = 0.1,
@@ -107,19 +107,23 @@ plot_th_simulated <- function(pair) {
     ) +
     
     # Coef. lines
-    geom_line(aes(x = qs, y = coef, colour = model)) +
+    geom_line(aes(x = qs, y = coef, colour = model, linetype = model)) +
     
     # Theme options 
     theme_Publication() +
     scale_colour_Publication()+
     theme(legend.position = 'none')+
     annotate("segment",x=Inf,xend=-Inf,y=Inf,yend=Inf,color="black",lwd=0.25)+
+    scale_linetype_manual(values = c('dotdash','longdash','dashed','solid'))+
+    theme(legend.key.height = unit(0.3, 'cm'),
+          legend.key.width = unit(0.6, 'cm'))+
     
     # Axes options
     ylab('Correlation') +
     xlab('Threshold') +
     coord_cartesian(xlim = c(0.10,0.90), ylim = c(-0.20, .60)) + 
     scale_x_continuous(labels = scales::percent, breaks = c(0.10, 0.50, 0.90)) +
+    
     
     ggtitle(sprintf("%s - %s", pair[1], pair[2]))
   
@@ -260,7 +264,7 @@ plot_roll_simulated <- function(pair) {
 # Page structure related --------------------------------------------------
 
 # Function to generate pages
-generate_page <- function(order, func, labels = NULL, width = 16, height = 20) {
+generate_page <- function(order, func, labels = NULL, linetype = NULL, width = 16, height = 20) {
   # Generate list of the plots
   g_list <- lapply(order, func)
   g <- grid.arrange(g_list[[1]],
@@ -283,6 +287,13 @@ generate_page <- function(order, func, labels = NULL, width = 16, height = 20) {
         labels = labels, 
         values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")
       )
+    if(!(is.null(linetype))) {
+      legend <- legend +
+        scale_linetype_manual(
+          labels = labels, 
+          values = c('solid','longdash','dashed','dotdash')
+        )
+    }
     
     legend <- gtable_filter(ggplotGrob(legend), "guide-box")
     

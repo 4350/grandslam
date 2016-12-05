@@ -145,7 +145,7 @@ summary.cumretplots <- function(df, outlabel) {
     xlab('Year')+
     ylab('Cumulative gross return')+
     theme(legend.position="bottom")+
-    scale_x_date(date_breaks = "2 years", date_labels = "%y")+
+    scale_x_date(date_breaks = "2 years", date_labels = "'%y")+
     theme_Publication()+
     guides(color = guide_legend(nrow = 1))+
     scale_colour_Publication()+
@@ -160,7 +160,7 @@ summary.cumretplots <- function(df, outlabel) {
     xlab('Year')+
     ylab('Cumulative gross return')+
     theme(legend.position="bottom")+
-    scale_x_date(date_breaks = "2 years", date_labels = "%y")+
+    scale_x_date(date_breaks = "2 years", date_labels = "'%y")+
     theme_Publication()+
     guides(color = guide_legend(nrow = 1))+
     scale_colour_Publication()+
@@ -179,7 +179,7 @@ summary.cumretplots <- function(df, outlabel) {
     xlab('Year')+
     ylab('Cumulative gross return')+
     theme(legend.position="bottom")+
-    scale_x_date(date_breaks = "2 years", date_labels = "%y")+
+    scale_x_date(date_breaks = "2 years", date_labels = "'%y")+
     theme_Publication()+
     guides(color = guide_legend(nrow = 1))+
     scale_colour_Publication()+
