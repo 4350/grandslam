@@ -23,10 +23,10 @@ load_all('wimbledon')
 # MODEL = 'mv/results_full_dynamic_std_10000'
 # SAMPLE_MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000'
 
-# MV
-# NAME = 'MV'
-# MODEL = 'mv/results_full_dynamic_std_10000'
-# SAMPLE_MODEL = 'mv/results_sample'
+MV
+NAME = 'MV'
+MODEL = 'mv/results_full_dynamic_std_10000'
+SAMPLE_MODEL = 'mv/results_sample'
 
 #CDB
 
@@ -107,7 +107,7 @@ g <- ggplot(tutti, aes(x = Date, y = ma, color = Model, linetype = Model)) +
     scale_y_continuous(labels = scales::percent, breaks = c(0, 0.30, 0.60))+
     scale_colour_manual(labels = LABELS, values = c("#386cb0","#fdb462","#386cb0","#fdb462"))+
     scale_linetype_manual(labels = LABELS, values = c("solid","solid","dashed","dashed"))+
-    theme(legend.key.height = unit(0.3, 'cm'))+
+    theme(legend.key.size = unit(0.75, 'lines'))+
     theme(legend.key.width = unit(0.6, 'cm'))+
     ylab('Smoothed weight (1-year moving average)')
 
