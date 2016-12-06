@@ -34,13 +34,13 @@ SAMPLE_MODEL = 'mv/results_sample'
 # MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000'
 # SAMPLE_MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000' # is not active when NAME = 'CDB'
 
-MODEL_NAME_1 = '6F'
-MODEL_NAME_2 = '6F_EXCL_RMW' # not active when NAME = 'CDB_MV'
+MODEL_NAME_1 = '5F'
+MODEL_NAME_2 = '5F_EXCL_RMW' # not active when NAME = 'CDB_MV'
 
-LABELS = c("Six-factor (model)", #model 1
-           "Six-factor excl. RMW (model)", #model-2
-           "Six-factor (sample)", #sample-1
-           "Six-factor excl. RMW (sample)" #sample-2
+LABELS = c("Five-factor (model)", #model 1
+           "Five-factor excl. RMW (model)", #model-2
+           "Five-factor (sample)", #sample-1
+           "Five-factor excl. RMW (sample)" #sample-2
            )
 
 
