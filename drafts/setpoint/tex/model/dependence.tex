@@ -20,7 +20,7 @@ Threshold (or exceedance) correlations have previously been used to highlight th
     \end{cases}
 \end{align}
 % XXX Be consistent with percentile and quantile
-where $F_i^{-1}(p)$ is the empirical quantile of $r_i$ at percentile $p$. Threshold correlations thus reflect how series correlate when both are simulataneously realizing in their respective tails. This subsetting of data is illustrated in \autoref{fig:illustrate_threshold}. In the left hand plots, we see the scatter of ARMA-GARCH residuals of Mkt.RF and HML respectively, and how the threshold $p$, found on the $x$-axis of the right hand plot, determines the subset of data that is included in the correlation calculation. We note that the unconditional (standard) correlation, given by the dashed line in the right hand plot, is clearly negative, while threshold correlations in the first and third quadrants are significantly more positive, which shows that not taking threshold correlations into account provides a vaguer picture of the dependence structure when both factor series realize in the tails.
+where $F_i^{-1}(p)$ is the empirical quantile of $r_i$ at percentile $p$. Threshold correlations thus reflect how series correlate when both are simultaneously realizing in their respective tails. This subsetting of data is illustrated in \autoref{fig:illustrate_threshold}. In the left hand plots, we see the scatter of ARMA-GARCH residuals of Mkt.RF and HML respectively, and how the threshold $p$, found on the $x$-axis of the right hand plot, determines the subset of data that is included in the correlation calculation. We note that the unconditional (standard) correlation, given by the dashed line in the right hand plot, is clearly negative, while threshold correlations in the first and third quadrants are significantly more positive, which shows that not taking threshold correlations into account provides a vaguer picture of the dependence structure when both factor series realize in the tails.
 
 \begin{figure}[H]
   \centering
@@ -97,7 +97,7 @@ Second, by visual inspection, we see no obvious trend in the correlations betwee
 
 Third, the HML--CMA factor pair again stands out as different from other factor pairs. The unconditional correlation is much closer to the rolling estimates than for other factor pairs, with a dip in the 2000--2010 period that appears to have gone away. Clearly, the HML--CMA pair is the most strongly correlated factor pair, even when considering subperiods of the data.
 
-Our key takeaway from the rolling correlations is that there seems to be persistency in the time-variation in correlations. This could be incorporated in the copula specification, which then needs to have a time-varying correlation matrix, $\Psi_t$.
+Our key takeaway from the rolling correlations is that there seems to be persistence in the time-variation in correlations. This could be incorporated in the copula specification, which then needs to have a time-varying correlation matrix, $\Psi_t$.
 
 % \subsubsection{Takeaways from Analysis of Multivariate Dependence}
 
