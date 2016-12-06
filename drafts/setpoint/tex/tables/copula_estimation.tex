@@ -8,7 +8,7 @@
   \caption{Copula parameter estimates (1963--2016)}
 
   \begin{longcaption}
-    Models from~\autoref{eq:copula_cdcc} on $N = 2,766$ weekly standardized residuals from the ARMA-GARCH models in~\autoref{tab:garch_estimation}. Stationary bootstrap standard errors in parentheses, following~\autocite{PolitisRomano1994} (see~\autoref{app:Appendix_bootstrap}). $nu_c$ is the degree of freedom parameter and $gamma_i$ are the copula skewness parameters. $\alpha, \beta$ control the correlation dynamics, and Persistence is $\alpha + \beta$. Elements of $\hat{Q}$ are estimated using moment matching (see~\autoref{app:copula_cdcc}). The constant copula is achieved by forcing $\alpha = \beta = 0$. For each model, there are 15 parameters in the $Q$ time-invariant correlation matrix, which are not reported in the table. Significance given by $^{*}p<10\%$; $^{**}p<5\%$; $^{***}p<1\%$
+    Models from~\autoref{eq:copula_cdcc} on \num{2766} weekly standardized residuals from the ARMA-GARCH models in~\autoref{tab:garch_estimation}. Stationary bootstrap standard errors in parentheses, following~\autocite{PolitisRomano1994} (see~\autoref{app:Appendix_bootstrap}). $nu_c$ is the degree of freedom parameter and $gamma_i$ are the copula skewness parameters. $\alpha, \beta$ control the correlation dynamics, and Persistence is $\alpha + \beta$. Elements of $\hat{Q}$ are estimated using moment matching (see~\autoref{app:copula_cdcc}). The constant copula is achieved by forcing $\alpha = \beta = 0$. For each model, there are 15 parameters in the $Q$ time-invariant correlation matrix, which are not reported in the table. Significance given by $^{*}p<10\%$; $^{**}p<5\%$; $^{***}p<1\%$
   \end{longcaption}
 
   \begin{tabularx}{\textwidth}{@{}l ddd X ddd}
@@ -21,22 +21,22 @@
       \multicolumn{1}{c}{Normal} & \multicolumn{1}{c}{Symmetric \emph{t}} & \multicolumn{1}{c}{Skewed \emph{t}} & &
       \multicolumn{1}{c}{Normal} & \multicolumn{1}{c}{Symmetric \emph{t}} & \multicolumn{1}{c}{Skewed \emph{t}} \\
     \midrule
-    $\nu_c$                & & 6.61^{***} & 6.65^{***}  & &             & 11.77^{***} & 11.63^{***} \\
+    $\nu_c$                & & 6.61^{***} & 6.64^{***}  & &             & 11.77^{***} & 11.63^{***} \\
                           & & (0.89)     & (0.10)      & &             & (0.89)      & (0.10) \\
     % $1/\nu_c$             & & 0.15^{***} & 0.15^{***}  & &             & 0.09^{***} & 0.09^{***} \\
     %                       & & (0.01)     & (0.01)      & &             & (0.01)      & (0.01) \\
     \\
     $\gamma_\text{Mkt}$ & &             & -0.06       & &             &              & -0.05 \\
-                        & &             & (0.07)      & &             &              & (0.05) \\
+                        & &             & (0.05)      & &             &              & (0.05) \\
     \\
     $\gamma_\text{SMB}$ & &             & -0.11^{*}   & &             &              & -0.14^{**} \\
                         & &             & (0.06)      & &             &              & (0.06) \\
     \\
-    $\gamma_\text{Mom}$ & &             & -0.20^{***} & &             &              & -0.12 \\
+    $\gamma_\text{Mom}$ & &             & -0.20^{**} & &             &              & -0.12 \\
                         & &             & (0.07)      & &             &              & (0.07) \\
     \\
     $\gamma_\text{HML}$ & &             & 0.10        & &             &              & -0.02 \\
-                        & &             & (0.07)      & &             &              & (0.06) \\
+                        & &             & (0.06)      & &             &              & (0.06) \\
     \\
     $\gamma_\text{CMA}$ & &             & 0.08        & &             &              & -0.05 \\
                         & &             & (0.06)      & &             &              & (0.07) \\
