@@ -49,12 +49,14 @@ CDB is a number between 0 and 1, which we report scaled to 0--100. Note that the
 
 Each week, we choose portfolio weights to maximize the Sharpe Ratio in the mean-variance case, and CDB in the CDB case. We impose two restrictions on the optimization problem. First, all factor weights must be positive. This reduces the problem with extreme weights, as seen in the unconstrained optimization problem, and reflects a view that an investor will not bet against factors that have generated a history of positive premia. Second, factor weights must sum to unity, i.e. the portfolio is fully invested across factors. In light of~\textcite{Asness2015}, we consider portfolios with and without momentum (five- and six-factor portfolios, respectively).
 
-Together, these restrictions make the maximized Sharpe Ratio reflect tangency portfolio weights subject to a constraint of no negative weights. Due to the restrictions, the standard analytical solution to the mean-variance problem is not equal to our optimal tangency portfolio. Similarly, no analytical solution exists for optimizing CDB. Hence, we perform a numerical optimization where we choose weights $w_t$ to maximize the objective function $\Omega_t(w_t)$, subject to the restrictions above:
-\begin{align}
-  \arg\!\max_{w_t} \Omega_t(w_t)
-    &&\text{\quad s.t.\quad} & \sum_{i=1}^N w_{i,t} = 1 \\
-    &&                       & w_{i,t} \ge 0 \notag
-\end{align}
+Together, these restrictions make the maximized Sharpe Ratio reflect tangency portfolio weights subject to a constraint of no negative weights. Due to the restrictions, the standard analytical solution to the mean-variance problem is not equal to our optimal tangency portfolio. Similarly, no analytical solution exists for optimizing CDB. Hence, for a portfolio with $N$ factors we perform a numerical optimization where we choose the vector of weights $w_t$ to maximize the objective function $\Omega_t(w_t)$, subject to the restrictions above:
+\begin{alignat}{2}
+  \max_{w_t} \quad
+    & \Omega_t(w_t)\  \\
+  \text{s.t.\quad}
+    & \sum_{i=1}^N w_{i,t} = 1 \notag \\
+    & w_{i,t} \geq 0 &\ & \forall i \in N \notag
+\end{alignat}
 For the MV case, the objective function is the one-week Sharpe Ratio (SR):
 \begin{align}
   \Omega_t(w_t) = \frac{w_t^\top \mathbb{E}_t[r_{t+1}]}{\sqrt{w_t^\top \mathbb{E}_t[\Sigma_{t+1}] w_t}}
@@ -65,7 +67,7 @@ For the CDB case, the objective function is the one-week CDB:
 \begin{align}
   \Omega_t(w_t) = \text{CDB}_t^q(w_t)
 \end{align}
-We perform MV and CDB optimization using in-sample simulated distributions from our dynamic copula model. Each week, we simulate $10,000$ returns from the estimated copula model and use those outcomes as the conditional distribution of factor returns. We also perform MV optimization based on sample means and covariances, in which case $\mathbb{E}_t[r_{t+1}]$ and $\mathbb{E}_t[\Sigma_{t+1}]$ are constant and equal to the full sample estimators.
+We perform MV and CDB optimization using in-sample simulated distributions from our dynamic copula model. Each week, we simulate \num{10000} returns from the estimated copula model and use those outcomes as the conditional distribution of factor returns. We also perform MV optimization based on sample means and covariances, in which case $\mathbb{E}_t[r_{t+1}]$ and $\mathbb{E}_t[\Sigma_{t+1}]$ are constant and equal to the full sample estimators.
 
 % subsection optimization_problem (end)
 

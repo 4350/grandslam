@@ -51,6 +51,7 @@
 
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
+\RequirePackage[group-separator={,}]{siunitx}
 
 %% BIBLIOGRAPHY OPTIONS
 % BIBLIOGRAPHY
