@@ -23,22 +23,24 @@ load_all('wimbledon')
 # MODEL = 'mv/results_full_dynamic_std_10000'
 # SAMPLE_MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000'
 
-#MV
-#NAME = 'MV'
-#MODEL = 'mv/results_full_dynamic_std_10000'
-#SAMPLE_MODEL = 'mv/results_sample'
+MV
+NAME = 'MV'
+MODEL = 'mv/results_full_dynamic_std_10000'
+SAMPLE_MODEL = 'mv/results_sample'
+
 #CDB
-NAME = 'CDB'
-MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000'
-SAMPLE_MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000' # is not active when NAME = 'CDB'
 
-MODEL_NAME_1 = '5F'
-MODEL_NAME_2 = '5F_EXCL_RMW' # not active when NAME = 'CDB_MV'
+# NAME = 'CDB'
+# MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000'
+# SAMPLE_MODEL = 'cdb/constrOptim_q5_full_dynamic_std_10000' # is not active when NAME = 'CDB'
 
-LABELS = c("Five-factor", #model 1
-           "Five-factor excl. RMW" #model-2
-           #"Six-factor (CDB optimal)" #sample-1
-           #"Five-factor excl. RMW (sample)" #sample-2
+MODEL_NAME_1 = '6F'
+MODEL_NAME_2 = '6F_EXCL_RMW' # not active when NAME = 'CDB_MV'
+
+LABELS = c("Six-factor (model)", #model 1
+           "Six-factor excl. RMW (model)", #model-2
+           "Six-factor (sample)", #sample-1
+           "Six-factor excl. RMW (sample)" #sample-2
            )
 
 
@@ -92,7 +94,7 @@ if(NAME == 'CDB_MV') {
     filter(Model %in% c(MODEL_NAME_1, sprintf('Sample %s', MODEL_NAME_1)))
 }
 
-g <- ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
+g <- ggplot(tutti, aes(x = Date, y = ma, color = Model, linetype = Model)) +
     facet_grid(Factor ~ ., switch = 'y') +
     geom_line()+
     theme_Publication()+
@@ -100,10 +102,13 @@ g <- ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
     theme(panel.margin = unit(1, "lines"))+
     theme(legend.direction = 'vertical')+
     theme(legend.position = 'none')+
-    theme(legend.key.size = unit(0.75, 'lines'))+
     scale_colour_Publication()+
     coord_cartesian(ylim = c(0, 0.60))+  
     scale_y_continuous(labels = scales::percent, breaks = c(0, 0.30, 0.60))+
+    scale_colour_manual(labels = LABELS, values = c("#386cb0","#fdb462","#386cb0","#fdb462"))+
+    scale_linetype_manual(labels = LABELS, values = c("solid","solid","dashed","dashed"))+
+    theme(legend.key.size = unit(0.75, 'lines'))+
+    theme(legend.key.width = unit(0.6, 'cm'))+
     ylab('Smoothed weight (1-year moving average)')
 
 
@@ -111,7 +116,7 @@ g <- ggplot(tutti, aes(x = Date, y = ma, color = Model)) +
 
 # First legend
 g_legend <- g+theme(legend.position = 'bottom')+
-  scale_colour_manual(labels = LABELS, values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33"))
+  scale_colour_manual(labels = LABELS, values = c("#386cb0","#fdb462","#386cb0","#fdb462"))
 
 g_legend = gtable_filter(ggplotGrob(g_legend), "guide-box") 
 
