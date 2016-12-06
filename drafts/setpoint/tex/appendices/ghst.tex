@@ -3,7 +3,7 @@
 \section{Skewed Student's \emph{t} distribution and copula density} % (fold)
 \label{app:ghstmv}
 
-We use the skewed Student's t distribution in modeling both univariate series as well as for the joint distribution under the copula. We use the definition of~\textcite{Hansen1994} and the following description is based on~\textcite{ChristoffersenLanglois2013}. A random vector $X$ that follows a multivariate skewed Student's distribution has the stochastic description
+We use the skewed Student's \emph{t} distribution in modeling both univariate series as well as for the joint distribution under the copula. We use the definition of~\textcite{Hansen1994} and the following description is based on~\textcite{ChristoffersenLanglois2013}. A random vector $X$ that follows a multivariate skewed \emph{t} distribution has the stochastic description
 \begin{align}
   X = \sqrt{W}Z + \gamma W
 \end{align}
@@ -16,11 +16,11 @@ The distribution has expectation and covariance matrix:
     \frac{\nu}{\nu - 2} \Psi +
     \frac{2 \nu^2 \gamma \gamma^\top}{(\nu - 2)(\nu - 4)}
 \end{align}
-i.e. $\nu \geq 4$ for these to be well-defined. Note that if $\gamma = 0$ (element-wise), $X$ follows a multivariate Student's \emph{t} distribution, and additionally if $\nu = \infty$, $X$ follows a multivariate standard normal distribution. Hypotheses $\gamma = 0$ and $1/\nu = 0$ can therefore be used to test for symmetry and normality, respectively.
+i.e. $\nu \geq 4$ for these to be well-defined. Note that if $\gamma = 0$ (element-wise), $X$ follows a multivariate symmetric \emph{t} distribution, and additionally if $\nu = \infty$, $X$ follows a multivariate standard normal distribution. Hypotheses $\gamma = 0$ and $1/\nu = 0$ can therefore be used to test for symmetry and normality, respectively.
 
 % TODO Re-add the copula density function here; how cumulative density and quantile function does not have a closed form.
 
-The copula joint density function $c_t$ always takes the form of the ratio between a joint density function $f^c_{t}(z_{t+1})$ (i.e. the multivariate normal, Student's t or skewed Student's t PDF, respectively) of copula shocks $z_{t+1}^*$ and the product of the univariate density functions $f^c_{i,t}(z_{i,t+1})$ (i.e. the univariate normal, Student's or skewed Student's t PDF, respectively) of the individual shocks $z_{i,t+1}^*$:
+The copula joint density function $c_t$ always takes the form of the ratio between a joint density function $f^c_{t}(z_{t+1})$ (i.e. the multivariate normal, symmetric \emph{t} or skewed \emph{t} PDF, respectively) of copula shocks $z_{t+1}^*$ and the product of the univariate density functions $f^c_{i,t}(z_{i,t+1})$ (i.e. the univariate normal, symmetric \emph{t} or skewed \emph{t} PDF, respectively) of the individual shocks $z_{i,t+1}^*$:
 \begin{align}
   c_t(U_{t+1}) = 
     \frac{f^c_t(z^*_{t+1})}{\prod_{i=1}^N f^c_{i,t}(z^*_{i,t+1})}
