@@ -2,6 +2,7 @@ rm(list = ls())
 
 library(tidyr)
 library(stargazer)
+library(rugarch)
 
 factors <- list(
   "Mkt.RF",
@@ -54,4 +55,10 @@ selfie <- function(dfs, column, digits = 2) {
 selfie(df2, 'coef', digits = 2)
 selfie(df2, 'se', digits = 2)
 selfie(df2, 'p', digits = 0)
+
+lapply(model.GARCH, function(m) persistence(m))
+lapply(model.GARCH, function(m) sqrt(uncvariance(m)) * 100)
+lapply(model.GARCH, function(m) sqrt(uncvariance(m)) * 100)
+lapply(model.GARCH, function(m) m@fit$LLH)
+
 # lapply(df2, selfie('coef'))
