@@ -39,7 +39,7 @@ sqr_ret_LB_10 <- apply(df.estim[,-1], 2, function(ret_sqr) Weighted.Box.test(ret
 
 summary_table <- df.estim %>%
     dplyr::select(-Date) %>%
-    select(Mkt.RF, SMB, Mom, HML, CMA, RMW) %>%
+    select(Mkt.RF, SMB, HML, CMA, RMW, Mom) %>%
     basicStats() %>%
     .[c('nobs','Maximum','Minimum','Mean','Median','Stdev','Skewness','Kurtosis'),]
 
@@ -50,7 +50,7 @@ summary_table <- rbind(summary_table,
                        'Squared return LB [10] p-value' = sqr_ret_LB_10)
 
 write.table(summary_table, file = 'output/MarginalStats/summaryTable.Estim.csv')
-#stargazer(summary_table, summary = FALSE)
+#stargazer(summary_table, summary = FALSE, type = 'text', digits = 4)
 
 
 # QQ Plots ----------------------------------------------------------------
