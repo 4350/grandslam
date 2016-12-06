@@ -122,7 +122,7 @@ threshold_correlations_models <- function(dynamic, models, pairs, qs) {
 #' @param pair two factor strings in vector
 #' @return exports graph
 #' @export
-plot_th_explain <- function(pair, width = 14, height = 8) {
+plot_th_explain <- function(pair, width = 16, height = 8) {
   
   # Subset data to pair
   plot_df_th <- th_corr_stdres %>% 
